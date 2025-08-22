@@ -1,0 +1,15 @@
+<div class="main_page_card_wrapper">
+  <article class="main_page_article">
+    <a routerLink="{{ href }}">
+      <img src="{{ image }}" alt="{{ name }}" />
+    </a>
+  </article>
+  <div class="main_page_info_wrapper">
+    <a routerLink="{{ href }}">{{ name }}</a>
+    <div>
+      @for (tag of tags; track tag) {
+      <span (click)="onTagsClick(tag)" role="button">{{ tag }}</span>
+      }
+    </div>
+  </div>
+</div>
