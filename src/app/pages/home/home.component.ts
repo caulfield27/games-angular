@@ -1,27 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { SearchIcon } from '../../icons/search/search.component';
 import { GameCard } from './components/gameCard/gameCard.component';
-import { games } from './constants/games';
 import { GamesFiltersService } from './services/filters.service';
 
 @Component({
   selector: 'home-page',
   imports: [SearchIcon, GameCard],
-  providers: [GamesFiltersService],
+  providers: [],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomePage {
-  gamesArray = games;
-  activeTags = [];
+  @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
-  // constructor(private)
+  constructor(public filters: GamesFiltersService) { }
+
+  getSearchValue() {
+    return this.searchInputRef?.nativeElement?.value ?? "";
+  }
+
+  onTagClear(tag: string) {
+    this.filters.removeTag(tag, this.getSearchValue());
+  }
 
   onSearch(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.gamesArray = games.filter((game) =>
-      game.name.toLowerCase().includes(target.value.toLowerCase())
-    );
+    const value = (event.target as HTMLInputElement).value;
+    this.filters.gamesArray.set(this.filters.filterGames(value));
   }
 
   onFocus(event: FocusEvent) {

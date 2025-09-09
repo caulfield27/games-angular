@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component  , Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { GamesFiltersService } from '../../services/filters.service';
 
 @Component({
   selector: 'game-card',
@@ -8,15 +9,15 @@ import { RouterLink } from '@angular/router';
   styleUrl: './gameCard.component.scss',
 })
 export class GameCard {
+  constructor(public filters: GamesFiltersService) { };
+
   @Input() name!: string;
   @Input() image!: string;
   @Input() href!: string;
   @Input() tags!: string[];
-  @Input() activeTags!: string[];
+  @Input() searchInput!: string
 
-  onTagsClick(tag: string){
-    if(this.activeTags.includes(tag)) return;
-    this.activeTags.push(tag);
-    // i need to change games array here
+  onTagAdd(tag: string) {
+    this.filters.addActiveTag(tag, this.searchInput);
   }
 }
