@@ -8,7 +8,7 @@
     <a routerLink="{{ href }}">{{ name }}</a>
     <div>
       @for (tag of tags; track tag) {
-      <span (click)="onTagsClick(tag)" role="button">{{ tag }}</span>
+      <span (click)="onTagAdd(tag)" role="button">{{ tag }}</span>
       }
     </div>
   </div>

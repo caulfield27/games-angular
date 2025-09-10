@@ -2,6 +2,7 @@
   <div class="main_page_filters">
     <div class="main_page_input_wrapper">
       <input
+        #searchInput
         (focus)="onFocus($event)"
         (blur)="onBlur($event)"
         (input)="onSearch($event)"
@@ -10,23 +11,23 @@
       />
       <search-icon class="main_page_search_icon" />
     </div>
-    <div class="main_page_tags_container" id="tags_container">
-      @for (tag of activeTags; track tag) {
+    <div class="main_page_tags_container">
+      @for (tag of filters.activeTags(); track tag) {
          <span>
           {{tag}}
-          <button>&#10006;</button>
+          <button (click)="onTagClear(tag)">&#10006;</button>
         </span>
       }
     </div>
   </div>
-  <div id="main_page_container" class="main_page_container">
-    @for (game of gamesArray; track game.name) {
+  <div class="main_page_container">
+    @for (game of filters.gamesArray(); track game.name) {
     <game-card
       [name]="game.name"
       [href]="game.href"
       [image]="game.image"
       [tags]="game.tags"
-      [activeTags]="activeTags"
+      [searchInput]="getSearchValue()"
     />
     }
   </div>

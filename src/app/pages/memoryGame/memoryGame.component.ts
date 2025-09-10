@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { images } from './constants/data';
 
 @Component({
     selector: 'memory-game',
@@ -6,4 +7,6 @@ import { Component } from '@angular/core';
     styleUrl: './memoryGame.component.scss'
 })
 
-export class MemoryGame {}
+export class MemoryGame {
+    data = images
+}
