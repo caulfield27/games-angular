@@ -10,6 +10,8 @@ interface IField {
   isFlaged: boolean;
   isOpen: boolean;
   edgeCase: number;
+  minesAround?: number
+  failed?: boolean
 }
 
 type LevelType = {

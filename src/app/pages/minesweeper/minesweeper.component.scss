@@ -145,7 +145,7 @@
   cursor: pointer;
   background: #bfbfbf;
 
-  & :active {
+  &:active {
     scale: 0.9;
   }
 
@@ -162,8 +162,22 @@
 
 .failed {
   border-bottom: 1px solid #a00c0c;
-  background: #e00707;
+  background: #e00707 !important;
 }
+
+.field_1{
+  color: #0B24FB;
+}
+.field_2{
+  color: #0E7A11;
+}
+.field_3{
+  color: #852123;
+}
+.field_default{
+  color: #FC0D1B;
+}
+
 
 .smile_container {
   cursor: pointer;
@@ -173,7 +187,7 @@
   border-left: 5px solid #fff;
   border-top: 5px solid #fff;
 
-  & :active {
+  &:active {
     scale: 0.95;
   }
 
@@ -226,11 +240,11 @@
   cursor: pointer;
   transition: filter 0.5s ease-in;
 
-  & :hover img {
+  &:hover img {
     filter: drop-shadow(4px 4px 10px rgb(238, 255, 0));
   }
 
-  & img {
+  &img {
     width: 42;
   }
 }

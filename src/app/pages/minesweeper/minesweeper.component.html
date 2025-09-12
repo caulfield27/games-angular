@@ -1,55 +1,58 @@
 <div class="pages_container">
   <div class="mainsweeper_wrapper">
     <div class="my_dropdown_wrapper">
-      <div id="hint_wrapper" class="hint_wrapper hidden">
-        <span id="hint-amount"></span>
+      <div class="hint_wrapper hidden">
+        <span></span>
         <!-- <button class="hint_btn" id="hint_btn">
               <img src="/assets/hint.png" alt="hint" />
             </button> -->
       </div>
     </div>
-    <div class="game_board" id="board">
+    <div class="game_board">
       <div class="tablo">
         <div class="tablo_content">
           <div class="tablo_flag">
-            <tablo [tabloNum]="10"/>
+            <tablo [tabloNum]="boardService.flagCounter()" />
           </div>
-          <div class="smile_container" id="smile" role="button">
-            <svg width="80" height="80" viewBox="0 0 100 100">
-              <circle
-                cx="50"
-                cy="50"
-                r="45"
-                fill="yellow"
-                stroke="black"
-                stroke-width="3"
-              />
-              <rect x="20" y="30" width="20" height="10" fill="black" />
-              <rect x="60" y="30" width="20" height="10" fill="black" />
-              <line
-                x1="40"
-                y1="35"
-                x2="60"
-                y2="35"
-                stroke="black"
-                stroke-width="3"
-              />
-              <path
-                d="M30 65 Q50 85, 70 65"
-                stroke="black"
-                stroke-width="3"
-                fill="none"
-              />
-            </svg>
+          <div
+            (click)="boardService.restart()"
+            class="smile_container"
+            role="button"
+          >
+            @if(boardService.isFailed()){
+            <sad-smile />
+            }@else {
+            <happy-smile />
+            }
           </div>
           <div class="timer_container">
-            <tablo [tabloNum]="1"/>
+            <tablo [tabloNum]="boardService.seconds()" />
           </div>
         </div>
       </div>
       <div #container class="mainsweeper_container">
         @for(field of boardService.fields(); track field.id){
-        <button class="field field_small" value="{{ $index }}"></button>
+        <button
+          (contextmenu)="onFieldCheck($event, $index)"
+          (click)="onFieldClick($index)"
+          [ngClass]="[
+            'field',
+            'field_small',
+            'field_' +
+              (field?.minesAround && (field?.minesAround ?? 4) < 4
+                ? field.minesAround
+                : 'default'),
+            field.isOpen ? 'open_field' : '',
+            field?.failed ? 'failed' : ''
+          ]"
+        >
+          @if(field.isFlaged){
+          <flag-icon [width]="boardService.levels.easy.flagSize" />
+          }@else if (field.isOpen && field.isMine) {
+          <mine-icon [width]="boardService.levels.easy.mineSize" />
+          }
+          {{ field?.minesAround ?? "" }}
+        </button>
         }
       </div>
     </div>
