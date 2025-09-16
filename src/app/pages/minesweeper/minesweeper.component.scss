@@ -1,3 +1,13 @@
+.page_container{
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("/minesweeper_bg.jpg");
+  background-size: cover;
+  padding: 32px;
+}
+
 .mainsweeper_wrapper {
   width: 100%;
   display: grid;
@@ -27,6 +37,7 @@
   grid-template-columns: repeat(var(--rows), var(--size));
   grid-template-rows: repeat(var(--cols), var(--size));
   height: auto;
+  overflow: hidden;
   border-radius: 2px;
   position: relative;
   border-right: 10px solid #fff;
@@ -90,7 +101,7 @@
   padding: 8px;
 }
 
-.field_small {
+.field_easy {
   font-size: 2vw;
   border-top: 4px solid #fff;
   border-left: 4px solid #fff;
@@ -165,6 +176,10 @@
   background: #e00707 !important;
 }
 
+.hint{
+  background-color: #45de45;
+}
+
 .field_1{
   color: #0B24FB;
 }
@@ -190,20 +205,6 @@
   &:active {
     scale: 0.95;
   }
-
-  @media screen and (max-width: 480px) {
-    svg {
-      width: 60px;
-      height: 60px;
-    }
-  }
-
-  @media screen and (max-width: 380px) {
-    svg {
-      width: 40px;
-      height: 40px;
-    }
-  }
 }
 
 .tablo_flag {
@@ -225,12 +226,10 @@
 }
 
 .hint_wrapper {
+  margin-top: 20px;
   display: flex;
-  flex-direction: column;
-  gap: 3px;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
 }
 
 .hint_btn {
@@ -238,13 +237,15 @@
   outline: none;
   background: transparent;
   cursor: pointer;
-  transition: filter 0.5s ease-in;
+  position: relative;
 
-  &:hover img {
-    filter: drop-shadow(4px 4px 10px rgb(238, 255, 0));
-  }
+  span{
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    transform: translate(-50%);
+    color: #000;
+    font-weight: 600;
 
-  &img {
-    width: 42;
   }
 }

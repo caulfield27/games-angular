@@ -1,3 +1,5 @@
+import { ILevelOption } from "../../../shared/types/types";
+
 export const digitSegments: {[key: string] : string[]} = {
   0: ["a", "b", "c", "d", "e", "f"],
   1: ["b", "c"],
@@ -10,3 +12,18 @@ export const digitSegments: {[key: string] : string[]} = {
   8: ["a", "b", "c", "d", "e", "f", "g"],
   9: ["a", "b", "c", "d", "g", "f"],
 };
+
+export const dropdownOptions: ILevelOption[] = [
+  {
+    name: "Лёгкий",
+    value: "easy"
+  },
+  {
+    name: "Средний",
+    value: "medium"
+  },
+  {
+    name: "Сложный",
+    value: "hard"
+  }
+]

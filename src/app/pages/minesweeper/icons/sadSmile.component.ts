@@ -22,5 +22,20 @@ import { Component } from '@angular/core';
       fill="none"
     />
   </svg>`,
+  styles: `
+  @media screen and (max-width: 480px) {
+    svg{
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  @media screen and (max-width: 380px) {
+    svg{
+      width: 40px;
+      height: 40px;
+    }
+  }
+  `,
 })
 export class SadSmile {}

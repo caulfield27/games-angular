@@ -1,0 +1,21 @@
+<div #container class="dropdown_container">
+  <button (click)="toggleDropdown()" class="my_dropdown_btn">
+    <span>{{ value.name || placeholder || "Выбрать" }}</span>
+  </button>
+  @if(isOpen){
+  <ul class="my_dropdown_ul">
+    @for (option of options; track option.value) {
+    <li
+      (click)="handleSelect(option)"
+      [ngClass]="[
+        'my_dropdown_list_item',
+        value.value === option.value ? 'active_li' : '',
+        value.value === option.value ? 'disabled' : ''
+      ]"
+    >
+      {{ option.name }}
+    </li>
+    }
+  </ul>
+  }
+</div>

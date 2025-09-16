@@ -6,79 +6,115 @@ import { MineIcon } from './icons/mine.component';
 import { NgClass } from '@angular/common';
 import { HappySmile } from './icons/happySmile.component';
 import { SadSmile } from './icons/sadSmile.component';
+import { Lightbulb, LucideAngularModule } from 'lucide-angular';
+import { Dropdown } from '../../shared/components/dropdown/dropdown.component';
+import { dropdownOptions } from './constants';
+import { IDropdownOption, ILevelOption } from '../../shared/types/types';
 
 @Component({
   selector: 'minesweeper',
   templateUrl: './minesweeper.component.html',
   styleUrl: './minesweeper.component.scss',
-  imports: [Tablo, FlagIcon, MineIcon, NgClass, HappySmile, SadSmile]
+  imports: [
+    Tablo,
+    FlagIcon,
+    MineIcon,
+    NgClass,
+    HappySmile,
+    SadSmile,
+    LucideAngularModule,
+    Dropdown,
+  ],
 })
-
 export class Minesweeper implements AfterViewInit {
   @ViewChild('container') container!: ElementRef<HTMLDivElement>;
+  readonly Bulb = Lightbulb;
+  readonly options = dropdownOptions;
 
-  constructor(public boardService: BoardService) {};
+  constructor(public boardService: BoardService) {}
 
   ngAfterViewInit(): void {
+    this.updateVariables();
+  }
+
+  updateVariables() {
+    const { levels, level } = this.boardService;
     this.container.nativeElement.style.setProperty(
       '--cols',
-      String(this.boardService.levels.easy.cols)
+      String(levels[level().value].cols)
     );
     this.container.nativeElement.style.setProperty(
       '--rows',
-      String(this.boardService.levels.easy.rows)
+      String(levels[level().value].rows)
     );
     this.container.nativeElement.style.setProperty(
       '--size',
-      String(this.boardService.levels.easy.size)
+      String(levels[level().value].size)
     );
   }
 
-  onFieldCheck(e: MouseEvent, idx: number){
+  onFieldCheck(e: MouseEvent, idx: number) {
     if (this.boardService.isGameOver) return;
-      e.preventDefault();
-      const fields = this.boardService.fields();
-      if (fields[idx].isFlaged) {
-        this.boardService.incrementFlags();
-        this.boardService.updateFlagStatus(idx);
-      } else {
-        if (this.boardService.flagCounter() < 1) return;
-        this.boardService.decrementFlags();
-        this.boardService.updateFlagStatus(idx);
-      }
+    e.preventDefault();
+    const fields = this.boardService.fields();
+    if (fields[idx].isFlaged) {
+      this.boardService.incrementFlags();
+      this.boardService.updateFlagStatus(idx);
+    } else {
+      if (this.boardService.flagCounter() < 1) return;
+      this.boardService.decrementFlags();
+      this.boardService.updateFlagStatus(idx);
+    }
   }
 
-  onFieldClick(idx: number){
-    if (!this.boardService.isGameStart) {
-        this.boardService.isGameStart = true;
-        this.boardService.startTimer();
-        this.boardService.generateMines(idx);
-      }
+  onFieldClick(idx: number) {
+    if (!this.boardService.isGameStart()) {
+      this.boardService.isGameStart.set(true);
+      this.boardService.startTimer();
+      this.boardService.generateMines(idx);
+    }
 
-      const fields = this.boardService.fields();
+    const fields = this.boardService.fields();
 
-      if (fields[idx].isOpen || fields[idx].isFlaged || this.boardService.isGameOver) return;
+    if (
+      fields[idx].isOpen ||
+      fields[idx].isFlaged ||
+      this.boardService.isGameOver
+    )
+      return;
 
-      if (fields[idx].isMine) {
-        this.boardService.isFailed.set(true);
-        this.boardService.isGameOver = true;
-        this.boardService.stopTimer();
-        this.boardService.gameOver(idx, true);
-        return;
-      }
+    if (fields[idx].isMine) {
+      this.boardService.isFailed.set(true);
+      this.boardService.isGameOver = true;
+      this.boardService.stopTimer();
+      this.boardService.gameOver(idx, true);
+      return;
+    }
 
-      const minesAround = this.boardService.checkField(idx);
+    const minesAround = this.boardService.checkField(idx);
 
-      if(minesAround){
-        this.boardService.updateMinesAroundStatus(minesAround, idx);
-      }
+    if (minesAround) {
+      this.boardService.updateMinesAroundStatus(minesAround, idx);
+    }
 
-      if(this.boardService.isWin()){
-        this.boardService.handleWin();
-      }
+    if (this.boardService.isWin()) {
+      this.boardService.handleWin();
+    }
 
-      if(minesAround){
-        this.boardService.updateMinesAroundStatus(minesAround, idx);
-      }
+    if (minesAround) {
+      this.boardService.updateMinesAroundStatus(minesAround, idx);
+    }
+  }
+
+  handleUseHint() {
+    if (this.boardService.hintAmount() === 0) return;
+    this.boardService.hintAmount.update((prev) => prev - 1);
+    this.boardService.showHint();
+  }
+
+  handleLevelSelect(option: IDropdownOption) {
+    this.boardService.level.set(option as ILevelOption);
+    this.updateVariables();
+    this.boardService.restart();
   }
 }

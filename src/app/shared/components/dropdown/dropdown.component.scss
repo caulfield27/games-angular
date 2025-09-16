@@ -1,0 +1,63 @@
+.dropdown_container{
+    position: relative;
+    width: fit-content;
+}
+
+.my_dropdown_btn{
+    border: 1px solid gainsboro;
+    outline: none;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    min-width: 130px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    color: gray;
+    cursor: pointer;
+}
+
+
+.my_dropdown_ul{
+    position: absolute;
+    z-index: 99;
+    top: 40px;
+    left: 0;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 5px;
+    gap: 5px;
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid gainsboro;
+    color: #000000;
+}
+
+.not_active{
+    display: none;
+}
+
+.my_dropdown_list_item{
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 6px;
+    background: transparent;
+    border-radius: 6px;
+    transition: background 0.3s linear;
+}
+
+.my_dropdown_list_item:hover{
+    background: gainsboro;
+    cursor: pointer;
+}
+
+.active_li{
+    pointer-events: none;
+    background: gainsboro;
+}

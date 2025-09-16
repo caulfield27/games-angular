@@ -2,19 +2,24 @@ import { Injectable, signal } from '@angular/core';
 import { getFields, getLevels } from '../utils/utils';
 import Swal from 'sweetalert2';
 import { launchConfetti } from '../../../shared/utils/utils';
+import { dropdownOptions } from '../constants';
+import { ILevelOption } from '../../../shared/types/types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BoardService {
+  level = signal<ILevelOption>(dropdownOptions[0]);
   levels = getLevels(window.innerWidth);
-  isGameStart: boolean = false;
+  isGameStart = signal<boolean>(false);
   isGameOver: boolean = false;
-  fields = signal(getFields(this.levels.easy));
+  fields = signal(getFields(this.levels[this.level().value]));
   intervalId: ReturnType<typeof setInterval> | null = null;
   seconds = signal<number>(0);
-  flagCounter = signal<number>(this.levels.easy.mines);
+  flagCounter = signal<number>(this.levels[this.level().value].mines);
   isFailed = signal<boolean>(false);
+  hintAmount = signal<number>(this.levels[this.level().value].hintAmount);
+  hintIdx = signal<number>(-1);
 
   checkField(idx: number): number {
     this.fields.update((prev) =>
@@ -64,7 +69,7 @@ export class BoardService {
     const saveFields = new Set(this.#getNeighbours(edgeCase, firstInd));
     saveFields.add(firstInd);
     const mines = new Set();
-    while (mines.size !== this.levels.easy.mines) {
+    while (mines.size !== this.levels[this.level().value].mines) {
       const minePosition = Math.floor(Math.random() * fields.length);
       if (saveFields.has(minePosition)) continue;
       if (!mines.has(minePosition)) {
@@ -79,7 +84,7 @@ export class BoardService {
   }
 
   #getNeighbours(edgeCase: number, pos: number) {
-    const rows = this.levels.easy.rows;
+    const rows = this.levels[this.level().value].rows;
     switch (edgeCase) {
       case 1:
         return [
@@ -124,7 +129,7 @@ export class BoardService {
   isWin() {
     let openCounter = 0;
     const fields = this.fields();
-    const mines = this.levels.easy.mines;
+    const mines = this.levels[this.level().value].mines;
     for (const field of fields) {
       if (field.isOpen) {
         openCounter++;
@@ -153,11 +158,14 @@ export class BoardService {
   }
 
   restart() {
-    this.fields.set(getFields(this.levels.easy));
-    this.isGameStart = false;
+    this.fields.set(getFields(this.levels[this.level().value]));
+    this.isGameStart.set(false);
     this.isGameOver = false;
-    this.flagCounter.set(this.levels.easy.mines);
+    this.flagCounter.set(this.levels[this.level().value].mines);
     this.seconds.set(0);
+    this.hintAmount.set(this.levels[this.level().value].hintAmount)
+    this.hintIdx.set(-1);
+    this.isFailed.set(false)
     this.stopTimer();
   }
 
@@ -234,5 +242,77 @@ export class BoardService {
         }
       });
     }, 2000);
+  }
+
+  showHint() {
+    const fields = this.fields();
+    const startIdx = Math.floor(Math.random() * fields.length);
+    if (this.#isValidHint(startIdx)) {
+      this.hintIdx.set(startIdx);
+      return;
+    }
+
+    let left = startIdx - 1;
+    let right = startIdx + 1;
+    let foundHint = -1;
+
+    while (left > 0 || right < fields.length) {
+      if (left > 0) {
+        if (this.#isValidHint(left)) {
+          foundHint = left;
+          break;
+        }
+      }
+
+      if (right < fields.length) {
+        if (this.#isValidHint(right)) {
+          foundHint = right;
+          break;
+        }
+      }
+
+      left--;
+      right++;
+    }
+
+    if (foundHint > -1) {
+      this.hintIdx.set(foundHint);
+    } else {
+      let left = startIdx - 1;
+      let right = startIdx + 1;
+      while (left > 0 || right < fields.length) {
+        if (left > 0) {
+          const { isFlaged, isMine, isOpen } = fields[left];
+          if (!isFlaged && !isMine && !isOpen) {
+            this.hintIdx.set(left);
+            break;
+          }
+        }
+
+        if (right < fields.length) {
+          const { isFlaged, isMine, isOpen } = fields[right];
+          if (!isFlaged && !isMine && !isOpen) {
+            this.hintIdx.set(right);
+            break;
+          }
+        }
+
+        left--;
+        right++;
+      }
+    }
+  }
+
+  #isValidHint(idx: number) {
+    const fields = this.fields();
+    const { edgeCase, isFlaged, isMine, isOpen } = fields[idx];
+    const neighbours = this.#getNeighbours(edgeCase, idx);
+
+    return (
+      !isFlaged &&
+      !isMine &&
+      !isOpen &&
+      neighbours.every((nb) => !fields[nb]?.isMine)
+    );
   }
 }

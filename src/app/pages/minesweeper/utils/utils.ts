@@ -1,4 +1,5 @@
-import { IField, ILevel, LevelType } from '../types/types';
+import { IField } from '../types/types';
+import { ILevel, LevelType } from '../../../shared/types/types';
 
 export function getLevels(width: number): ILevel {
   return {

@@ -1,9 +1,3 @@
-interface ILevel {
-  easy: LevelType;
-  medium: LevelType;
-  hard: LevelType;
-}
-
 interface IField {
   id: number;
   isMine: boolean;
@@ -14,15 +8,4 @@ interface IField {
   failed?: boolean
 }
 
-type LevelType = {
-  label: string;
-  rows: number;
-  cols: number;
-  mines: number;
-  size: string;
-  mineSize: string;
-  flagSize: string;
-  hintAmount: number;
-};
-
-export type { ILevel, IField, LevelType };
+export type { IField };
