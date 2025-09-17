@@ -1,4 +1,4 @@
-<div class="pages_container">
+<div class="memory_game__container">
   <div>
     <header class="header">
       <div class="timer_wrapper">
@@ -8,21 +8,23 @@
       </div>
       <h1>Найди пару</h1>
       <div class="buttons_wrap">
-        <button>
-          <lucide-icon [img]="SettingsIcon"></lucide-icon>
+        <button (click)="handleSettings()">
+          <lucide-icon [img]="SettingsIcon" color="#fff"></lucide-icon>
         </button>
         <button>
-          <lucide-icon [img]="RotateIcon"></lucide-icon>
+          <lucide-icon [img]="RotateIcon" color="#fff"></lucide-icon>
         </button>
       </div>
     </header>
-    <div>
+    <div [ngClass]="['cards_container','card_'+game.quantity]">
+      @for (card of game.cards(); track card.id) {
       <div class="card">
         <div class="content_wrap">
-          <!-- <img src="${defaultImage}" class="img front" />
-                    <img src="${image.src}" class="img back" /> -->
+          <img src="/question.webp" alt="question" [ngClass]="['img','front']"/>
+          <img src={{card.src}} alt="car" [ngClass]="['img','back']">
         </div>
       </div>
+      }
     </div>
   </div>
 </div>
