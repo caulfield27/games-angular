@@ -1,10 +1,19 @@
+export type Timer = {
+    minutes: number;
+    seconds: number;
+}
+
+export type LevelEnum = 'easy' | 'medium' | 'hard' | 'gigachad';
+
 interface ISettings{
-    timer: {
-        minutes: number;
-        seconds: number;
-    },
-    quantity: string;
+    level: LevelEnum;
     category: string;
 }
 
-export type {ISettings}
+interface ICard{
+    src: string;
+    id: number;
+    isActive: boolean;
+}
+
+export type {ISettings, ICard}

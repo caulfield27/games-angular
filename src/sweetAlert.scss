@@ -1,0 +1,22 @@
+
+.settings_container {
+  font-family: "New Amsterdam", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.setting_wrap {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.setting_wrap select {
+  background: gainsboro;
+  border: none;
+  outline: brown;
+  padding: 5px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}

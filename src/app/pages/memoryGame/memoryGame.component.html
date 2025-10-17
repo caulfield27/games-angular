@@ -2,26 +2,30 @@
   <div>
     <header class="header">
       <div class="timer_wrapper">
-        <span></span>
+        <span>{{ minutes }}</span>
         <span>:</span>
-        <span></span>
+        <span>{{ seconds }}</span>
       </div>
       <h1>Найди пару</h1>
       <div class="buttons_wrap">
         <button (click)="handleSettings()">
           <lucide-icon [img]="SettingsIcon" color="#fff"></lucide-icon>
         </button>
-        <button>
+        <button (click)="restart()">
           <lucide-icon [img]="RotateIcon" color="#fff"></lucide-icon>
         </button>
       </div>
     </header>
-    <div [ngClass]="['cards_container','card_'+game.quantity]">
+    <div [ngClass]="['cards_container', 'card_' + quantity]">
       @for (card of game.cards(); track card.id) {
-      <div class="card">
-        <div class="content_wrap">
-          <img src="/question.webp" alt="question" [ngClass]="['img','front']"/>
-          <img src={{card.src}} alt="car" [ngClass]="['img','back']">
+      <div (click)="handleOpenCard(card)" class="card">
+        <div [ngClass]="['content_wrap', card.isActive ? 'active' : '']">
+          <img
+            src="/question.webp"
+            alt="question"
+            [ngClass]="['img', 'front']"
+          />
+          <img src="{{ card.src }}" alt="car" [ngClass]="['img', 'back']" />
         </div>
       </div>
       }

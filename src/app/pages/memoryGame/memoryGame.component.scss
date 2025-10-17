@@ -1,10 +1,10 @@
 .memory_game__container {
-  font-family: "memory_game__container", sans-serif;
+  font-family: "New Amsterdam", sans-serif;
   font-weight: 400;
   font-style: normal;
   letter-spacing: 3px;
   color: #fff;
-  background: linear-gradient(135deg, #2e1a47, #1c0f2e);
+  background: linear-gradient(135deg, #b91c1c, #450a0a);
   min-height: 100vh;
   padding: 32px;
 }
@@ -27,7 +27,6 @@ button {
 .header h1 {
   color: #f6dfff;
   font-size: 2.2rem;
-  text-shadow: 0 0 15px rgba(203, 157, 240, 0.6);
 }
 
 .cards_container_active {
@@ -39,7 +38,7 @@ button {
 
 .cards_container {
   position: relative;
-  background: rgba(255, 255, 255, 0.05);
+  background: #ef4444;
   padding: 30px;
   border-radius: 15px;
   border: 2px solid rgba(255, 255, 255, 0.1);
@@ -63,11 +62,10 @@ button {
   justify-content: center;
   align-items: center;
   border-radius: 12px;
-  border: 1px solid #cb9df0;
   width: 100px;
   height: 100px;
   cursor: pointer;
-  background: transparent;
+  background: #fef2f2;
 }
 
 .card:hover {
@@ -128,28 +126,6 @@ button {
   width: 22px;
   height: 22px;
   filter: brightness(0) invert(1);
-}
-
-/* Настройки модалки */
-.settings_container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.setting_wrap {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.setting_wrap select {
-  background: gainsboro;
-  border: none;
-  outline: brown;
-  padding: 5px 8px;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
 .timer_inputs input {

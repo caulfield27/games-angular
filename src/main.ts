@@ -3,4 +3,4 @@ import { appConfig } from './app/app.config';
 import { Bootstrap } from './app/bootstrap.component';
 
 bootstrapApplication(Bootstrap, appConfig)
-  .catch((err) => console.error(err));
+  .catch(console.error);

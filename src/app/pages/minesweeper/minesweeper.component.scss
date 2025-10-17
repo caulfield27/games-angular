@@ -3,7 +3,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url("/minesweeper_bg.jpg");
   background-size: cover;
   padding: 32px;
 }
@@ -31,6 +30,7 @@
     margin-top: 0;
   }
 }
+
 
 .mainsweeper_container {
   display: grid;
@@ -244,7 +244,7 @@
     left: 50%;
     top: 15%;
     transform: translate(-50%);
-    color: #000;
+    color: #ffff48;
     font-weight: 600;
 
   }
