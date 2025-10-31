@@ -1,1 +1,27 @@
-<h1>Battleship</h1>
+<battleship-chat />
+<div class="pages_container">
+  <div class="battleship_container">
+    <header class="battleship_header">
+      <h1>Морской бой</h1>
+      <div>
+        <span>Игроков онлайн:</span>
+        <span id="active-users"></span>
+      </div>
+    </header>
+    <div class="instructions_wrapper">
+      <div class="instructions_container">
+        <span id="instructions">Расположите корабли</span>
+        <button id="shuffle-btn">
+          <img src="/shuffle.svg" alt="shuffle icon" />
+        </button>
+      </div>
+      <button class="battleship_btn" style="display: none" id="quit-btn">
+        Выйти из игры
+      </button>
+    </div>
+    <main id="battleship_main" class="battleship_main">
+      <battleship-board />
+      <find-game-options />
+    </main>
+  </div>
+</div>
