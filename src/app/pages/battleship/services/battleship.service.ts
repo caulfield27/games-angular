@@ -1,5 +1,12 @@
 import { EmbeddedViewRef, Injectable, signal } from '@angular/core';
-import { Direction, ISessionData, IShip, Position } from '../types/types';
+import {
+  Direction,
+  incomneMessageType,
+  ISessionData,
+  IShip,
+  IWsIncomeMessage,
+  Position,
+} from '../types/types';
 
 @Injectable({
   providedIn: 'root',
@@ -56,6 +63,39 @@ export class BattleshipService {
     return ships;
   }
 
+  public reset() {
+    this.gameSessionData = {
+      ...this.gameSessionData,
+      fieldMatrix: [
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+        [false, false, false, false, false, false, false, false, false, false],
+      ],
+      sessionId: null,
+    };
+    this.directions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    this.directionsHash = {
+      0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      4: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      5: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      6: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      7: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      8: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      9: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    };
+    this.ships.set(this.getShips());
+  }
+
   private randomlyArrangeShip(shipSize: number): IShip | void {
     if (shipSize === 1) {
       const y =
@@ -89,6 +129,7 @@ export class BattleshipService {
           y,
         },
         direction: null,
+        size: shipSize,
       };
     } else {
       let isArranged = false;
@@ -118,6 +159,7 @@ export class BattleshipService {
               x: [x, end],
               y,
             },
+            size: shipSize,
           };
         }
 
@@ -136,6 +178,7 @@ export class BattleshipService {
               x: [x, end],
               y,
             },
+            size: shipSize,
           };
         }
 
@@ -149,6 +192,7 @@ export class BattleshipService {
               x,
               y: [y, end],
             },
+            size: shipSize,
           };
         }
 
@@ -167,6 +211,7 @@ export class BattleshipService {
               x,
               y: [y, end],
             },
+            size: shipSize,
           };
         }
 
@@ -367,5 +412,52 @@ export class BattleshipService {
     }
 
     return arr;
+  }
+
+  public updateBattleshipCell(x: number, y: number, value: boolean) {
+    this.gameSessionData.fieldMatrix[y][x] = value;
+  }
+
+  public updateShip(ship: IShip, newShip: IShip) {
+    this.ships.update((prev) =>
+      prev.map((mapShip) => (mapShip === ship ? newShip : mapShip))
+    );
+  }
+
+  public onMessage(msg: IWsIncomeMessage) {
+    const { type, data } = msg;
+
+    switch (type) {
+      case incomneMessageType.ACTIVE_USERS_COUNT:
+        // todo
+        break;
+      case incomneMessageType.CHECK:
+        // todo
+        break;
+      case incomneMessageType.GAME_FOUND:
+        // todo
+        break;
+      case incomneMessageType.GAME_START:
+        // todo
+        break;
+      case incomneMessageType.LOSE:
+        // todo
+        break;
+      case incomneMessageType.MESSAGE:
+        // todo
+        break;
+      case incomneMessageType.READY:
+        // todo
+        break;
+      case incomneMessageType.ROOM_CLOSED:
+        // todo
+        break;
+      case incomneMessageType.STATUS:
+        // todo
+        break;
+      case incomneMessageType.TURN:
+        // todo
+        break;
+    }
   }
 }

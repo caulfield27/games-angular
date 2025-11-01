@@ -1,4 +1,4 @@
-<div class="battle_field" id="battlefield">
+<div class="battle_field" id="battlefield" #container>
   <div class="letters_grid">
     <span>А</span><span>Б</span><span>В</span><span>Г</span><span>Д</span
     ><span>Е</span><span>Ж</span><span>З</span><span>И</span><span>К</span>
@@ -15,8 +15,21 @@
   <div
     cdkDrag
     [cdkDragBoundary]="'#battlefield'"
+    [cdkDragData]="ship"
+    (cdkDragMoved)="onDragMove($event)"
+    (cdkDragEnded)="onDragEnd($event)"
     class="ship"
     [ngStyle]="getGridArea(ship.coordinates, ship.direction)"
+  ></div>
+  } @if (boardService.placeToArrange()) {
+  <div
+    class="place_to_arrange"
+    [ngStyle]="
+      getGridArea(
+        boardService.placeToArrange()!.coordinates,
+        boardService.placeToArrange()!.direction
+      )
+    "
   ></div>
   }
 </div>

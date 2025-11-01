@@ -4,14 +4,17 @@
     <header class="battleship_header">
       <h1>Морской бой</h1>
       <div>
-        <span>Игроков онлайн:</span>
-        <span id="active-users"></span>
+        <span>
+          @if(ws.state() === 'connecting'){ Идет соеденение... }
+          @else if(ws.state() === 'open'){ Игроков онлайн: }
+        </span>
+        @if(ws.state() === 'open'){<span id="active-users"></span>}
       </div>
     </header>
     <div class="instructions_wrapper">
       <div class="instructions_container">
         <span id="instructions">Расположите корабли</span>
-        <button id="shuffle-btn">
+        <button (click)="handleShuffle()" id="shuffle-btn">
           <img src="/shuffle.svg" alt="shuffle icon" />
         </button>
       </div>

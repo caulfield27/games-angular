@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Type } from './findGameOptions.types';
 import { NgClass } from '@angular/common';
 import { copy } from '@/app/shared/utils/utils';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'find-game-options',
@@ -27,7 +28,7 @@ export class FindGameOptions {
 
     if (name === 'friend') {
       if (!this.inviteLink) {
-        const id = Date.now().toString();
+        const id = uuidv4();
         this.inviteLink = `${window.location.href}?room=${id}`;
         // todo
       }
