@@ -1,9 +1,12 @@
-.memory_game__container {
+* {
   font-family: "New Amsterdam", sans-serif;
   font-weight: 400;
   font-style: normal;
   letter-spacing: 3px;
   color: #fff;
+}
+
+.memory_game__container {
   background: linear-gradient(135deg, #b91c1c, #450a0a);
   min-height: 100vh;
   padding: 32px;
@@ -14,7 +17,6 @@ button {
   outline: none;
   cursor: pointer;
 }
-
 
 .header {
   width: 100%;
@@ -50,11 +52,18 @@ button {
   justify-content: center;
 }
 
-.card_10{max-width: 600px}
-.card_16{max-width: 600px}
-.card_20{max-width: 700px}
-.card_32{max-width: 1000px}
-
+.card_10 {
+  max-width: 600px;
+}
+.card_16 {
+  max-width: 600px;
+}
+.card_20 {
+  max-width: 700px;
+}
+.card_32 {
+  max-width: 1000px;
+}
 
 .card {
   perspective: 1000px;
@@ -111,14 +120,14 @@ button {
 }
 
 .buttons_wrap button {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   padding: 8px;
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .buttons_wrap button:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
@@ -138,8 +147,8 @@ button {
 .timer_wrapper {
   padding: 5px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
   display: flex;
   gap: 5px;
 }
@@ -165,7 +174,8 @@ button {
     width: 70px;
     height: 70px;
   }
-  .front, .back {
+  .front,
+  .back {
     width: 50px;
     height: 40px;
   }

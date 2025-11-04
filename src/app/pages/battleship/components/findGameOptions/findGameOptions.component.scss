@@ -1,0 +1,119 @@
+.actions_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.switcher {
+  position: relative;
+  display: inline-flex;
+  background: #7965c1;
+  border-radius: 8px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.switcher button {
+  position: relative;
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 8px 16px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.switch-control {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  background: #362b7d;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+.switcher.right .switch-control {
+  transform: translateX(100%);
+}
+
+.invite_friend_wrapper {
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 10px 10px 34px 10px;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 12px;
+  border: 1px solid gainsboro;
+}
+
+.invite_friend_wrapper div {
+  width: 100%;
+  border-radius: 4px;
+  background: #7965c1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-items: stretch;
+  color: #ffffff;
+}
+
+.link {
+  margin: 8px;
+}
+
+.battleship_btn {
+  border: none;
+  outline: none;
+  background: #7965c1;
+  border-radius: 8px;
+  padding: 10px 20px;
+  width: fit-content;
+  font-size: 14px;
+  color: #ffffff;
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.battleship_btn:hover {
+  background: #362b7d;
+}
+
+.play_btn_loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.link {
+  overflow-x: scroll;
+}
+
+.link::-webkit-scrollbar {
+  display: none;
+}
+
+.invite_friend_wrapper div button {
+  width: 40px;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-left: 1px solid #ae9fe6;
+  outline: none;
+  cursor: copy;
+  background: transparent;
+}
+
+.invite_friend_wrapper img {
+  width: 30px;
+}

@@ -1,0 +1,130 @@
+* {
+  font-family: "Tektur";
+}
+
+.battleship_header h1 {
+  font-size: 26px;
+  color: #313131;
+  font-weight: 600;
+}
+
+.battleship_header span {
+  color: #808080;
+}
+
+.battleship_container {
+  padding: 24px 0;
+  margin: auto;
+  max-width: 860px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 42px;
+}
+
+.battleship_header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.battleship_main {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 80px;
+}
+
+.instructions_wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.instructions_wrapper span {
+  color: gray;
+}
+
+.disabled_btn {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.instructions_container {
+  min-width: calc(30px * 10);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.instructions_container button {
+  border: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  border-radius: 8px;
+  will-change: background;
+  transition: background 0.3s linear;
+}
+
+.battleship_btn {
+  border: none;
+  outline: none;
+  background: #7965c1;
+  border-radius: 8px;
+  padding: 10px 20px;
+  width: fit-content;
+  font-size: 14px;
+  color: #ffffff;
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.instructions_container button:hover {
+  background: gainsboro;
+}
+
+.instructions_container img {
+  width: 25px;
+}
+
+@media screen and (max-width: 900px) {
+  .invite_friend_wrapper {
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 900px) and (min-width: 768px) {
+  .battleship_main {
+    padding: 0 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .battleship_main {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+  }
+
+  .instructions_wrapper {
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .invite_friend_wrapper {
+    max-width: 320px;
+  }
+}

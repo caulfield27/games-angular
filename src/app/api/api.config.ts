@@ -1,0 +1,1 @@
+export const WS_CONNECTION_URL = 'ws://localhost:3000';

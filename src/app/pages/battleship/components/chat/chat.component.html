@@ -1,0 +1,43 @@
+@if (isOpen) {
+<div class="chat_container">
+  <div class="chat_wrapper">
+    <header>
+      <span></span>
+      <button (click)="onCLose()">&times;</button>
+    </header>
+    <div class="messages_container">
+      <div class="messages_wrapper">
+        @for (message of chatService.messages(); track $index) {
+        <div
+          [ngClass]="{
+            msg: true,
+            op_msg: message.type === 'opponent',
+            my_msg: message.type === 'user'
+          }"
+        >
+          {{ message.content }}
+        </div>
+        }
+      </div>
+    </div>
+    <footer>
+      <input
+        (keydown)="onKeyDown($event)"
+        type="text"
+        placeholder="написать..."
+      />
+      <button (click)="handleSend()">
+        <img src="/send.svg" alt="send" />
+      </button>
+    </footer>
+  </div>
+</div>
+}@else{
+<div class="chat" (click)="onOpen()" role="button" id="chat">
+  <img class="chat_icon" src="/chat.png" alt="chat" />
+  @if (chatService.notifications() > 0) {
+  <span class="not">{{ chatService.notifications() }}</span>
+  }
+</div>
+
+}

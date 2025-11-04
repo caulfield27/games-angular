@@ -1,0 +1,36 @@
+<div class="actions_wrapper">
+  <div [ngClass]="switcherClasses">
+    <div class="switch-control"></div>
+    <button (click)="onChange($event)" name="random">
+      Cлучайный противник
+    </button>
+    <button (click)="onChange($event)" name="friend">Играть с другом</button>
+  </div>
+  @if(type === 'random'){
+  <button
+    (click)="handleFindOpponent()"
+    class="battleship_btn"
+    [ngClass]="{
+      play_btn_loading: battleshipService.selectionLoading()
+    }"
+  >
+    @if(battleshipService.selectionLoading()){ Подбор противника... }@else{
+    Найти противника }
+  </button>
+  }@else{
+  <div class="invite_friend_wrapper">
+    <span>Чтобы пригласить друга, отправьте ему эту ссылку</span>
+    <div>
+      <span class="link">
+        @if(inviteLink){
+        {{ inviteLink }}
+        }
+      </span>
+      <button (click)="handleCopy()">
+        <img src="/copy.svg" alt="copy icon" />
+      </button>
+    </div>
+    <span>С вами сыграет первый, кто перейдёт по этой ссылке.</span>
+  </div>
+  }
+</div>
