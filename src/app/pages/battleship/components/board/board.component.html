@@ -7,29 +7,50 @@
     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span
     ><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
   </div>
-  <div style="display: none" id="info-section" class="info-section">
-    <span id="name"></span>
-    <div id="ready-wrapper"></div>
+  @if (battleshipService.gameStatus() === 'start' ||
+  battleshipService.gameStatus() === 'found') {
+  <div class="info-section">
+    <span>{{ battleshipService.gameMetadata().myName }}</span>
+    @if(battleshipService.gameStatus() !== 'start'){
+    <div>
+      @if (battleshipService.isReady()) {
+      <span>Готов</span>
+      }@else{
+      <button (click)="onReady()" class="ready_btn">Готов</button>
+      }
+    </div>
+    }
   </div>
-  @for(ship of battleshipService.ships(); track $index) {
+  } @for(ship of battleshipService.ships(); track $index) {
   <div
     cdkDrag
+    [cdkDragDisabled]="battleshipService.gameStatus() === 'start'"
     [cdkDragBoundary]="'#battlefield'"
     [cdkDragData]="ship"
     (cdkDragMoved)="onDragMove($event)"
     (cdkDragEnded)="onDragEnd($event)"
     class="ship"
-    [ngStyle]="getGridArea(ship.coordinates, ship.direction)"
+    [ngStyle]="battleshipService.getGridArea(ship.coordinates, ship.direction)"
+    [style]="
+      battleshipService.gameStatus() === 'start'
+        ? 'cursor: default'
+        : 'cursor:grab'
+    "
   ></div>
   } @if (boardService.placeToArrange()) {
   <div
     class="place_to_arrange"
     [ngStyle]="
-      getGridArea(
+      battleshipService.getGridArea(
         boardService.placeToArrange()!.coordinates,
         boardService.placeToArrange()!.direction
       )
     "
+  ></div>
+  } @for (field of battleshipService.hittedFields(); track $index) {
+  <div
+    [ngClass]="field.type === 'hit' ? 'hitted_field' : 'miss_field'"
+    [ngStyle]="battleshipService.getGridArea({ x: field.x, y: field.y }, null)"
   ></div>
   }
 </div>

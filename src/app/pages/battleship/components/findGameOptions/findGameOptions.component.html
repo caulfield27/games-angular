@@ -7,7 +7,16 @@
     <button (click)="onChange($event)" name="friend">Играть с другом</button>
   </div>
   @if(type === 'random'){
-  <button class="battleship_btn">Найти противника</button>
+  <button
+    (click)="handleFindOpponent()"
+    class="battleship_btn"
+    [ngClass]="{
+      play_btn_loading: battleshipService.selectionLoading()
+    }"
+  >
+    @if(battleshipService.selectionLoading()){ Подбор противника... }@else{
+    Найти противника }
+  </button>
   }@else{
   <div class="invite_friend_wrapper">
     <span>Чтобы пригласить друга, отправьте ему эту ссылку</span>

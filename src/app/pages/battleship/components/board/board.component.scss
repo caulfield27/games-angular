@@ -50,11 +50,73 @@
 
 .ship {
   border: 2px solid blue;
-  cursor: grab;
   position: relative;
   touch-action: none;
 }
 
 .place_to_arrange{
   border: 2px solid lightgreen;
+}
+
+.miss_field {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: default;
+}
+
+.miss_field::after {
+  content: "";
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url(/dot-fill.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.hitted_field {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  cursor: default;
+  border: 2px solid #dd1919;
+}
+
+.hitted_field::after {
+  content: "";
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url(/x.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.ready_btn {
+  border: none;
+  outline: none;
+  background: #7965c1;
+  border-radius: 8px;
+  padding: 10px 20px;
+  width: fit-content;
+  font-size: 14px;
+  color: #ffffff;
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.ready_btn:hover {
+  background: #362b7d;
 }

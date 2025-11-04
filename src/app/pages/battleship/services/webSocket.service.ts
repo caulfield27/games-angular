@@ -47,6 +47,7 @@ export class WebSocketService {
 
         this.socket.close = () => {
           this.state.set('closed');
+
           // todo
         };
 

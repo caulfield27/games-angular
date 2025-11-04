@@ -1,16 +1,16 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { BattleshipService } from '../../services/battleship.service';
-import { Direction, ICoordinates, IShip } from '../../types/types';
-import { NgStyle } from '@angular/common';
+import { IShip, sendMessageType } from '../../types/types';
+import { NgStyle, NgClass } from '@angular/common';
 import { CdkDrag, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
 import { getCoordinates } from '../../utils/getCoordinates';
 import { BoardService } from '../../services/board.service';
+import { BattleshipService, WebSocketService } from '../../services';
 
 @Component({
   selector: 'battleship-board',
   templateUrl: './board.component.html',
   styleUrl: './board.component.scss',
-  imports: [NgStyle, CdkDrag],
+  imports: [NgStyle, CdkDrag, NgClass],
   providers: [BoardService],
 })
 export class Board implements AfterViewInit {
@@ -18,12 +18,18 @@ export class Board implements AfterViewInit {
 
   constructor(
     public battleshipService: BattleshipService,
-    public boardService: BoardService
+    public boardService: BoardService,
+    public ws: WebSocketService
   ) {}
 
   ngAfterViewInit(): void {
     const ships = this.battleshipService.ships;
     ships.set(this.battleshipService.getShips());
+  }
+
+  onReady(){
+    this.ws.sendMessage({ type: sendMessageType.READY, data: this.battleshipService.gameSessionData.sessionId });
+    this.battleshipService.isReady.set(true);
   }
 
   onDragMove(event: CdkDragMove<IShip>) {
@@ -93,43 +99,5 @@ export class Board implements AfterViewInit {
       this.boardService.placeToArrange.set(null);
     }
     this.boardService.coordinateDif = null;
-  }
-
-  getGridArea(
-    coordinates: ICoordinates,
-    dir: null | Direction
-  ): { gridColumn: string; gridRow: string } {
-    let gridColumn = '0';
-    let gridRow = '0';
-    const { x, y } = coordinates;
-
-    if (!dir) {
-      gridRow = String((y as number) + 1);
-      gridColumn = String((x as number) + 1);
-    } else {
-      switch (dir) {
-        case 'horizontal':
-          if (Array.isArray(x)) {
-            const xStart = Math.min(x[0], x[1]);
-            const xEnd = Math.max(x[0], x[1]);
-            gridRow = String((y as number) + 1);
-            gridColumn = `${xStart + 1} / ${xEnd + 2}`;
-          }
-          break;
-        case 'vertical':
-          if (Array.isArray(y)) {
-            const yStart = Math.min(y[0], y[1]);
-            const yEnd = Math.max(y[0], y[1]);
-            gridColumn = String((x as number) + 1);
-            gridRow = `${yStart + 1} / ${yEnd + 2}`;
-          }
-          break;
-      }
-    }
-
-    return {
-      gridColumn,
-      gridRow,
-    };
   }
 }

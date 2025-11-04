@@ -1,30 +1,56 @@
+@if (battleshipService.gameStatus() === 'found' ||
+battleshipService.gameStatus() === 'start') {
 <battleship-chat />
+}
 <div class="pages_container">
   <div class="battleship_container">
     <header class="battleship_header">
       <h1>Морской бой</h1>
       <div>
         <span>
-          @if(ws.state() === 'connecting'){ Идет соеденение... }
+          @if(ws.state() === 'connecting'){ Идет соеденение... } 
           @else if(ws.state() === 'open'){ Игроков онлайн: }
         </span>
-        @if(ws.state() === 'open'){<span id="active-users"></span>}
+        @if(ws.state() === 'open'){<span>{{
+          battleshipService.activeUsers()
+        }}</span
+        >}
       </div>
     </header>
     <div class="instructions_wrapper">
       <div class="instructions_container">
-        <span id="instructions">Расположите корабли</span>
-        <button (click)="handleShuffle()" id="shuffle-btn">
+        <span>
+          @if(battleshipService.gameStatus() === 'idle' ||
+          battleshipService.gameStatus() === 'found'){ Расположите корабли
+          }@else if(battleshipService.turn() === 1){ Ваш ход }@else{ Ход
+          противника }
+        </span>
+        @if (battleshipService.gameStatus() !== 'start') {
+        <button (click)="handleShuffle()">
           <img src="/shuffle.svg" alt="shuffle icon" />
         </button>
+        }@else{
+        <button (click)="handleQuit()" class="battleship_btn">
+          Выйти из игры
+        </button>
+        }
       </div>
-      <button class="battleship_btn" style="display: none" id="quit-btn">
-        Выйти из игры
-      </button>
     </div>
-    <main id="battleship_main" class="battleship_main">
+    <main
+      class="battleship_main"
+      [ngStyle]="
+        battleshipService.gameStatus() === 'found' ||
+        battleshipService.gameStatus() === 'start'
+          ? { justifyContent: 'space-between', gap: '0' }
+          : {}
+      "
+    >
       <battleship-board />
+      @if (battleshipService.gameStatus() === 'idle') {
       <find-game-options />
+      }@else{
+      <opponent-board/>
+      }
     </main>
   </div>
 </div>

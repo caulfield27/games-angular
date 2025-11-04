@@ -11,10 +11,19 @@ export interface ICoordinates {
 }
 
 export interface ISessionData {
-  myName: string;
-  opponentName: string;
   fieldMatrix: boolean[][];
   sessionId: null | string;
+}
+
+export interface IGameMetadata {
+  myName: string;
+  opName: string;
+}
+
+export interface IHittedFields {
+  x: number;
+  y: number;
+  type: 'hit' | 'mis';
 }
 
 export interface IShip {
@@ -63,3 +72,48 @@ export enum incomneMessageType {
   GAME_START = 'gameStart',
   MESSAGE = 'message',
 }
+
+export type CheckMessageData = {
+  type: sendMessageType.STATUS;
+  data: {
+    roomId: string;
+    coordinates: ICoordinates;
+    status?: 'hit' | 'miss' | 'lose' | 'destroy';
+    range?: {
+      range: number[] | null;
+      isVertical: boolean;
+    };
+  };
+};
+
+export type GameFoundData = {
+  name: string;
+  sessionId: string;
+};
+
+export type FieldButton = {
+  disabled: boolean;
+  missed: boolean;
+  hitted: boolean;
+  gridColumn: string;
+  gridRow: string;
+};
+
+export type StatusData = {
+  status: 'hit' | 'miss' | 'lose' | 'destroy';
+  coordinates: {
+    xDir: number;
+    yDir: number;
+  };
+  range: {
+    range: number[];
+    isVertical: boolean
+  }
+}
+
+export interface IMessage{
+  type: 'user' | 'opponent';
+  content: string;
+}
+
+export type GameStatus = 'idle' | 'found' | 'start'

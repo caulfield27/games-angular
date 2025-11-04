@@ -1,21 +1,55 @@
-import { EmbeddedViewRef, Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
+  CheckMessageData,
   Direction,
+  FieldButton,
+  GameFoundData,
+  GameStatus,
+  ICoordinates,
+  IGameMetadata,
+  IHittedFields,
   incomneMessageType,
   ISessionData,
   IShip,
   IWsIncomeMessage,
+  IWsMessagePattern,
   Position,
+  sendMessageType,
+  StatusData,
 } from '../types/types';
+import Swal from 'sweetalert2';
+import { launchConfetti } from '@/app/shared/utils/utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BattleshipService {
+  // contructor
+  constructor(private route: ActivatedRoute, private router: Router) {}
   // states
+  private audio: HTMLAudioElement | null = null;
+  private directions: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  private initialMatrix: boolean[][] = [];
+  private directionsHash: Record<string, number[]> = {
+    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    4: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    5: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    6: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    7: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    8: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    9: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  };
+  selectionLoading = signal<boolean>(false);
+  turn = signal<number>(1);
+  shotPending: boolean = false;
+  isReady = signal<boolean>(false);
+  isOpponentReady = signal<boolean>(false);
+  gameStatus = signal<GameStatus>('idle');
   gameSessionData: ISessionData = {
-    myName: 'me',
-    opponentName: '',
     fieldMatrix: [
       [false, false, false, false, false, false, false, false, false, false],
       [false, false, false, false, false, false, false, false, false, false],
@@ -30,22 +64,17 @@ export class BattleshipService {
     ],
     sessionId: null,
   };
-  directions: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-  directionsHash: Record<string, number[]> = {
-    0: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    1: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    3: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    4: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    5: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    6: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    7: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    8: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    9: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-  };
+  gameMetadata = signal<IGameMetadata>({
+    myName: 'me',
+    opName: '',
+  });
   ships = signal<IShip[]>([]);
+  hittedFields = signal<IHittedFields[]>([]);
+  activeUsers = signal<number>(0);
+  buttons = signal<FieldButton[]>([]);
 
   // methods
+
   public getShips(): IShip[] {
     const sizeMap: Record<string, number> = {
       1: 4,
@@ -64,8 +93,10 @@ export class BattleshipService {
   }
 
   public reset() {
+    this.gameStatus.set('idle');
+    this.isReady.set(false);
+    this.isOpponentReady.set(false);
     this.gameSessionData = {
-      ...this.gameSessionData,
       fieldMatrix: [
         [false, false, false, false, false, false, false, false, false, false],
         [false, false, false, false, false, false, false, false, false, false],
@@ -94,6 +125,11 @@ export class BattleshipService {
       9: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     };
     this.ships.set(this.getShips());
+    this.hittedFields.set([]);
+    this.gameMetadata.set({
+      myName: 'me',
+      opName: '',
+    });
   }
 
   private randomlyArrangeShip(shipSize: number): IShip | void {
@@ -424,40 +460,321 @@ export class BattleshipService {
     );
   }
 
-  public onMessage(msg: IWsIncomeMessage) {
+  private getRange(x: number, y: number) {
+    const arr = this.initialMatrix;
+    const matrix = this.gameSessionData.fieldMatrix;
+    if (
+      !arr[y][x - 1] &&
+      !arr[y][x + 1] &&
+      !arr[y - 1]?.[x] &&
+      !arr[y + 1]?.[x]
+    ) {
+      return {
+        range: null,
+        isVertical: false,
+        isDestroyed: true,
+      };
+    }
+
+    const isVertical = arr[y + 1]?.[x] || arr[y - 1]?.[x];
+    let start = isVertical ? y : x;
+    let end = isVertical ? y : x;
+
+    if (isVertical) {
+      while (arr[start]?.[x] || arr[end]?.[x]) {
+        if (arr[start]?.[x]) start--;
+        if (arr[end]?.[x]) end++;
+      }
+    } else {
+      while (arr[y][start] || arr[y][end]) {
+        if (arr[y][start]) start--;
+        if (arr[y][end]) end++;
+      }
+    }
+
+    let isDestroyed = true;
+    for (let i = start + 1; i < end; i++) {
+      if (isVertical) {
+        if (matrix[i]?.[x]) {
+          isDestroyed = false;
+        }
+      } else {
+        if (matrix[y]?.[i]) {
+          isDestroyed = false;
+        }
+      }
+    }
+
+    return {
+      range: [start, end],
+      isVertical,
+      isDestroyed,
+    };
+  }
+
+  private isLose() {
+    return this.gameSessionData.fieldMatrix.every((arr) =>
+      arr.every((field) => !field)
+    );
+  }
+
+  public onMessage(
+    msg: IWsIncomeMessage,
+    sendMessage: (msg: IWsMessagePattern) => void,
+    handleMessage: (msg: string, type: 'user' | 'opponent') => void
+  ) {
     const { type, data } = msg;
 
     switch (type) {
       case incomneMessageType.ACTIVE_USERS_COUNT:
-        // todo
+        this.activeUsers.set(data as number);
         break;
       case incomneMessageType.CHECK:
-        // todo
+        console.log('check: ', data);
+        
+        const checkData = data as { x: number; y: number };
+        const { x, y } = checkData;
+        const { fieldMatrix } = this.gameSessionData;
+        const message: CheckMessageData = {
+          type: sendMessageType.STATUS,
+          data: {
+            roomId: this.gameSessionData.sessionId!,
+            coordinates: checkData,
+          },
+        };
+
+        if (fieldMatrix[y]?.[x]) {
+          fieldMatrix[y][x] = false;
+          if (this.isLose()) {
+            message.data['status'] = 'lose';
+          } else {
+            const { range, isVertical, isDestroyed } = this.getRange(x, y);
+
+            if (isDestroyed) {
+              message.data['status'] = 'destroy';
+              message.data['range'] = { range, isVertical };
+            } else {
+              message.data['status'] = 'hit';
+            }
+          }
+        } else {
+          message.data['status'] = 'miss';
+        }
+
+        this.hittedFields.update((prev) => [
+          ...prev,
+          {
+            ...checkData,
+            type: message.data.status === 'miss' ? 'mis' : 'hit',
+          },
+        ]);
+        sendMessage(message);
         break;
       case incomneMessageType.GAME_FOUND:
-        // todo
+        const params = this.route.snapshot.queryParamMap;
+        const gameFoundData = data as GameFoundData;
+        if (params.has('room')) {
+          this.router.navigate([], { queryParams: { room: null } });
+        }
+        const { name, sessionId } = gameFoundData;
+        this.gameMetadata.update((prev) => ({ ...prev, opName: name }));
+        this.gameSessionData.sessionId = sessionId;
+        this.gameStatus.set('found');
+
+        if (!this.audio) {
+          this.audio = new Audio('/audio/message.wav');
+        }
+
+        this.selectionLoading.set(false);
+        Swal.fire({
+          icon: 'success',
+          text: 'Игра началась.',
+          showConfirmButton: false,
+          timer: 1300,
+        });
         break;
       case incomneMessageType.GAME_START:
-        // todo
+        this.gameStatus.set('start');
+        this.initialMatrix = this.gameSessionData.fieldMatrix.map((arr) => [
+          ...arr,
+        ]);
         break;
       case incomneMessageType.LOSE:
-        // todo
+        Swal.fire({
+          icon: 'error',
+          title: 'К сожалению, вы проиграли битву.',
+          text: 'Но не проиграли войну!',
+        }).then(() => this.reset());
         break;
       case incomneMessageType.MESSAGE:
-        // todo
+        const msg = data as string;
+        if (this.audio) {
+          this.audio.play();
+        }
+        handleMessage(msg, 'opponent');
         break;
       case incomneMessageType.READY:
-        // todo
+        this.isOpponentReady.set(true);
         break;
       case incomneMessageType.ROOM_CLOSED:
-        // todo
+        Swal.fire({
+          icon: 'info',
+          title: 'Игра закончена',
+          text: `Противник ${this.gameMetadata().opName ?? ''} покинул игру`,
+        }).then(() => this.reset());
         break;
       case incomneMessageType.STATUS:
-        // todo
+        const statusData = data as StatusData;
+        const status = statusData.status;
+        const xDir = statusData.coordinates.xDir;
+        const yDir = statusData.coordinates.yDir;
+
+        this.initialMatrix[yDir][xDir] !== undefined &&
+          this.updateButtonField(
+            xDir,
+            yDir,
+            status === 'miss' ? 'miss' : 'hit'
+          );
+
+        if (status === 'lose') {
+          launchConfetti(2000);
+          setTimeout(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Поздравляем, вы выиграли битву!',
+              text: 'Вы смогли уничтожить весь флот противника',
+            }).then(() => this.reset());
+          }, 2000);
+        } else if (status === 'destroy') {
+          const { range, isVertical } = statusData.range;
+          if (!range) {
+            this.disableAround(xDir, yDir, null, null, isVertical, true);
+          } else {
+            this.disableAround(
+              xDir,
+              yDir,
+              range[0],
+              range[1],
+              isVertical,
+              false
+            );
+          }
+        }
+        this.shotPending = false;
         break;
       case incomneMessageType.TURN:
-        // todo
+        const turnData = data as number;
+        this.turn.set(turnData);
+        this.updateButtonsState(turnData !== 1);
         break;
     }
+  }
+
+  private disableAround(
+    x: number,
+    y: number,
+    start: number | null,
+    end: number | null,
+    isVertical: boolean,
+    isSingle: boolean
+  ) {
+    const matrix = this.gameSessionData.fieldMatrix;
+    if (isSingle) {
+      this.updateButtonField(x + 1, y, 'miss');
+      this.updateButtonField(y, x - 1, 'miss');
+      matrix[y - 1]?.[x] !== undefined &&
+        this.updateButtonField(x, y - 1, 'miss');
+      matrix[y - 1]?.[x - 1] !== undefined &&
+        this.updateButtonField(x - 1, y - 1, 'miss');
+      matrix[y - 1]?.[x + 1] !== undefined &&
+        this.updateButtonField(x + 1, y - 1, 'miss');
+      matrix[y + 1]?.[x] !== undefined &&
+        this.updateButtonField(x, y + 1, 'miss');
+      matrix[y + 1]?.[x - 1] !== undefined &&
+        this.updateButtonField(x - 1, y + 1, 'miss');
+      matrix[y + 1]?.[x + 1] !== undefined &&
+        this.updateButtonField(x + 1, y + 1, 'miss');
+    } else if (start !== null && end !== null) {
+      for (let i = start; i <= end; i++) {
+        if (isVertical) {
+          matrix[i]?.[x - 1] !== undefined &&
+            this.updateButtonField(i, x - 1, 'miss');
+          matrix[i]?.[x - 1] !== undefined &&
+            this.updateButtonField(i, x - 1, 'miss');
+          if (i === start || i === end) {
+            matrix[i]?.[x] !== undefined &&
+              this.updateButtonField(i, x, 'miss');
+          }
+        } else {
+          matrix[y - 1]?.[i] !== undefined &&
+            this.updateButtonField(y - 1, i, 'miss');
+          matrix[y + 1]?.[i] !== undefined &&
+            this.updateButtonField(y + 1, i, 'miss');
+          if (i === start || i === end) {
+            matrix[y]?.[i] !== undefined &&
+              this.updateButtonField(y, i, 'miss');
+          }
+        }
+      }
+    }
+  }
+
+  private updateButtonsState(disable: boolean) {
+    this.buttons.update((prev) =>
+      prev.map((btn) => ({ ...btn, disabled: disable }))
+    );
+  }
+
+  private updateButtonField(x: number, y: number, type: 'miss' | 'hit') {
+    this.buttons.update((prev) =>
+      prev.map((btn) => {
+        const btnX = Number(btn.gridColumn) - 1;
+        const btnY = Number(btn.gridRow) - 1;
+        const key = type === 'miss' ? 'missed' : 'hitted';
+        if (x === btnX && y === btnY) {
+          return { ...btn, [key]: true };
+        }
+
+        return btn;
+      })
+    );
+  }
+
+  public getGridArea(
+    coordinates: ICoordinates,
+    dir: null | Direction
+  ): { gridColumn: string; gridRow: string } {
+    let gridColumn = '0';
+    let gridRow = '0';
+    const { x, y } = coordinates;
+
+    if (!dir) {
+      gridRow = String((y as number) + 1);
+      gridColumn = String((x as number) + 1);
+    } else {
+      switch (dir) {
+        case 'horizontal':
+          if (Array.isArray(x)) {
+            const xStart = Math.min(x[0], x[1]);
+            const xEnd = Math.max(x[0], x[1]);
+            gridRow = String((y as number) + 1);
+            gridColumn = `${xStart + 1} / ${xEnd + 2}`;
+          }
+          break;
+        case 'vertical':
+          if (Array.isArray(y)) {
+            const yStart = Math.min(y[0], y[1]);
+            const yEnd = Math.max(y[0], y[1]);
+            gridColumn = String((x as number) + 1);
+            gridRow = `${yStart + 1} / ${yEnd + 2}`;
+          }
+          break;
+      }
+    }
+
+    return {
+      gridColumn,
+      gridRow,
+    };
   }
 }

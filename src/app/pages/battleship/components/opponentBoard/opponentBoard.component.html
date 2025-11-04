@@ -1,4 +1,4 @@
-<div class="battle_field">
+<div class="battle_field" #container>
   <div class="letters_grid">
     <span>А</span><span>Б</span><span>В</span><span>Г</span><span>Д</span
     ><span>Е</span><span>Ж</span><span>З</span><span>И</span><span>К</span>
@@ -8,8 +8,27 @@
     ><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
   </div>
   <div class="info-section">
-    <span>2</span>
-    <div id="opp-ready-wrapper" style="display: none"><span>готов</span></div>
+    <span>{{ battleshipService.gameMetadata().opName }}</span>
+    @if (battleshipService.gameStatus() !== 'start') {
+    <div>
+      @if (battleshipService.isOpponentReady()) {
+      <span>готов</span>
+      }@else{
+      <span>готовится...</span>
+      }
+    </div>
+    }
   </div>
-  <!--buttons-->
+  @for (button of battleshipService.buttons(); track $index) {
+  <button
+    (click)="onClick($event)"
+    [ngStyle]="{ gridColumn: button.gridColumn, gridRow: button.gridRow }"
+    [ngClass]="{
+      miss_field: button.missed,
+      hitted_field: button.hitted,
+      disabled_btn: button.disabled,
+      cell_btn: !button.missed && !button.hitted && !button.disabled
+    }"
+  ></button>
+  }
 </div>
