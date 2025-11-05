@@ -54,22 +54,24 @@ export class FindGameOptions {
       inputPlaceholder: 'никнейм',
       confirmButtonText: 'Продолжить',
     }).then((result) => {
-      const name = result?.value;
-      this.battleshipService.gameMetadata.update((prev) => ({
-        ...prev,
-        myName: !name
-          ? 'you'
-          : name.length > 15
-          ? name.slice(0, 15) + '...'
-          : name,
-      }));
-      this.battleshipService.selectionLoading.set(true);
-      this.ws.sendMessage({
-        type: sendMessageType.SELECTION,
-        data: {
-          name,
-        },
-      });
+      if (result.isConfirmed) {
+        const name = result?.value;
+        this.battleshipService.gameMetadata.update((prev) => ({
+          ...prev,
+          myName: !name
+            ? 'you'
+            : name.length > 15
+            ? name.slice(0, 15) + '...'
+            : name,
+        }));
+        this.battleshipService.selectionLoading.set(true);
+        this.ws.sendMessage({
+          type: sendMessageType.SELECTION,
+          data: {
+            name,
+          },
+        });
+      }
     });
   }
 

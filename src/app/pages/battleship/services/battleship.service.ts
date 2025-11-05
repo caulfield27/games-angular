@@ -72,6 +72,8 @@ export class BattleshipService {
   hittedFields = signal<IHittedFields[]>([]);
   activeUsers = signal<number>(0);
   buttons = signal<FieldButton[]>([]);
+  isChatOpen = signal<boolean>(false);
+  notifications = signal<number>(0);
 
   // methods
 
@@ -85,8 +87,12 @@ export class BattleshipService {
     const ships = [];
     for (let i = 1; i < 5; i++) {
       for (let j = 0; j < sizeMap[i]; j++) {
-        const ship = this.randomlyArrangeShip(i);
-        if (ship) ships.push(ship);
+        try {
+          const ship = this.randomlyArrangeShip(i);
+          if (ship) ships.push(ship);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
     return ships;
@@ -607,8 +613,12 @@ export class BattleshipService {
         break;
       case incomneMessageType.MESSAGE:
         const msg = data as string;
-        if (this.audio) {
-          this.audio.play();
+
+        if (!this.isChatOpen()) {
+          if (this.audio) {
+            this.audio.play();
+          }
+          this.notifications.update((prev) => prev + 1);
         }
         handleMessage(msg, 'opponent');
         break;
@@ -627,7 +637,7 @@ export class BattleshipService {
         const status = statusData.status;
         const xDir = statusData.coordinates.x;
         const yDir = statusData.coordinates.y;
-        
+
         this.initialMatrix[yDir]?.[xDir] !== undefined &&
           this.updateButtonField(
             xDir,
@@ -680,7 +690,7 @@ export class BattleshipService {
     const matrix = this.gameSessionData.fieldMatrix;
     if (isSingle) {
       this.updateButtonField(x + 1, y, 'miss');
-      this.updateButtonField(y, x - 1, 'miss');
+      this.updateButtonField(x - 1, y, 'miss');
       matrix[y - 1]?.[x] !== undefined &&
         this.updateButtonField(x, y - 1, 'miss');
       matrix[y - 1]?.[x - 1] !== undefined &&
@@ -696,22 +706,22 @@ export class BattleshipService {
     } else if (start !== null && end !== null) {
       for (let i = start; i <= end; i++) {
         if (isVertical) {
+          matrix[i]?.[x + 1] !== undefined &&
+            this.updateButtonField(x + 1, i, 'miss');
           matrix[i]?.[x - 1] !== undefined &&
-            this.updateButtonField(i, x - 1, 'miss');
-          matrix[i]?.[x - 1] !== undefined &&
-            this.updateButtonField(i, x - 1, 'miss');
+            this.updateButtonField(x - 1, i, 'miss');
           if (i === start || i === end) {
             matrix[i]?.[x] !== undefined &&
-              this.updateButtonField(i, x, 'miss');
+              this.updateButtonField(x, i, 'miss');
           }
         } else {
           matrix[y - 1]?.[i] !== undefined &&
-            this.updateButtonField(y - 1, i, 'miss');
+            this.updateButtonField(i, y - 1, 'miss');
           matrix[y + 1]?.[i] !== undefined &&
-            this.updateButtonField(y + 1, i, 'miss');
+            this.updateButtonField(i, y + 1, 'miss');
           if (i === start || i === end) {
             matrix[y]?.[i] !== undefined &&
-              this.updateButtonField(y, i, 'miss');
+              this.updateButtonField(i, y, 'miss');
           }
         }
       }

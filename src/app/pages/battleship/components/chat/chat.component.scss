@@ -130,6 +130,12 @@
   width: 60px;
 }
 
+.send_btn{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media screen and (max-width: 768px) {
 
   .chat_icon {

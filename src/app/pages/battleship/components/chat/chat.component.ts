@@ -21,15 +21,14 @@ export class Chat {
   ) {}
 
   @ViewChild('msgInput') msgInput!: ElementRef<HTMLInputElement>;
-  public isOpen: boolean = false;
 
   onOpen() {
-    this.isOpen = true;
-    this.chatService.notifications.set(0);
+    this.battleshipService.isChatOpen.set(true);
+    this.battleshipService.notifications.set(0);
   }
 
   onCLose() {
-    this.isOpen = false;
+    this.battleshipService.isChatOpen.set(false);
   }
 
   onKeyDown(e: KeyboardEvent) {
@@ -43,8 +42,12 @@ export class Chat {
       this.chatService.addMessage(value, 'user');
       this.ws.sendMessage({
         type: sendMessageType.MESSAGE,
-        data: value,
+        data: {
+          curRoomId: this.battleshipService.gameSessionData.sessionId,
+          value,
+        },
       });
+      this.msgInput.nativeElement.value = '';
     }
   }
 }

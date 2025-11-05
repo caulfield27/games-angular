@@ -5,7 +5,6 @@ import { IMessage } from '../types/types';
   providedIn: 'root',
 })
 export class ChatService {
-  public notifications = signal<number>(0);
   public messages = signal<IMessage[]>([]);
 
   public addMessage(msg: string, type: 'user' | 'opponent') {
