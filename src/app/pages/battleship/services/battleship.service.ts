@@ -98,10 +98,7 @@ export class BattleshipService {
     return ships;
   }
 
-  public reset() {
-    this.gameStatus.set('idle');
-    this.isReady.set(false);
-    this.isOpponentReady.set(false);
+  public shuffleShips(resetSessionData: boolean, addShips: boolean) {
     this.gameSessionData = {
       fieldMatrix: [
         [false, false, false, false, false, false, false, false, false, false],
@@ -115,7 +112,7 @@ export class BattleshipService {
         [false, false, false, false, false, false, false, false, false, false],
         [false, false, false, false, false, false, false, false, false, false],
       ],
-      sessionId: null,
+      sessionId: resetSessionData ? null : this.gameSessionData.sessionId,
     };
     this.directions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     this.directionsHash = {
@@ -130,13 +127,22 @@ export class BattleshipService {
       8: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
       9: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     };
-    this.ships.set(this.getShips());
+    if (addShips) {
+      this.ships.set(this.getShips());
+    }
+  }
+
+  public reset(fullReset: boolean) {
+    this.gameStatus.set('idle');
+    this.isReady.set(false);
+    this.isOpponentReady.set(false);
     this.hittedFields.set([]);
     this.gameMetadata.set({
       myName: 'me',
       opName: '',
     });
     this.shotPending = false;
+    this.shuffleShips(true, fullReset ? false : true);
   }
 
   private randomlyArrangeShip(shipSize: number): IShip | void {
@@ -609,7 +615,7 @@ export class BattleshipService {
           icon: 'error',
           title: 'К сожалению, вы проиграли битву.',
           text: 'Но не проиграли войну!',
-        }).then(() => this.reset());
+        }).then(() => this.reset(false));
         break;
       case incomneMessageType.MESSAGE:
         const msg = data as string;
@@ -630,7 +636,7 @@ export class BattleshipService {
           icon: 'info',
           title: 'Игра закончена',
           text: `Противник ${this.gameMetadata().opName ?? ''} покинул игру`,
-        }).then(() => this.reset());
+        }).then(() => this.reset(false));
         break;
       case incomneMessageType.STATUS:
         const statusData = data as StatusData;
@@ -652,7 +658,7 @@ export class BattleshipService {
               icon: 'success',
               title: 'Поздравляем, вы выиграли битву!',
               text: 'Вы смогли уничтожить весь флот противника',
-            }).then(() => this.reset());
+            }).then(() => this.reset(false));
           }, 2000);
         } else if (status === 'destroy') {
           const { range, isVertical } = statusData.range;

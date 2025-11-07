@@ -17,12 +17,12 @@ export function getSettings(): ISettings {
     ? JSON.parse(storageSettings!)
     : {
         level: 'medium',
-        category: 'cars',
+        category: 'superheroes',
       };
 }
 
 export function getCards(settings: ISettings): ICard[] {
-  return images[settings?.category ?? 'cars'].slice(
+  return images[settings?.category ?? 'superheroes'].slice(
     0,
     getQuantity(settings)
   );

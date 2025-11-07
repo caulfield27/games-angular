@@ -216,7 +216,7 @@ export class BoardService {
             }
 
             if (field.isMine) {
-              return { ...field, isOpen: true };
+              return { ...field, isOpen: true, isFlaged: false };
             }
 
             return field;

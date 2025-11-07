@@ -9,7 +9,7 @@
 }
 
 .battleship_header span {
-  color: #808080;
+  color: #313131;
 }
 
 .battleship_container {
@@ -46,7 +46,7 @@
 }
 
 .instructions_wrapper span {
-  color: gray;
+  color: #313131;
 }
 
 .disabled_btn {
@@ -61,7 +61,7 @@
   justify-content: space-between;
 }
 
-.instructions_container button {
+.shuffle_btn {
   border: none;
   background: transparent;
   outline: none;
@@ -90,7 +90,11 @@
   letter-spacing: 1px;
 }
 
-.instructions_container button:hover {
+.battleship_btn:hover {
+  background: #362b7d;
+}
+
+.shuffle_btn:hover {
   background: gainsboro;
 }
 
@@ -105,21 +109,28 @@
 }
 
 @media screen and (max-width: 900px) and (min-width: 768px) {
-  .battleship_main {
+  .battleship_container {
     padding: 0 20px;
   }
 }
 
 @media screen and (max-width: 768px) {
+.battleship_container{
+  padding: 72px 16px 16px 16px;
+}
+
   .battleship_main {
     flex-direction: column;
-    justify-content: center;
+    justify-content: center !important;
     align-items: center;
-    gap: 80px;
+    gap: 100px !important;
   }
 
   .instructions_wrapper {
+    flex-direction: column-reverse;
     justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
   }
 }
 

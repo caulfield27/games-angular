@@ -119,18 +119,20 @@ export class MemoryGame {
         <div class="setting_wrap">
             <span>уровень</span>
             <select name="level" id="level">
-                <option value="easy" ${this.game.settings.level === 'easy' ? 'selected="true"' : ""}>лёгкий</option>
-                <option value="medium" ${this.game.settings.level === 'medium' ? 'selected="true"' : ""}>средний</option>
-                <option value="hard" ${this.game.settings.level === 'hard' ? 'selected="true"' : ""}>сложный</option>
-                <option value="gigachad" ${this.game.settings.level === 'gigachad' ? 'selected="true"' : ""}>очень сложный</option>
-            </select>
-        </div>
-        <div class="setting_wrap">
-            <span>тема</span>
-            <select name="category" id="category">
-                <option value="cars" selected=${
-                  this.game.settings.category === 'cars'
-                }>машины</option>
+                <option value="easy" ${
+                  this.game.settings.level === 'easy' ? 'selected="true"' : ''
+                }>лёгкий</option>
+                <option value="medium" ${
+                  this.game.settings.level === 'medium' ? 'selected="true"' : ''
+                }>средний</option>
+                <option value="hard" ${
+                  this.game.settings.level === 'hard' ? 'selected="true"' : ''
+                }>сложный</option>
+                <option value="gigachad" ${
+                  this.game.settings.level === 'gigachad'
+                    ? 'selected="true"'
+                    : ''
+                }>очень сложный</option>
             </select>
         </div>
     </div>
@@ -140,12 +142,9 @@ export class MemoryGame {
       confirmButtonText: 'Сохранить',
       preConfirm: () => {
         const level = document.getElementById('level') as HTMLInputElement;
-        const category = document.getElementById(
-          'category'
-        ) as HTMLInputElement;
         this.game.settings = {
           level: level.value as LevelEnum,
-          category: category.value,
+          category: 'superheroes',
         };
       },
     }).then((res) => {

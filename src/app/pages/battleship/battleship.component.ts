@@ -1,9 +1,9 @@
-import { Component, effect, OnInit } from '@angular/core';
+import { Component, effect, OnDestroy, OnInit } from '@angular/core';
 import { Board, Chat, FindGameOptions, OpponentBoard } from './components';
 import { BattleshipService, ChatService, WebSocketService } from './services';
 import { NgStyle } from '@angular/common';
 import Swal from 'sweetalert2';
-import { IWsMessagePattern, sendMessageType } from './types/types';
+import { sendMessageType } from './types/types';
 
 @Component({
   selector: 'battleship',
@@ -11,7 +11,7 @@ import { IWsMessagePattern, sendMessageType } from './types/types';
   styleUrl: './battleship.component.scss',
   imports: [Chat, Board, FindGameOptions, NgStyle, OpponentBoard],
 })
-export class Battleship implements OnInit {
+export class Battleship implements OnInit, OnDestroy {
   constructor(
     public battleshipService: BattleshipService,
     public ws: WebSocketService,
@@ -46,6 +46,10 @@ export class Battleship implements OnInit {
     );
   }
 
+  ngOnDestroy(): void {
+    this.battleshipService.reset(true);
+  }
+
   handleQuit() {
     Swal.fire({
       icon: 'warning',
@@ -61,12 +65,12 @@ export class Battleship implements OnInit {
             roomId: this.battleshipService.gameSessionData.sessionId,
           },
         });
-        this.battleshipService.reset();
+        this.battleshipService.reset(false);
       }
     });
   }
 
   handleShuffle() {
-    this.battleshipService.reset();
+    this.battleshipService.shuffleShips(false, true);
   }
 }

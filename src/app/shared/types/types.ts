@@ -25,4 +25,8 @@ interface IDropdownOption{
     value: string
 }
 
-export type {LevelType, ILevel, IDropdownOption, ILevelOption}
+interface IPagesMetadata{
+  background_url_path: string | null;
+}
+
+export type {LevelType, ILevel, IDropdownOption, ILevelOption, IPagesMetadata}

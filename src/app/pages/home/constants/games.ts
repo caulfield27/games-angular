@@ -9,7 +9,7 @@ export const games: IGames[] = [
     },
     {
       name: 'Найди пару',
-      image: '/memory.avif',
+      image: '/pagesBackground/heroes_bg.webp',
       href: 'memory-game',
       tags: ['2D', 'Memory', 'Singleplayer'],
     },

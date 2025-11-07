@@ -1,21 +1,15 @@
 * {
-  font-family: "New Amsterdam", sans-serif;
+  font-family: "Bangers", cursive;
   font-weight: 400;
-  font-style: normal;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   color: #fff;
 }
 
+
 .memory_game__container {
-  background: linear-gradient(135deg, #b91c1c, #450a0a);
   min-height: 100vh;
   padding: 32px;
-}
-
-button {
-  border: none;
-  outline: none;
-  cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .header {
@@ -27,29 +21,34 @@ button {
 }
 
 .header h1 {
-  color: #f6dfff;
-  font-size: 2.2rem;
-}
+  font-size: 3rem;
+  color: #ffeb3b;
+  text-shadow: 3px 3px 0 #000, 6px 6px 0 #e91e63;
+  text-transform: uppercase;
+  text-align: center;
 
-.cards_container_active {
-  display: flex !important;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
+  @media screen and (max-width: 500px) {
+    font-size: 2rem;
+  }
 }
 
 .cards_container {
   position: relative;
-  background: #ef4444;
+  background: rgba(255, 255, 255, 0.1);
   padding: 30px;
-  border-radius: 15px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   margin: 28px auto;
-  box-shadow: 0 0 25px rgba(203, 157, 240, 0.2);
+  box-shadow: 0 0 40px rgba(255, 0, 0, 0.4);
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.cards_container:hover {
+  box-shadow: 0 0 60px rgba(255, 255, 0, 0.5);
 }
 
 .card_10 {
@@ -74,11 +73,15 @@ button {
   width: 100px;
   height: 100px;
   cursor: pointer;
-  background: #fef2f2;
+  background: linear-gradient(145deg, #ff3d00, #e91e63);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 0 #000, 0 0 20px rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 0 25px rgba(203, 157, 240, 0.2);
+  transform: translateY(-5px) rotate(-1deg);
+  box-shadow: 0 6px 0 #000, 0 0 25px rgba(255, 255, 0, 0.5);
 }
 
 .content_wrap {
@@ -86,7 +89,7 @@ button {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: 0.5s linear;
+  transition: transform 0.5s ease;
 }
 
 .front,
@@ -120,46 +123,49 @@ button {
 }
 
 .buttons_wrap button {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px;
-  border-radius: 8px;
+  background: linear-gradient(90deg, #2196f3, #00bcd4);
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+  text-transform: uppercase;
+  color: #fff;
+  box-shadow: 2px 2px 0 #000;
   transition: all 0.3s ease;
 }
 
 .buttons_wrap button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+  background: linear-gradient(90deg, #ffeb3b, #f44336);
+  transform: translateY(-3px);
+  box-shadow: 4px 4px 0 #000;
 }
 
 .buttons_wrap img {
-  width: 22px;
-  height: 22px;
-  filter: brightness(0) invert(1);
-}
-
-.timer_inputs input {
-  border: 1px solid gainsboro;
-  border-radius: 6px;
-  outline: #cb9df0;
-  padding: 3px;
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(2px 2px 0 #000);
 }
 
 .timer_wrapper {
-  padding: 5px 12px;
+  padding: 6px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid #fff;
+  background: rgba(255, 0, 0, 0.4);
   display: flex;
   gap: 5px;
+  box-shadow: 2px 2px 0 #000;
 }
 
 .timer_wrapper span {
-  color: #ffb86c;
+  color: #fff;
   font-size: 22px;
   font-weight: 600;
+  text-shadow: 2px 2px 0 #000;
 }
 
 @media screen and (max-width: 620px) {
+  .memory_game__container{
+    padding: 72px 16px 16px 16px
+  }
   .cards_container {
     padding: 16px;
   }

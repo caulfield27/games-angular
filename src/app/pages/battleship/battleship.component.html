@@ -26,15 +26,16 @@ battleshipService.gameStatus() === 'start') {
           противника }
         </span>
         @if (battleshipService.gameStatus() !== 'start') {
-        <button (click)="handleShuffle()">
+        <button class="shuffle_btn" (click)="handleShuffle()">
           <img src="/shuffle.svg" alt="shuffle icon" />
-        </button>
-        }@else{
-        <button (click)="handleQuit()" class="battleship_btn">
-          Выйти из игры
         </button>
         }
       </div>
+      @if (battleshipService.gameStatus() === 'start') {
+      <button (click)="handleQuit()" class="battleship_btn">
+        Выйти из игры
+      </button>
+      }
     </div>
     <main
       class="battleship_main"
@@ -49,7 +50,7 @@ battleshipService.gameStatus() === 'start') {
       @if (battleshipService.gameStatus() === 'idle') {
       <find-game-options />
       }@else{
-      <opponent-board/>
+      <opponent-board />
       }
     </main>
   </div>
