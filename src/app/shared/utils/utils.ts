@@ -1,5 +1,6 @@
 import confetti from 'canvas-confetti';
 import Swal from 'sweetalert2';
+import { PAGES_METADATA } from '../constants/constants';
 
 export function launchConfetti(duration: number) {
   const end = Date.now() + duration;
@@ -47,4 +48,22 @@ export function copy(data: string) {
         timer: 1000,
       })
     );
+}
+
+export function handleAppBackground(
+  pathname: string,
+  updateIsHome: (isHome: boolean) => boolean
+) {
+  const curPageBackground = PAGES_METADATA[pathname]?.background_url_path;
+  document.body.style.backgroundImage = curPageBackground
+    ? `url(${curPageBackground})`
+    : '';
+
+  if (pathname === '/') {
+    updateIsHome(true);
+    document.body.style.backgroundColor = '#EEF4F7';
+  } else {
+    updateIsHome(false);
+    document.body.style.backgroundColor = '';
+  }
 }

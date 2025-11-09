@@ -1,8 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomePage } from './pages/home/home.component';
-import { Minesweeper } from './pages/minesweeper/minesweeper.component';
-import { MemoryGame } from './pages/memoryGame/memoryGame.component';
-import { Battleship } from './pages/battleship/battleship.component';
+import { HomePage, Minesweeper, MemoryGame, Battleship, Tetris } from './pages';
 
 export const routes: Routes = [
         {
@@ -20,6 +17,10 @@ export const routes: Routes = [
         {
             path: "battleship",
             component: Battleship
+        },
+        {
+            path: "tetris",
+            component: Tetris
         }
 
 ];

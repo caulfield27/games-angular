@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
-import { PAGES_METADATA } from './shared/constants/constants';
 import { LucideAngularModule, House } from 'lucide-angular';
+import { handleAppBackground } from './shared/utils/utils';
+import { SeoService } from './shared/services/seo.service';
 
 @Component({
   selector: 'bootstrap',
@@ -19,23 +20,16 @@ import { LucideAngularModule, House } from 'lucide-angular';
   `,
 })
 export class Bootstrap {
-  constructor(private router: Router) {
+  constructor(private router: Router, private seoService: SeoService) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
         const pathname = this.router.url;
-        const curPageBackground = PAGES_METADATA[pathname]?.background_url_path;
-        document.body.style.backgroundImage = curPageBackground
-          ? `url(${curPageBackground})`
-          : '';
-
-        if (pathname === '/') {
-          this.isHome = true;
-          document.body.style.backgroundColor = '#EEF4F7';
-        } else {
-          this.isHome = false;
-          document.body.style.backgroundColor = '';
-        }
+        seoService.updateMetadata(pathname);
+        handleAppBackground(
+          this.router.url,
+          (isHome) => (this.isHome = isHome)
+        );
       });
   }
   isHome: boolean = true;

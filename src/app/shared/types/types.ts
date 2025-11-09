@@ -27,6 +27,10 @@ interface IDropdownOption{
 
 interface IPagesMetadata{
   background_url_path: string | null;
+  title: string;
+  description: string;
+  keywords: string;
+  icoPath: string;
 }
 
 export type {LevelType, ILevel, IDropdownOption, ILevelOption, IPagesMetadata}

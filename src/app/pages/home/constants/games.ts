@@ -19,4 +19,10 @@ export const games: IGames[] = [
       href: 'battleship',
       tags: ['2D', 'Strategy', 'Multiplayer', 'Board Game'],
     },
+    {
+      name: 'Тетрис',
+      image: '/tetris_preview.jpg',
+      href: 'tetris',
+      tags: ['2D', 'Puzzle', 'Arcade', 'Singleplayer'],
+    },
   ];
