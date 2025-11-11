@@ -22,7 +22,7 @@ export function getSettings(): ISettings {
 }
 
 export function getCards(settings: ISettings): ICard[] {
-  return images[settings?.category ?? 'superheroes'].slice(
+  return images[settings?.category ?? 'superheroes']?.slice(
     0,
     getQuantity(settings)
   );

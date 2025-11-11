@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { LucideAngularModule, Settings, RotateCcw } from 'lucide-angular';
 import { GameService } from './services/memoryGame.service';
 import { NgClass } from '@angular/common';
@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import { ICard, LevelEnum } from './types/types';
 import { launchConfetti } from '../../shared/utils/utils';
 import { getCards, getQuantity, getSettings, getTimer } from './utils/utils';
+import { reset } from 'canvas-confetti';
 
 @Component({
   selector: 'memory-game',
@@ -13,7 +14,7 @@ import { getCards, getQuantity, getSettings, getTimer } from './utils/utils';
   styleUrl: './memoryGame.component.scss',
   imports: [LucideAngularModule, NgClass],
 })
-export class MemoryGame {
+export class MemoryGame implements OnDestroy {
   // locale states
   readonly SettingsIcon = Settings;
   readonly RotateIcon = RotateCcw;
@@ -154,5 +155,11 @@ export class MemoryGame {
         this.restart();
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.isGameStart) {
+      this.restart();
+    }
   }
 }

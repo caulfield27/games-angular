@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { BoardService } from './services/board.service';
 import { Tablo } from './components/tablo/tablo.component';
 import { FlagIcon } from './icons/flag.component';
@@ -26,7 +32,7 @@ import { IDropdownOption, ILevelOption } from '../../shared/types/types';
     Dropdown,
   ],
 })
-export class Minesweeper implements AfterViewInit {
+export class Minesweeper implements AfterViewInit, OnDestroy {
   @ViewChild('container') container!: ElementRef<HTMLDivElement>;
   readonly Bulb = Lightbulb;
   readonly options = dropdownOptions;
@@ -116,5 +122,11 @@ export class Minesweeper implements AfterViewInit {
     this.boardService.level.set(option as ILevelOption);
     this.updateVariables();
     this.boardService.restart();
+  }
+
+  ngOnDestroy(): void {
+    if (this.boardService.isGameStart()) {
+      this.boardService.restart();
+    }
   }
 }

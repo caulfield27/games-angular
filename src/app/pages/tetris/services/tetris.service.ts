@@ -1,30 +1,27 @@
 import { Injectable, signal } from '@angular/core';
-import { Figures } from '../types';
+import { FiguresMap } from '../types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TetrisService {
-  figures = signal<Figures[]>(
+  figures = signal<FiguresMap[]>(
     this.shuffleFigures([
-      Figures.I,
-      Figures.J,
-      Figures.L,
-      Figures.O,
-      Figures.S,
-      Figures.T,
-      Figures.Z,
+      { i: 0 },
+      { j: 0 },
+      { l: 0 },
+      { o: 0 },
+      { s: 0 },
+      { t: 0 },
+      { z: 0 },
     ])
   );
-  row: number = 1;
-  col: number = 5;
 
-  private shuffleFigures(figures: Figures[]) {
+  private shuffleFigures(figures: FiguresMap[]) {
     const shuffled = [...figures];
 
     for (let i = shuffled.length - 1; i > 0; i--) {
-      const randomIdx = Math.floor(Math.random() * (i+1));
-      [shuffled[i], shuffled[randomIdx]] = [shuffled[randomIdx], shuffled[i]];
+      this.randomSwap(i, shuffled);
     }
 
     return shuffled;
@@ -32,5 +29,21 @@ export class TetrisService {
 
   public updateFiguresPlacement() {
     const updatedFigure = [...this.figures()];
+    updatedFigure.push(updatedFigure.shift() ?? { i: 0 });
+
+    for (let i = updatedFigure.length - 1; i >= 3; i--) {
+      this.randomSwap(i, updatedFigure);
+    }
+
+    this.figures.set(updatedFigure);
   }
+
+  private randomSwap(idx: number, arr: FiguresMap[]): void {
+    const randomIdx = Math.floor(Math.random() * (idx + 1));
+    [arr[idx], arr[randomIdx]] = [arr[randomIdx], arr[idx]];
+  }
+
+
+  
+  
 }
