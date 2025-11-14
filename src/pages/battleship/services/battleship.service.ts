@@ -19,7 +19,7 @@ import {
   StatusData,
 } from '../types/types';
 import Swal from 'sweetalert2';
-import { launchConfetti } from '@/app/shared/utils/utils';
+import { launchConfetti } from '@/shared/utils/utils';
 
 @Injectable({
   providedIn: 'root',

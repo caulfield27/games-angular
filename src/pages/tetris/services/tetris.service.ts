@@ -16,6 +16,10 @@ export class TetrisService {
       { z: 0 },
     ])
   );
+  readonly GRID_ROWS = 10;
+  readonly GRID_COLS = 20;
+  readonly GRID_SIZE = 40;
+  private canvas: HTMLCanvasElement | null = null;
 
   private shuffleFigures(figures: FiguresMap[]) {
     const shuffled = [...figures];
@@ -43,7 +47,19 @@ export class TetrisService {
     [arr[idx], arr[randomIdx]] = [arr[randomIdx], arr[idx]];
   }
 
+  public drawGrid(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+    const ctx = canvas.getContext('2d');
 
-  
-  
+    for (let i = 0; i <= this.GRID_ROWS; i++) {
+      const px = this.GRID_SIZE * (i || 1);
+      if (ctx) {
+        ctx.beginPath();
+        ctx.moveTo(this.GRID_SIZE, px);
+        ctx.lineTo(px, this.GRID_SIZE);
+        ctx.strokeStyle = 'white';
+        ctx.stroke();
+      }
+    }
+  }
 }

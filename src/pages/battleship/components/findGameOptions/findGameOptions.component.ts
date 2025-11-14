@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Type } from './findGameOptions.types';
 import { NgClass } from '@angular/common';
-import { copy } from '@/app/shared/utils/utils';
+import { copy } from '@/shared/utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { BattleshipService, WebSocketService } from '../../services';
 import { sendMessageType } from '../../types/types';

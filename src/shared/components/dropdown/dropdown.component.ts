@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { IDropdownOption } from '../../types/types';
+import { IDropdownOption } from '@/shared/types/types';
 import { NgClass } from '@angular/common';
 
 @Component({

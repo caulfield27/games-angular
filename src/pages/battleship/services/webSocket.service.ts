@@ -1,4 +1,4 @@
-import { WS_CONNECTION_URL } from '@/app/api/api.config';
+import { WS_CONNECTION_URL } from '@/api/api.config';
 import { Injectable, signal } from '@angular/core';
 import {
   IWsIncomeMessage,

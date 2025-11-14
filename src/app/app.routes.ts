@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { HomePage, Minesweeper, MemoryGame, Battleship, Tetris } from './pages';
+import { HomePage, Minesweeper, MemoryGame, Battleship, Tetris } from '@/pages';
 
 export const routes: Routes = [
         {

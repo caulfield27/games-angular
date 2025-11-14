@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { LucideAngularModule, House } from 'lucide-angular';
-import { handleAppBackground } from './shared/utils/utils';
-import { SeoService } from './shared/services/seo.service';
+import { handleAppBackground } from '@/shared/utils/utils';
+import { SeoService } from '../shared/services/seo.service';
 
 @Component({
   selector: 'bootstrap',
