@@ -30,7 +30,7 @@ export class TetrisService {
   private prevCoordinates: number[][] | null = null;
   private x: number = 4;
   private y: number = -1;
-  private lastY: number = 0;
+  private lastY: number = this.y;
   public isBoardFilled: boolean = false;
   public interval: ReturnType<typeof setInterval> | null = null;
   private colorsHash: Map<string, string> = new Map();
@@ -131,8 +131,6 @@ export class TetrisService {
       this.updateMatrix();
 
       for (let i = this.y; i <= this.lastY; i++) {
-        console.log(i);
-        
         if (this.matrix[i].every((block) => block)) {
           this.breakLine();
           break;
@@ -180,6 +178,17 @@ export class TetrisService {
     return { xSize, ySize };
   }
 
+  private getLastY(coordinates: number[][]): number {
+    let lastY = -Infinity;
+    for(let i = 0; i < coordinates.length; i++){
+      if(coordinates[i][1] > lastY){
+        lastY = coordinates[i][1];
+      };
+    }
+
+    return lastY;
+  }
+
   private randomSwap(range: number[], arr: FiguresMap[]): void {
     const rangeArr = [];
     for (let i = range[1]; i >= range[0]; i--) {
@@ -202,7 +211,7 @@ export class TetrisService {
       const color = COLORS[this.figures[1].label];
       for (let i = 0; i < coordinates.length; i++) {
         this.drawBlock(
-          coordinates[i][0],
+          coordinates[i][0]+1,
           coordinates[i][1],
           color,
           this.infoCanvas
@@ -252,9 +261,11 @@ export class TetrisService {
   private isBottom(): boolean {
     const coordinates = this.coordinates;
     if (coordinates) {
-      this.lastY = coordinates[coordinates.length - 1][1];
-
-      if (this.lastY === this.matrix.length - 1) return true;
+      this.lastY = this.getLastY(coordinates);
+      if (this.lastY === this.matrix.length - 1) {
+        console.log(coordinates, this.lastY);
+        return true;
+      };
 
       if (coordinates.some(([x, y]) => this.matrix[y + 1]?.[x])) {
         if (this.y === 0) {
@@ -286,6 +297,7 @@ export class TetrisService {
     this.y = -1;
     this.coordinates = null;
     this.prevCoordinates = null;
+    this.lastY = this.y;
   }
 
   private updateMatrix() {
@@ -301,74 +313,6 @@ export class TetrisService {
   }
 
   private breakLine() {
-    let lastLine = 0;
-    for (let i = 0; i < this.matrix.length; i++) {
-      if (this.matrix[i].every((block) => block)) {
-        for (let j = 0; j < this.matrix[i].length; j++) {
-          this.clearBlock(j, i);
-          lastLine = i;
-        }
-      }
-    }
-
-    const seen = new Set();
-
-    for (let x = 0; x < this.GRID_ROWS; x++) {
-      let startY = 0;
-      while (startY < lastLine) {
-        const key = `${x},${startY}`;
-        if (this.matrix[startY][x] && !seen.has(key)) {
-          seen.add(key);
-          this.matrix[startY][x] = false;
-          this.clearBlock(x, startY);
-          if (this.matrix[startY + 1]?.[x] !== undefined) {
-            this.matrix[startY + 1][x] = true;
-            const prevKey = `${x},${startY}`;
-            const color = this.colorsHash.get(prevKey)!;
-            this.colorsHash.delete(prevKey);
-            this.colorsHash.set(key, color);
-            this.drawBlock(x, startY + 1, color, this.canvas);
-          }
-        }
-        startY++;
-      }
-    }
-    // for (let i = 0; i < lastLine; i++) {
-    //   for (let j = 0; j < this.matrix[i].length; j++) {
-    //     if (this.matrix[i][j]) {
-    //       let start = i;
-    //       while (this.matrix[start]?.[j]) {
-    //         this.matrix[start][j] = false;
-    //         this.clearBlock(j, start);
-    //         if (this.matrix[start + 1]?.[j] !== undefined) {
-    //           this.matrix[start + 1][j] = true;
-
-    //           const prevKey = `${j},${start}`;
-    //           const key = `${j},${start+1}`;
-    //           const color = this.colorsHash.get(prevKey)!;
-    //           this.colorsHash.delete(prevKey);
-    //           this.colorsHash.set(key, color);
-    //           this.drawBlock(j, start+1, color, this.canvas);
-    //         }
-    //         start++;
-    //       }
-    //     }
-    //   }
-    // for (let j = 0; j < this.matrix[i].length; j++) {
-    //   if (this.matrix[i][j]) {
-    //     this.matrix[i][j] = false;
-    //     if (this.matrix[i + lineCounter]?.[j] !== undefined) {
-    //       this.matrix[i + lineCounter][j] = true;
-    //       this.clearBlock(j, i);
-
-    //       const prevKey = `${j},${i}`;
-    //       const key = `${j},${i + lineCounter}`;
-    //       const color = this.colorsHash.get(prevKey)!;
-    //       this.colorsHash.delete(prevKey);
-    //       this.colorsHash.set(key, color);
-    //       this.drawBlock(j,i + lineCounter, color, this.canvas);
-    //     }
-    //   }
-    // }
+   
   }
 }
