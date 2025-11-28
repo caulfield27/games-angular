@@ -5,7 +5,6 @@ import {
   COLORS,
   FIGURES_INITIAL_COORDINATES,
 } from '../constants';
-import { FoldHorizontal } from 'lucide-angular';
 
 @Injectable({
   providedIn: 'root',
@@ -31,9 +30,11 @@ export class TetrisService {
   private x: number = 4;
   private y: number = -1;
   private lastY: number = this.y;
-  public isBoardFilled: boolean = false;
-  public interval: ReturnType<typeof setInterval> | null = null;
+  private isBoardFilled: boolean = false;
+  private interval: ReturnType<typeof setInterval> | null = null;
   private colorsHash: Map<string, string> = new Map();
+  private listener: ((event: KeyboardEvent) => void) | null = null;
+  private asideListener: ((event: KeyboardEvent) => void) | null = null;
 
   public init(canvas: HTMLCanvasElement, infoCanvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -47,9 +48,15 @@ export class TetrisService {
     this.infoCanvas.width = this.CELL_SIZE * 4 * dpr;
     this.infoCanvas.height = this.CELL_SIZE * 4 * dpr;
     this.drawNextFigure();
+    this.listener = (e) => this.onKeyDown(e);
+    window.addEventListener('keydown', this.listener);
+    this.interval = setInterval(() => this.moveFigure('down'), 500);
   }
 
-  public moveFigure(to: 'left' | 'right' | 'down' | 'up') {
+  private moveFigure(
+    to: 'left' | 'right' | 'down' | 'up',
+    isAside: boolean = false
+  ) {
     if (this.isBoardFilled) return;
 
     const { label, direction } = this.figures[0];
@@ -65,7 +72,7 @@ export class TetrisService {
         initialCoordinates = initialMatrix[newDirection];
         const { xSize, ySize } = this.getSize(initialCoordinates);
 
-        if (this.x + xSize > 10 || this.y + ySize > 20) {
+        if (this.x + xSize > 10 || this.y + ySize > 20 || this.x < 0) {
           return;
         }
 
@@ -108,46 +115,57 @@ export class TetrisService {
 
     this.coordinates = this.getCoordinates(initialCoordinates);
 
-    if (this.coordinates) {
-      if (this.prevCoordinates) {
-        for (let i = 0; i < this.prevCoordinates.length; i++) {
-          this.clearBlock(
-            this.prevCoordinates[i][0],
-            this.prevCoordinates[i][1]
-          );
-        }
+    if (this.prevCoordinates) {
+      for (let i = 0; i < this.prevCoordinates.length; i++) {
+        this.clearBlock(this.prevCoordinates[i][0], this.prevCoordinates[i][1]);
       }
-      for (let i = 0; i < this.coordinates.length; i++) {
-        const [xdir, ydir] = this.coordinates[i];
-        if (this.matrix[ydir]?.[xdir] === false) {
-          this.colorsHash.set(`${xdir},${ydir}`, color);
-          this.drawBlock(xdir, ydir, color, this.canvas);
-        }
-      }
-      this.prevCoordinates = this.coordinates;
     }
+    for (let i = 0; i < this.coordinates.length; i++) {
+      const [xdir, ydir] = this.coordinates[i];
+      if (this.matrix[ydir]?.[xdir] === false) {
+        this.colorsHash.set(`${xdir},${ydir}`, color);
+        this.drawBlock(xdir, ydir, color, this.canvas);
+      }
+    }
+    this.prevCoordinates = this.coordinates;
+
+    if (isAside) return;
 
     if (this.isBottom()) {
-      this.updateMatrix();
+      clearInterval(this.interval!);
+      window.removeEventListener('keydown', this.listener!);
+      this.asideListener = (e: KeyboardEvent) => this.onKeyDownAside(e);
+      window.addEventListener('keydown', this.asideListener);
 
-      for (let i = this.y; i <= this.lastY; i++) {
-        if (this.matrix[i].every((block) => block)) {
-          this.breakLine();
-          break;
+      setTimeout(() => {
+        let lastLine = null;
+        this.updateMatrix();
+        for (let i = this.y; i <= this.lastY; i++) {
+          if (this.matrix[i].every((block) => block)) {
+            lastLine = i;
+            this.breakLine(i);
+          }
         }
-      }
 
-      this.resetPosition();
-      this.updateFiguresPlacement();
-      this.drawNextFigure();
+        if (lastLine !== null) {
+          while (this.matrix[lastLine].every((block) => block)) {
+            this.breakLine(lastLine);
+          }
+        }
+
+        this.resetPosition();
+        this.updateFiguresPlacement();
+        this.drawNextFigure();
+        this.interval = setInterval(() => this.moveFigure('down'), 500);
+        window.removeEventListener('keydown', this.asideListener!);
+        window.addEventListener('keydown', this.listener!);
+      }, 350);
     }
   }
 
   private shuffleFigures(figures: FiguresMap[]) {
     const shuffled = [...figures];
-
     this.randomSwap([0, shuffled.length - 1], shuffled);
-
     return shuffled;
   }
 
@@ -180,10 +198,10 @@ export class TetrisService {
 
   private getLastY(coordinates: number[][]): number {
     let lastY = -Infinity;
-    for(let i = 0; i < coordinates.length; i++){
-      if(coordinates[i][1] > lastY){
+    for (let i = 0; i < coordinates.length; i++) {
+      if (coordinates[i][1] > lastY) {
         lastY = coordinates[i][1];
-      };
+      }
     }
 
     return lastY;
@@ -211,7 +229,7 @@ export class TetrisService {
       const color = COLORS[this.figures[1].label];
       for (let i = 0; i < coordinates.length; i++) {
         this.drawBlock(
-          coordinates[i][0]+1,
+          coordinates[i][0] + 1,
           coordinates[i][1],
           color,
           this.infoCanvas
@@ -262,10 +280,7 @@ export class TetrisService {
     const coordinates = this.coordinates;
     if (coordinates) {
       this.lastY = this.getLastY(coordinates);
-      if (this.lastY === this.matrix.length - 1) {
-        console.log(coordinates, this.lastY);
-        return true;
-      };
+      if (this.lastY === this.matrix.length - 1) return true;
 
       if (coordinates.some(([x, y]) => this.matrix[y + 1]?.[x])) {
         if (this.y === 0) {
@@ -312,7 +327,62 @@ export class TetrisService {
     }
   }
 
-  private breakLine() {
-   
+  private breakLine(index: number) {
+    for (let x = 0; x < this.matrix[index].length; x++) {
+      let start = index;
+      while (start >= 0) {
+        if (this.matrix[start][x]) {
+          this.dropBlock(x, start);
+        }
+        start--;
+      }
+    }
+  }
+
+  private dropBlock(x: number, y: number) {
+    this.matrix[y][x] = false;
+    this.clearBlock(x, y);
+    const key = `${x},${y}`;
+    const color = this.colorsHash.get(key);
+    this.colorsHash.delete(key);
+    if (this.matrix[y + 1]?.[x] !== undefined) {
+      this.matrix[y + 1][x] = true;
+      this.drawBlock(x, y + 1, color ?? '#f00000', this.canvas);
+      this.colorsHash.set(`${x},${y + 1}`, color ?? '#f00000');
+    }
+  }
+
+  private onKeyDown(event: KeyboardEvent) {
+    const { key } = event;
+    switch (key) {
+      case 'ArrowRight':
+        this.moveFigure('right');
+        break;
+      case 'ArrowLeft':
+        this.moveFigure('left');
+        break;
+      case 'ArrowDown':
+        this.moveFigure('down');
+        break;
+      case 'ArrowUp':
+        if (this.figures[0].label === Figures.O) return;
+        this.moveFigure('up');
+        break;
+      case ' ':
+        // todo
+        break;
+    }
+  }
+
+  private onKeyDownAside(event: KeyboardEvent) {
+    const { key } = event;
+    switch (key) {
+      case 'ArrowRight':
+        this.moveFigure('right', true);
+        break;
+      case 'ArrowLeft':
+        this.moveFigure('left', true);
+        break;
+    }
   }
 }
