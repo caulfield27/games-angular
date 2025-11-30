@@ -34,7 +34,7 @@ export class TetrisService {
   private interval: ReturnType<typeof setInterval> | null = null;
   private colorsHash: Map<string, string> = new Map();
   private listener: ((event: KeyboardEvent) => void) | null = null;
-  private asideListener: ((event: KeyboardEvent) => void) | null = null;
+  private isDelayed = false;
 
   public init(canvas: HTMLCanvasElement, infoCanvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -53,10 +53,7 @@ export class TetrisService {
     this.interval = setInterval(() => this.moveFigure('down'), 500);
   }
 
-  private moveFigure(
-    to: 'left' | 'right' | 'down' | 'up',
-    isAside: boolean = false
-  ) {
+  private moveFigure(to: 'left' | 'right' | 'down' | 'up') {
     if (this.isBoardFilled) return;
 
     const { label, direction } = this.figures[0];
@@ -129,37 +126,31 @@ export class TetrisService {
     }
     this.prevCoordinates = this.coordinates;
 
-    if (isAside) return;
-
     if (this.isBottom()) {
-      clearInterval(this.interval!);
-      window.removeEventListener('keydown', this.listener!);
-      this.asideListener = (e: KeyboardEvent) => this.onKeyDownAside(e);
-      window.addEventListener('keydown', this.asideListener);
-
-      setTimeout(() => {
-        let lastLine = null;
-        this.updateMatrix();
-        for (let i = this.y; i <= this.lastY; i++) {
-          if (this.matrix[i].every((block) => block)) {
-            lastLine = i;
-            this.breakLine(i);
-          }
+      this.updateMatrix();
+      let lastLine = null;
+      for (let i = this.y; i <= this.lastY; i++) {
+        if (!this.matrix[i]) continue;
+        if (this.matrix[i].every((block) => block)) {
+          lastLine = i + 1;
+          this.breakLine(i);
         }
+      }
 
-        if (lastLine !== null) {
-          while (this.matrix[lastLine].every((block) => block)) {
-            this.breakLine(lastLine);
-          }
+      if (lastLine !== null && lastLine < this.matrix.length) {
+        while (
+          lastLine < this.matrix.length &&
+          this.matrix[lastLine].every((block) => block)
+        ) {
+          this.breakLine(lastLine);
+          lastLine = lastLine + 1;
         }
+      }
 
-        this.resetPosition();
-        this.updateFiguresPlacement();
-        this.drawNextFigure();
-        this.interval = setInterval(() => this.moveFigure('down'), 500);
-        window.removeEventListener('keydown', this.asideListener!);
-        window.addEventListener('keydown', this.listener!);
-      }, 350);
+      this.isDelayed = false;
+      this.resetPosition();
+      this.updateFiguresPlacement();
+      this.drawNextFigure();
     }
   }
 
@@ -370,18 +361,6 @@ export class TetrisService {
         break;
       case ' ':
         // todo
-        break;
-    }
-  }
-
-  private onKeyDownAside(event: KeyboardEvent) {
-    const { key } = event;
-    switch (key) {
-      case 'ArrowRight':
-        this.moveFigure('right', true);
-        break;
-      case 'ArrowLeft':
-        this.moveFigure('left', true);
         break;
     }
   }
