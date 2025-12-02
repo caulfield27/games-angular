@@ -6,7 +6,6 @@ import Swal from 'sweetalert2';
 import { ICard, LevelEnum } from './types/types';
 import { launchConfetti } from '../../shared/utils/utils';
 import { getCards, getQuantity, getSettings, getTimer } from './utils/utils';
-import { reset } from 'canvas-confetti';
 
 @Component({
   selector: 'memory-game',

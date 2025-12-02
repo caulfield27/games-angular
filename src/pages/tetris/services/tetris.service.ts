@@ -1,15 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Figures, FiguresMap } from '../types';
 import {
   BOARD_MATRIX,
   COLORS,
   FIGURES_INITIAL_COORDINATES,
 } from '../constants';
+import Swal from 'sweetalert2';
+import { launchConfetti } from '@/shared/utils/utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TetrisService {
+  public bestScore = signal<number>(
+    Number(localStorage.getItem('testris_best_score')) || 0
+  );
+  public level = signal<number>(1);
+  public score = signal<number>(0);
   public figures: FiguresMap[] = this.shuffleFigures([
     { label: Figures.I, direction: 0 },
     { label: Figures.J, direction: 0 },
@@ -31,10 +38,13 @@ export class TetrisService {
   private y: number = -1;
   private lastY: number = this.y;
   private isBoardFilled: boolean = false;
-  private interval: ReturnType<typeof setInterval> | null = null;
   private colorsHash: Map<string, string> = new Map();
   private listener: ((event: KeyboardEvent) => void) | null = null;
-  private isDelayed = false;
+  private duration: number = 1000;
+  private prevTimestamp: number = 0;
+  public gameStopped = signal<boolean>(false);
+  public gameStarted = signal<boolean>(false);
+  private linesPerLevel: number = 0;
 
   public init(canvas: HTMLCanvasElement, infoCanvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -45,16 +55,51 @@ export class TetrisService {
     this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
     this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
 
-    this.infoCanvas.width = this.CELL_SIZE * 4 * dpr;
-    this.infoCanvas.height = this.CELL_SIZE * 4 * dpr;
-    this.drawNextFigure();
-    this.listener = (e) => this.onKeyDown(e);
-    window.addEventListener('keydown', this.listener);
-    this.interval = setInterval(() => this.moveFigure('down'), 500);
+    this.infoCanvas.width = 30 * 4 * dpr;
+    this.infoCanvas.height = 30 * 4 * dpr;
   }
 
-  private moveFigure(to: 'left' | 'right' | 'down' | 'up') {
-    if (this.isBoardFilled) return;
+  public reset() {
+    const ctx1 = this.canvas?.getContext('2d');
+    const ctx2 = this.infoCanvas?.getContext('2d');
+    if (ctx1)
+      ctx1.clearRect(0, 0, this.canvas?.width ?? 0, this.canvas?.height ?? 0);
+    if (ctx2)
+      ctx2.clearRect(
+        0,
+        0,
+        this.infoCanvas?.width ?? 0,
+        this.infoCanvas?.height ?? 0
+      );
+    this.x = 4;
+    this.y = -1;
+    this.lastY = this.y;
+    this.colorsHash.clear();
+    window.removeEventListener('keydown', this.listener!);
+    this.gameStopped.set(false);
+    this.gameStarted.set(false);
+    this.matrix = BOARD_MATRIX;
+    this.bestScore.set(
+      Number(localStorage.getItem('testris_best_score')) || this.score()
+    );
+    this.score.set(0);
+  }
+
+  public play() {
+    if (!this.gameStarted()) {
+      this.drawNextFigure();
+      this.listener = (e) => this.onKeyDown(e);
+      window.addEventListener('keydown', this.listener);
+    }
+    if (this.gameStopped()) {
+      this.gameStopped.set(false);
+    }
+    this.gameStarted.set(true);
+    requestAnimationFrame((time: number) => this.moveDownLoop(time));
+  }
+
+  public moveFigure(to: 'left' | 'right' | 'down' | 'up') {
+    if (this.isBoardFilled || this.gameStopped()) return;
 
     const { label, direction } = this.figures[0];
     const color = COLORS[label] ?? '#f0f000';
@@ -121,36 +166,78 @@ export class TetrisService {
       const [xdir, ydir] = this.coordinates[i];
       if (this.matrix[ydir]?.[xdir] === false) {
         this.colorsHash.set(`${xdir},${ydir}`, color);
-        this.drawBlock(xdir, ydir, color, this.canvas);
+        this.drawBlock(xdir, ydir, color, this.canvas, this.CELL_SIZE);
       }
     }
     this.prevCoordinates = this.coordinates;
 
     if (this.isBottom()) {
+      if (this.isBoardFilled) {
+        const isRecoredBreaked = this.score() > this.bestScore();
+        if (isRecoredBreaked) {
+          launchConfetti(1000);
+          Swal.fire({
+            icon: 'success',
+            title: 'Вы побили свой рекорд',
+            text: `Ваш новый рекорд: ${this.score()}`,
+          }).then(() => {
+            localStorage.setItem('testris_best_score', String(this.score()));
+            this.reset();
+          });
+        } else {
+          Swal.fire({
+            title: 'Игра окончена!',
+            text: `Ваш счёт: ${this.score()} Текущий рекорд: ${this.bestScore()}`,
+          }).then(() => {
+            this.reset();
+          });
+        }
+        return;
+      }
       this.updateMatrix();
-      let lastLine = null;
+      let breakCounter = 0;
       for (let i = this.y; i <= this.lastY; i++) {
         if (!this.matrix[i]) continue;
         if (this.matrix[i].every((block) => block)) {
-          lastLine = i + 1;
+          breakCounter++;
+          this.linesPerLevel++;
           this.breakLine(i);
         }
       }
 
-      if (lastLine !== null && lastLine < this.matrix.length) {
-        while (
-          lastLine < this.matrix.length &&
-          this.matrix[lastLine].every((block) => block)
-        ) {
-          this.breakLine(lastLine);
-          lastLine = lastLine + 1;
+      if (breakCounter) {
+        const dif =
+          breakCounter === 1
+            ? 100
+            : breakCounter === 2
+            ? 300
+            : breakCounter === 3
+            ? 500
+            : 800;
+        this.score.update((prev) => (prev += dif * this.level()));
+        if (this.linesPerLevel > 20) {
+          this.linesPerLevel = 0;
+          this.level.update((prev) => prev + 1);
+          if (this.duration > 100) {
+            this.duration -= 50;
+          }
         }
       }
 
-      this.isDelayed = false;
       this.resetPosition();
       this.updateFiguresPlacement();
       this.drawNextFigure();
+    }
+  }
+
+  private moveDownLoop(timestamp: number) {
+    if (timestamp - this.prevTimestamp >= this.duration) {
+      this.prevTimestamp = timestamp;
+      this.moveFigure('down');
+    }
+
+    if (!this.isBoardFilled && !this.gameStopped() && this.gameStarted()) {
+      requestAnimationFrame((time: number) => this.moveDownLoop(time));
     }
   }
 
@@ -223,7 +310,8 @@ export class TetrisService {
           coordinates[i][0] + 1,
           coordinates[i][1],
           color,
-          this.infoCanvas
+          this.infoCanvas,
+          30
         );
       }
     }
@@ -233,29 +321,27 @@ export class TetrisService {
     x: number,
     y: number,
     color: string,
-    canvas: HTMLCanvasElement | null
+    canvas: HTMLCanvasElement | null,
+    size: number
   ) {
     const ctx = canvas?.getContext('2d');
-    if (ctx) {
-      x = x * this.CELL_SIZE;
-      y = y * this.CELL_SIZE;
+    if (!ctx) return;
 
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y, this.CELL_SIZE, this.CELL_SIZE);
+    x = x * size;
+    y = y * size;
 
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.fillRect(x, y, this.CELL_SIZE * 0.3, this.CELL_SIZE * 0.3);
-      ctx.fillRect(
-        x + this.CELL_SIZE * 0.7,
-        y + this.CELL_SIZE * 0.7,
-        this.CELL_SIZE * 0.3,
-        this.CELL_SIZE * 0.3
-      );
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, size, size);
 
-      ctx.strokeStyle = 'rgba(0,0,0,0.5)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(x + 1, y + 1, this.CELL_SIZE - 2, this.CELL_SIZE - 2);
-    }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+
+    ctx.fillRect(x, y, size * 0.3, size * 0.3);
+    ctx.fillRect(x + size * 0.7, y + size * 0.7, size * 0.3, size * 0.3);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x + 1, y + 1, size - 2, size - 2);
   }
 
   private clearBlock(x: number, y: number) {
@@ -276,9 +362,6 @@ export class TetrisService {
       if (coordinates.some(([x, y]) => this.matrix[y + 1]?.[x])) {
         if (this.y === 0) {
           this.isBoardFilled = true;
-          if (this.interval) {
-            clearInterval(this.interval);
-          }
         }
         return true;
       }
@@ -320,7 +403,12 @@ export class TetrisService {
 
   private breakLine(index: number) {
     for (let x = 0; x < this.matrix[index].length; x++) {
-      let start = index;
+      this.matrix[index][x] = false;
+      this.clearBlock(x, index);
+    }
+
+    for (let x = 0; x < this.matrix[index - 1].length; x++) {
+      let start = index - 1;
       while (start >= 0) {
         if (this.matrix[start][x]) {
           this.dropBlock(x, start);
@@ -338,7 +426,7 @@ export class TetrisService {
     this.colorsHash.delete(key);
     if (this.matrix[y + 1]?.[x] !== undefined) {
       this.matrix[y + 1][x] = true;
-      this.drawBlock(x, y + 1, color ?? '#f00000', this.canvas);
+      this.drawBlock(x, y + 1, color ?? '#f00000', this.canvas, this.CELL_SIZE);
       this.colorsHash.set(`${x},${y + 1}`, color ?? '#f00000');
     }
   }
@@ -358,9 +446,6 @@ export class TetrisService {
       case 'ArrowUp':
         if (this.figures[0].label === Figures.O) return;
         this.moveFigure('up');
-        break;
-      case ' ':
-        // todo
         break;
     }
   }

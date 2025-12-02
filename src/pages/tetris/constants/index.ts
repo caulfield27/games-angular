@@ -23,14 +23,15 @@ export const BOARD_MATRIX: boolean[][] = [
   [false, false, false, false, false, false, false, false, false, false],
 ];
 
+
 export const COLORS: Record<string, string> = {
-  I: '#00f0f0',
-  O: '#f0f000',
-  T: '#a000f0',
-  S: '#00f000',
-  Z: '#f00000',
-  J: '#0000f0',
-  L: '#f0a000',
+  I: '#3ef2ff',
+  O: '#ffe65c',
+  T: '#d057ff',
+  S: '#5aff8b',
+  Z: '#ff4b6b',
+  J: '#4c6bff',
+  L: '#ff9651',
 };
 
 export const FIGURES_INITIAL_COORDINATES: Record<Figures, number[][][]> = {

@@ -38,7 +38,7 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/battleship.ico',
   },
    '/tetris': {
-    background_url_path: null,
+    background_url_path: '/pagesBackground/tetris-bg.png',
     title: 'Тетрис — Классическая онлайн игра бесплатно',
     description:
       'Играйте в Тетрис онлайн бесплатно! Собирайте линии, зарабатывайте очки и ставьте рекорды в легендарной игре прямо в браузере.',
