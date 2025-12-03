@@ -19,6 +19,7 @@ import {
 @Component({
   selector: 'tetris',
   templateUrl: './tetris.component.html',
+  styleUrl: './tetris.component.scss',
   imports: [LucideAngularModule],
 })
 export class Tetris implements AfterViewInit, OnDestroy {

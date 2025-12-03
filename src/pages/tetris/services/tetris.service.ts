@@ -12,6 +12,7 @@ import { launchConfetti } from '@/shared/utils/utils';
   providedIn: 'root',
 })
 export class TetrisService {
+  readonly isMobile = window.innerWidth <= 710;
   public bestScore = signal<number>(
     Number(localStorage.getItem('testris_best_score')) || 0
   );
@@ -29,7 +30,8 @@ export class TetrisService {
   private matrix = BOARD_MATRIX;
   readonly GRID_ROWS = 10;
   readonly GRID_COLS = 20;
-  readonly CELL_SIZE = 40;
+  readonly CELL_SIZE = 25;
+  readonly NEXT_CELL_SIZE = this.isMobile ? 10 : 20;
   private canvas: HTMLCanvasElement | null = null;
   private infoCanvas: HTMLCanvasElement | null = null;
   private coordinates: number[][] | null = null;
@@ -50,13 +52,20 @@ export class TetrisService {
     this.canvas = canvas;
     this.infoCanvas = infoCanvas;
 
-    const dpr = Math.round(window.devicePixelRatio);
+    // const dpr = Math.round(window.devicePixelRatio);
+    // console.log('cell: ', this.CELL_SIZE);
 
-    this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
-    this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
+    // this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
+    // this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
 
-    this.infoCanvas.width = 30 * 4 * dpr;
-    this.infoCanvas.height = 30 * 4 * dpr;
+    // this.infoCanvas.width = this.NEXT_CELL_SIZE * 4 * dpr;
+    // this.infoCanvas.height = this.NEXT_CELL_SIZE * 4 * dpr;
+
+    this.canvas.width = this.CELL_SIZE * this.GRID_ROWS;
+    this.canvas.height = this.CELL_SIZE * this.GRID_COLS;
+
+    this.infoCanvas.width = this.NEXT_CELL_SIZE * 4;
+    this.infoCanvas.height = this.NEXT_CELL_SIZE * 4;    
   }
 
   public reset() {
@@ -90,6 +99,7 @@ export class TetrisService {
       this.drawNextFigure();
       this.listener = (e) => this.onKeyDown(e);
       window.addEventListener('keydown', this.listener);
+      this.drawNextFigure();
     }
     if (this.gameStopped()) {
       this.gameStopped.set(false);
@@ -187,7 +197,7 @@ export class TetrisService {
         } else {
           Swal.fire({
             title: 'Игра окончена!',
-            text: `Ваш счёт: ${this.score()} Текущий рекорд: ${this.bestScore()}`,
+            text: `Ваш счёт: ${this.score()}, текущий рекорд: ${this.bestScore()}`,
           }).then(() => {
             this.reset();
           });
@@ -311,7 +321,7 @@ export class TetrisService {
           coordinates[i][1],
           color,
           this.infoCanvas,
-          30
+          this.NEXT_CELL_SIZE
         );
       }
     }
@@ -327,6 +337,10 @@ export class TetrisService {
     const ctx = canvas?.getContext('2d');
     if (!ctx) return;
 
+    if(size === 20){
+      console.log(x, y, canvas);
+      
+    }
     x = x * size;
     y = y * size;
 
@@ -432,6 +446,7 @@ export class TetrisService {
   }
 
   private onKeyDown(event: KeyboardEvent) {
+    event.stopPropagation();
     const { key } = event;
     switch (key) {
       case 'ArrowRight':
