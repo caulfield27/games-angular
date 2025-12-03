@@ -52,18 +52,12 @@ export class TetrisService {
     this.canvas = canvas;
     this.infoCanvas = infoCanvas;
 
-    // const dpr = Math.round(window.devicePixelRatio);
-    // this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
-    // this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
+    const dpr = Math.round(window.devicePixelRatio);
+    this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
+    this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
 
-    // this.infoCanvas.width = this.NEXT_CELL_SIZE * 4 * dpr;
-    // this.infoCanvas.height = this.NEXT_CELL_SIZE * 4 * dpr;
-
-    this.canvas.width = this.CELL_SIZE * this.GRID_ROWS;
-    this.canvas.height = this.CELL_SIZE * this.GRID_COLS;
-
-    this.infoCanvas.width = this.NEXT_CELL_SIZE * 4;
-    this.infoCanvas.height = this.NEXT_CELL_SIZE * 4;    
+    this.infoCanvas.width = this.NEXT_CELL_SIZE * 4 * dpr;
+    this.infoCanvas.height = this.NEXT_CELL_SIZE * 4 * dpr;
   }
 
   public reset() {
