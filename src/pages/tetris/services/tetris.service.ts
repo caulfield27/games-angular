@@ -53,8 +53,6 @@ export class TetrisService {
     this.infoCanvas = infoCanvas;
 
     // const dpr = Math.round(window.devicePixelRatio);
-    // console.log('cell: ', this.CELL_SIZE);
-
     // this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
     // this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
 
@@ -337,10 +335,6 @@ export class TetrisService {
     const ctx = canvas?.getContext('2d');
     if (!ctx) return;
 
-    if(size === 20){
-      console.log(x, y, canvas);
-      
-    }
     x = x * size;
     y = y * size;
 
