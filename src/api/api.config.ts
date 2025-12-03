@@ -1,1 +1,1 @@
-export const WS_CONNECTION_URL = 'ws://localhost:3000';
+export const WS_CONNECTION_URL = 'wss://games-online-service.onrender.com';
