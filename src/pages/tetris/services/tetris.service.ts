@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { effect, Injectable, signal } from '@angular/core';
 import { Figures, FiguresMap } from '../types';
 import {
   BOARD_MATRIX,
@@ -27,7 +27,7 @@ export class TetrisService {
     { label: Figures.T, direction: 0 },
     { label: Figures.Z, direction: 0 },
   ]);
-  private matrix = BOARD_MATRIX;
+  private matrix = this.getInitialMatrix();
   readonly GRID_ROWS = 10;
   readonly GRID_COLS = 20;
   readonly CELL_SIZE = this.isMobile ? 20 : 25;
@@ -63,7 +63,7 @@ export class TetrisService {
     this.canvas.height = this.CELL_SIZE * this.GRID_COLS;
 
     this.infoCanvas.width = this.NEXT_CELL_SIZE * 4;
-    this.infoCanvas.height = this.NEXT_CELL_SIZE * 4;    
+    this.infoCanvas.height = this.NEXT_CELL_SIZE * 4;
   }
 
   public reset() {
@@ -85,7 +85,9 @@ export class TetrisService {
     window.removeEventListener('keydown', this.listener!);
     this.gameStopped.set(false);
     this.gameStarted.set(false);
-    this.matrix = BOARD_MATRIX;
+    this.isBoardFilled = false;
+    this.matrix = this.getInitialMatrix();
+    this.prevTimestamp = 0;
     this.bestScore.set(
       Number(localStorage.getItem('testris_best_score')) || this.score()
     );
@@ -107,7 +109,7 @@ export class TetrisService {
   }
 
   public moveFigure(to: 'left' | 'right' | 'down' | 'up') {
-    if (this.isBoardFilled || this.gameStopped()) return;
+    if (this.isBoardFilled || this.gameStopped() || !this.gameStarted()) return;
 
     const { label, direction } = this.figures[0];
     const color = COLORS[label] ?? '#f0f000';
@@ -366,7 +368,6 @@ export class TetrisService {
     if (coordinates) {
       this.lastY = this.getLastY(coordinates);
       if (this.lastY === this.matrix.length - 1) return true;
-
       if (coordinates.some(([x, y]) => this.matrix[y + 1]?.[x])) {
         if (this.y === 0) {
           this.isBoardFilled = true;
@@ -440,7 +441,7 @@ export class TetrisService {
   }
 
   private onKeyDown(event: KeyboardEvent) {
-    event.stopPropagation();
+    event.preventDefault();
     const { key } = event;
     switch (key) {
       case 'ArrowRight':
@@ -457,5 +458,9 @@ export class TetrisService {
         this.moveFigure('up');
         break;
     }
+  }
+
+  private getInitialMatrix() {
+    return BOARD_MATRIX.map((arr) => [...arr]);
   }
 }
