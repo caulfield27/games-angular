@@ -1,10 +1,14 @@
 .page_container{
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-size: cover;
-  padding: 32px;
+  padding: 80px 32px 32px 32px;
+
+  @media screen and (max-width: 500px) {
+    padding: 80px 16px 16px 16px;
+  }
 }
 
 .mainsweeper_wrapper {

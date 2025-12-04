@@ -30,7 +30,7 @@ export class TetrisService {
   private matrix = BOARD_MATRIX;
   readonly GRID_ROWS = 10;
   readonly GRID_COLS = 20;
-  readonly CELL_SIZE = 25;
+  readonly CELL_SIZE = this.isMobile ? 20 : 25;
   readonly NEXT_CELL_SIZE = this.isMobile ? 10 : 20;
   private canvas: HTMLCanvasElement | null = null;
   private infoCanvas: HTMLCanvasElement | null = null;
@@ -223,11 +223,11 @@ export class TetrisService {
             ? 500
             : 800;
         this.score.update((prev) => (prev += dif * this.level()));
-        if (this.linesPerLevel > 20) {
+        if (this.linesPerLevel > 10) {
           this.linesPerLevel = 0;
           this.level.update((prev) => prev + 1);
           if (this.duration > 100) {
-            this.duration -= 50;
+            this.duration -= 100;
           }
         }
       }

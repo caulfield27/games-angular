@@ -1,7 +1,7 @@
 .tetris_wrapper {
   font-family: "Press Start 2P", system-ui;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -76,8 +76,8 @@
 
   @media screen and (max-width: 710px) {
     color: white;
-    font-size: 12px;
-    width: calc(10 * 25px);
+    font-size: 10px;
+    width: calc(10 * 20px);
     height: calc(4 * 20px);
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
@@ -140,7 +140,7 @@
   display: none;
 
   @media screen and (max-width: 710px) {
-    margin-top: 12px;
+    margin-top: 10px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
@@ -149,7 +149,6 @@
     & button {
       color: white;
       cursor: pointer;
-      padding: 3px;
       background-color: #3b82f6;
       border-radius: 10px;
       display: flex;
@@ -157,7 +156,7 @@
       align-items: center;
 
       &:active {
-        scale: 0.9;
+        scale: 0.95;
       }
 
       &:nth-child(1) {
@@ -180,4 +179,8 @@
   color: white;
   font-weight: 500;
   font-size: 16px;
+
+  @media screen and (max-width: 710px) {
+    font-size: 12px;
+  }
 }
