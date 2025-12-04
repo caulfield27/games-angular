@@ -92,6 +92,7 @@ export class TetrisService {
       Number(localStorage.getItem('testris_best_score')) || this.score()
     );
     this.score.set(0);
+    this.level.set(1);
   }
 
   public play() {
