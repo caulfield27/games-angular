@@ -37,13 +37,22 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
       'морской бой, онлайн игра, мультиплеер, игра с другом, бесплатные игры',
     icoPath: 'ico/battleship.ico',
   },
-   '/tetris': {
-    background_url_path: '/pagesBackground/tetris-bg.png',
+  '/tetris': {
+    background_url_path: null,
     title: 'Тетрис — Классическая онлайн игра бесплатно',
     description:
       'Играйте в Тетрис онлайн бесплатно! Собирайте линии, зарабатывайте очки и ставьте рекорды в легендарной игре прямо в браузере.',
     keywords:
       'тетрис, онлайн тетрис, бесплатные игры, головоломка, классические игры, аркада',
     icoPath: 'ico/Tetris.ico',
+  },
+  '/flappy-bird': {
+    background_url_path: '/pagesBackground/flappy-bird-night.jpg',
+    title: 'Flappy Bird — Классическая аркадная онлайн игра',
+    description:
+      'Flappy Bird — популярная аркадная игра онлайн. Управляйте птицей, пролетайте между трубами, набирайте очки и ставьте новые рекорды. Играйте бесплатно прямо в браузере.',
+    keywords:
+      'flappy bird, флаппи берд, аркадные игры, онлайн игры, бесплатные игры, браузерные игры, классические игры',
+    icoPath: 'ico/flappy_bird_icon.ico',
   },
 };

@@ -21,8 +21,14 @@ export const games: IGames[] = [
     },
     {
       name: 'Тетрис',
-      image: '/tetris_preview.jpg',
+      image: '/tetris_preview.png',
       href: 'tetris',
       tags: ['2D', 'Puzzle', 'Arcade', 'Singleplayer'],
+    },
+    {
+      name: 'Flappy bird',
+      image: '/flappy-bird.png',
+      href: 'flappy-bird',
+      tags: ['2D', 'Arcade', 'Endless', 'Casual', 'Singleplayer'],
     },
   ];
