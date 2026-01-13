@@ -47,7 +47,8 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/Tetris.ico',
   },
   '/flappy-bird': {
-    background_url_path: '/pagesBackground/flappy-bird-night.jpg',
+    // background_url_path: '/pagesBackground/flappy-bird.jpg',
+    background_url_path: null ,
     title: 'Flappy Bird — Классическая аркадная онлайн игра',
     description:
       'Flappy Bird — популярная аркадная игра онлайн. Управляйте птицей, пролетайте между трубами, набирайте очки и ставьте новые рекорды. Играйте бесплатно прямо в браузере.',
