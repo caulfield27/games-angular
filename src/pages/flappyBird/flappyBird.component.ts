@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { BirdState, Pipe } from './types';
+import { Pipe } from './types';
 
 @Component({
   selector: 'flappy-bird',
@@ -10,21 +10,21 @@ export class FlappyBird implements AfterViewInit {
   ctx: null | CanvasRenderingContext2D = null;
   canvas: null | HTMLCanvasElement = null;
   bird: HTMLImageElement = new Image();
-  readonly birdFallSpeed: number = 150;
-  readonly birdJumpSpeed: number = 250;
+  readonly birdFallSpeed: number = 4;
   readonly pipeSpeed: number = 100;
-  readonly jumpRange: number = 65;
   readonly pipeWidth: number = 100;
   readonly pipeGap: number = this.pipeWidth * 2.5;
-  rotateAngle = 45;
   prevBirdTimestamp: number = 0;
   prevPipeTimestamp: number = 0;
-  birdX: number = 100;
-  birdY: number = 200;
+  birdX: number = 150;
+  birdY: number = 0;
   prevBirdY: number | null = null;
   prevJumpPoint: number | null = null;
-  birdState: BirdState = BirdState.FALL;
   pipes: Pipe[] = [];
+
+  speedY = 0;
+  gravity = 1200;
+  jumpImpulse = -350;
 
   ngAfterViewInit(): void {
     this.canvas = this.canvasRef.nativeElement;
@@ -35,9 +35,12 @@ export class FlappyBird implements AfterViewInit {
 
     this.generatePipes();
 
-    // requestAnimationFrame((time: number) => this.movePipes(time));
+    requestAnimationFrame((time: number) => this.movePipes(time));
     requestAnimationFrame((time: number) => this.moveBird(time));
-    window.addEventListener('keydown', (e) => this.handleKeyPress(e));
+
+    this.drawBird();
+    window.addEventListener('keyup', (e) => this.handleKeyPress(e));
+    window.addEventListener('click', () => this.jump());
   }
 
   private generatePipes() {
@@ -71,44 +74,31 @@ export class FlappyBird implements AfterViewInit {
 
   private drawBird() {
     if (!this.ctx) return;
-
     const angle = this.getBirdRotation();
-    const cx = this.birdX+this.bird.width / 2;
-    const cy = this.birdY+this.bird.height / 2;
+    const w = this.bird.width;
+    const h = this.bird.height;
+
+    const cx = this.birdX + w / 2;
+    const cy = this.birdY + h / 2;
 
     this.ctx.save();
-
-    this.ctx.translate(cx,cy);
+    this.ctx.translate(cx, cy);
     this.ctx.rotate(angle);
 
-    this.ctx.drawImage(this.bird, this.birdX, this.birdY);
-     
+    this.ctx.drawImage(this.bird, -w / 2, -h / 2);
+
     this.ctx.restore();
-    
     this.prevBirdY = this.birdY;
   }
 
   private moveBird(timeStamp: number) {
     const delta = (timeStamp - this.prevBirdTimestamp) / 1000;
     this.prevBirdTimestamp = timeStamp;
-    const speed =
-      this.birdState === BirdState.FALL
-        ? this.birdFallSpeed
-        : this.birdJumpSpeed;
-    if (this.birdState == BirdState.FALL) {
-      this.birdY += speed * delta;
-    } else {
-      if (
-        this.prevJumpPoint !== null &&
-        this.birdY <= this.prevJumpPoint! - this.jumpRange
-      ) {
-        this.prevJumpPoint = null;
-        this.birdState = BirdState.FALL;
-      }
-      this.birdY -= speed * delta;
-    }
 
-    if (this.birdY > (this.canvas?.height ?? 0) || this.birdY < 0) return;
+    this.speedY += this.gravity * delta;
+    this.birdY += this.speedY * delta;
+
+    if (this.birdY > (this.canvas?.height ?? 0)) return;
 
     if (this.prevBirdY) {
       this.clearBird(this.prevBirdY);
@@ -121,9 +111,12 @@ export class FlappyBird implements AfterViewInit {
 
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key === ' ') {
-      this.prevJumpPoint = this.birdY;
-      this.birdState = BirdState.JUMP;
+      this.jump();
     }
+  }
+
+  private jump() {
+    this.speedY = this.jumpImpulse;
   }
 
   private movePipes(timeStamp: number) {
@@ -143,7 +136,6 @@ export class FlappyBird implements AfterViewInit {
 
     const last = this.pipes[this.pipes.length - 1];
     if (last.xDir + this.pipeWidth < 0) {
-      // this.clearPipe(last.xDir, last.topHeight, last.bottomHeight);
       this.pipes[this.pipes.length - 1] = this.getPipePosition(
         this.canvas!.width,
         this.canvas!.height,
@@ -184,14 +176,31 @@ export class FlappyBird implements AfterViewInit {
 
   private clearBird(y: number) {
     if (!this.ctx) return;
-    // this.ctx.clearRect(this.birdX, y, this.bird.width, this.bird.height);
-    this.ctx.clearRect(0,0,this.canvas!.width,this.canvas!.height);
+    const angle = this.getBirdRotation();
+    const w = this.bird.width;
+    const h = this.bird.height;
+
+    const cx = this.birdX + w / 2;
+    const cy = y + h / 2;
+
+    this.ctx.save();
+    this.ctx.translate(cx, cy);
+    this.ctx.rotate(angle);
+
+    const realH = angle < 0 ? h + 16 : h + 5;
+    this.ctx.clearRect(-w / 2 - 5, -h / 2 - 5, w + 5, realH);
+
+    this.ctx.restore();
   }
 
   private getBirdRotation(): number {
-    if (this.birdState === BirdState.JUMP) {
-      return -0.35; // вверх (~ -20°)
-    }
-    return 0.5; // вниз (~ +30°)
+    const angle = this.speedY * 0.0015;
+
+    return Math.max(-0.35, Math.min(angle, 1.5));
+  }
+
+  private checkCollisions() {
+    console.log(this.pipes);
+    console.log(this.birdX, this.birdY);
   }
 }
