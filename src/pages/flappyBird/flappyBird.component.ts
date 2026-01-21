@@ -8,7 +8,7 @@ import { defaultPipe } from './constants';
 })
 export class FlappyBird implements AfterViewInit {
   // dom
-  @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  // @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   ctx: null | CanvasRenderingContext2D = null;
   canvas: null | HTMLCanvasElement = null;
 
@@ -50,25 +50,25 @@ export class FlappyBird implements AfterViewInit {
   }
 
   private init() {
-    this.canvas = this.canvasRef.nativeElement;
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-    this.ctx = this.canvas.getContext('2d');
+    // this.canvas = this.canvasRef.nativeElement;
+    // this.canvas.width = window.innerWidth;
+    // this.canvas.height = window.innerHeight;
+    // this.ctx = this.canvas.getContext('2d');
     this.bird.src = '/flappyBird/yellowbird.png';
     this.pipe.src = '/flappyBird/pipe-green.png';
-    this.pipe.onload = () => {
-      this.pipeWidth = this.pipe.width;
-      this.pipeGap = this.pipeWidth * 2.5;
-         this.generatePipes();
-      requestAnimationFrame((time: number) => this.movePipes(time));
-    };
+    // this.pipe.onload = () => {
+    //   this.pipeWidth = this.pipe.width;
+    //   this.pipeGap = this.pipeWidth * 2.5;
+    //   this.generatePipes();
+    //   requestAnimationFrame((time: number) => this.movePipes(time));
+    // };
 
 
-    requestAnimationFrame((time: number) => this.moveBird(time));
+    // requestAnimationFrame((time: number) => this.moveBird(time));
 
-    this.drawBird();
-    window.addEventListener('keyup', (e) => this.handleKeyPress(e));
-    window.addEventListener('click', () => this.jump());
+    // this.drawBird();
+    // window.addEventListener('keyup', (e) => this.handleKeyPress(e));
+    // window.addEventListener('click', () => this.jump());
   }
 
   private getPipePosition(
@@ -184,20 +184,15 @@ export class FlappyBird implements AfterViewInit {
     const { topHeight, bottomHeight, xDir } = currentPipe;
     const bottomY = topHeight + (height - (topHeight + bottomHeight));
     
-    const cx = xDir+this.pipeWidth / 2;
+    const centerX = xDir+this.pipeWidth / 2;
+    const centerY = topHeight/2;
 
     this.ctx.save();
-    this.ctx.drawImage(this.pipe, xDir, 0, this.pipeWidth, topHeight);
+    this.ctx.translate(centerX,centerY);
+    this.ctx.rotate(Math.PI);
+    this.ctx.drawImage(this.pipe, -this.pipeWidth/2, -topHeight/2, this.pipeWidth, topHeight);
     this.ctx.restore();
     this.ctx.drawImage(this.pipe, xDir, bottomY, this.pipeWidth, bottomHeight);
-    // this.ctx.fillStyle = '#A3C65C';
-    // this.ctx.fillRect(xDir, 0, this.pipeWidth, topHeight);
-    // this.ctx.fillRect(xDir, bottomY, this.pipeWidth, bottomHeight);
-
-    // this.ctx.lineWidth = 6;
-    // this.ctx.strokeStyle = '#749E3A';
-    // this.ctx.strokeRect(xDir, 0, this.pipeWidth, topHeight);
-    // this.ctx.strokeRect(xDir, bottomY, this.pipeWidth, bottomHeight);
 
     currentPipe.prevX = xDir;
   }
