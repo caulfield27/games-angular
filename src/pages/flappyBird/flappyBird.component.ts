@@ -149,12 +149,7 @@ export class FlappyBird implements AfterViewInit {
       this.clearBird(this.prevBirdY);
     }
 
-    // if (!this.isCollisioned && this.pipes.length) {
-    //   this.isCollisioned = this.checkCollisions();
-    //   if (this.isCollisioned) {
-    //     this.failed();
-    //   }
-    // }
+     
 
     this.drawBird();
     requestAnimationFrame((time: number) => this.moveBird(time));
