@@ -1,5 +1,13 @@
-<div class="w-full h-svh flex justify-center items-center">
-    <div class="w-[288px] h-full bg-cover bg-center" style="background-image: url('/flappyBird/background-day.png');">
-    </div>
-    <!-- <canvas #canvas></canvas> -->
+<div class="w-full h-svh flex justify-center bg-black/80">
+  <div #container class="relative w-full max-w-[550px] h-full overflow-hidden">
+    <div
+      class="absolute inset-0 bg-cover bg-center"
+      style="background-image: url('/flappyBird/background-night.png')"
+    ></div>
+    <div 
+      class="absolute bottom-0 left-0 w-full h-[20svh] bg-repeat-x bg-bottom"
+      style="background-image: url('/flappyBird/base.png')"
+    ></div>
+    <canvas class="absolute inset-0" #canvas></canvas>
+  </div>
 </div>

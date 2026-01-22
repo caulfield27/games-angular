@@ -8,9 +8,11 @@ import { defaultPipe } from './constants';
 })
 export class FlappyBird implements AfterViewInit {
   // dom
-  // @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
   ctx: null | CanvasRenderingContext2D = null;
   canvas: null | HTMLCanvasElement = null;
+  container: null | HTMLDivElement = null;
 
   // images
   bird: HTMLImageElement = new Image();
@@ -19,13 +21,17 @@ export class FlappyBird implements AfterViewInit {
   // constants
   readonly birdFallSpeed: number = 4;
   readonly pipeSpeed: number = 100;
+  readonly landHeight: number = 112;
 
   // variables
+  keyupListener: ((e: KeyboardEvent) => void) | null = null;
+  clickListener: (() => void) | null = null;
+  isCollisioned: boolean = false;
   pipeWidth: number | null = null;
   pipeGap: number | null = null;
   prevBirdTimestamp: number = 0;
   prevPipeTimestamp: number = 0;
-  birdX: number = 150;
+  birdX: number = 50;
   birdY: number = 0;
   prevBirdY: number | null = null;
   prevJumpPoint: number | null = null;
@@ -50,25 +56,27 @@ export class FlappyBird implements AfterViewInit {
   }
 
   private init() {
-    // this.canvas = this.canvasRef.nativeElement;
-    // this.canvas.width = window.innerWidth;
-    // this.canvas.height = window.innerHeight;
-    // this.ctx = this.canvas.getContext('2d');
+    this.container = this.containerRef.nativeElement;
+    this.canvas = this.canvasRef.nativeElement;
+    this.canvas.width = this.container.clientWidth;
+    this.canvas.height = this.container.clientHeight;
+    this.ctx = this.canvas.getContext('2d');
     this.bird.src = '/flappyBird/yellowbird.png';
-    this.pipe.src = '/flappyBird/pipe-green.png';
-    // this.pipe.onload = () => {
-    //   this.pipeWidth = this.pipe.width;
-    //   this.pipeGap = this.pipeWidth * 2.5;
-    //   this.generatePipes();
-    //   requestAnimationFrame((time: number) => this.movePipes(time));
-    // };
+    this.pipe.src = '/flappyBird/pipe-red.png';
 
+    this.pipe.onload = () => {
+      this.pipeWidth = this.pipe.width;
+      this.pipeGap = this.pipeWidth * 2.5;
+      this.generatePipes();
+      requestAnimationFrame((time: number) => this.movePipes(time));
+    };
 
-    // requestAnimationFrame((time: number) => this.moveBird(time));
-
-    // this.drawBird();
-    // window.addEventListener('keyup', (e) => this.handleKeyPress(e));
-    // window.addEventListener('click', () => this.jump());
+    requestAnimationFrame((time: number) => this.moveBird(time));
+    this.drawBird();
+    this.keyupListener = (e) => this.handleKeyPress(e);
+    this.clickListener = () => this.jump();
+    window.addEventListener('keyup', this.keyupListener);
+    window.addEventListener('click', this.clickListener);
   }
 
   private getPipePosition(
@@ -78,8 +86,11 @@ export class FlappyBird implements AfterViewInit {
     isFirstGenerate: boolean,
   ): Pipe {
     if (!this.pipeGap || !this.pipeWidth) return defaultPipe;
-    const randomTopPos = (Math.round(Math.random() * 5) || 1) * 10;
+
+    height = height - this.landHeight;
+    const randomTopPos = (Math.round(Math.random() * 6) || 1) * 10;
     const topHeight = (randomTopPos / 100) * height;
+    const bottomHeight = height - (topHeight + 0.25 * height);
     let xDir;
     if (!isFirstGenerate) {
       const before = this.pipes[0];
@@ -91,12 +102,12 @@ export class FlappyBird implements AfterViewInit {
       }
     } else {
       xDir =
-        this.pipes[idx - 1]?.xDir - (this.pipeGap + this.pipeWidth) || width;
+        this.pipes[idx - 1]?.xDir - (this.pipeGap + this.pipeWidth) || (width+width/2);
     }
 
     return {
       topHeight,
-      bottomHeight: height - (topHeight + 0.25 * height),
+      bottomHeight,
       xDir,
       prevX: null,
     };
@@ -124,18 +135,28 @@ export class FlappyBird implements AfterViewInit {
   private moveBird(timeStamp: number) {
     const delta = (timeStamp - this.prevBirdTimestamp) / 1000;
     this.prevBirdTimestamp = timeStamp;
-
     this.speedY += this.gravity * delta;
     this.birdY += this.speedY * delta;
 
-    if (this.birdY > (this.canvas?.height ?? 0)) return;
+    const height = this.canvas?.height ?? 0;
+    const realH = height - this.landHeight;
+    if (this.birdY + this.bird.height / 2 >= realH) {
+      this.failed();
+      return;
+    }
 
     if (this.prevBirdY) {
       this.clearBird(this.prevBirdY);
     }
 
-    this.drawBird();
+    // if (!this.isCollisioned && this.pipes.length) {
+    //   this.isCollisioned = this.checkCollisions();
+    //   if (this.isCollisioned) {
+    //     this.failed();
+    //   }
+    // }
 
+    this.drawBird();
     requestAnimationFrame((time: number) => this.moveBird(time));
   }
 
@@ -174,23 +195,33 @@ export class FlappyBird implements AfterViewInit {
       );
       this.pipes.unshift(this.pipes.pop()!);
     }
+
+    if (this.isCollisioned) return;
     requestAnimationFrame((time: number) => this.movePipes(time));
   }
 
   private drawPipe(idx: number) {
     if (!this.ctx || !this.pipeWidth) return;
     const { height } = this.canvas!;
+    const realHeight = height - this.landHeight;
+
     const currentPipe = this.pipes[idx];
     const { topHeight, bottomHeight, xDir } = currentPipe;
-    const bottomY = topHeight + (height - (topHeight + bottomHeight));
-    
-    const centerX = xDir+this.pipeWidth / 2;
-    const centerY = topHeight/2;
+    const bottomY = topHeight + (realHeight - (topHeight + bottomHeight));
+
+    const centerX = xDir + this.pipeWidth / 2;
+    const centerY = topHeight / 2;
 
     this.ctx.save();
-    this.ctx.translate(centerX,centerY);
+    this.ctx.translate(centerX, centerY);
     this.ctx.rotate(Math.PI);
-    this.ctx.drawImage(this.pipe, -this.pipeWidth/2, -topHeight/2, this.pipeWidth, topHeight);
+    this.ctx.drawImage(
+      this.pipe,
+      -this.pipeWidth / 2,
+      -topHeight / 2,
+      this.pipeWidth,
+      topHeight,
+    );
     this.ctx.restore();
     this.ctx.drawImage(this.pipe, xDir, bottomY, this.pipeWidth, bottomHeight);
 
@@ -200,7 +231,8 @@ export class FlappyBird implements AfterViewInit {
   private clearPipe(x: number, topH: number, bottomH: number) {
     if (!this.ctx || !this.pipeWidth) return;
     const { height } = this.canvas!;
-    const bottomY = topH + (height - (topH + bottomH));
+    const realH = height - this.landHeight;
+    const bottomY = topH + (realH - (topH + bottomH));
     this.ctx.clearRect(x - 6, 0, this.pipeWidth + 12, topH + 6);
     this.ctx.clearRect(x - 6, bottomY - 6, this.pipeWidth + 12, bottomH + 6);
   }
@@ -230,8 +262,26 @@ export class FlappyBird implements AfterViewInit {
     return Math.max(-0.35, Math.min(angle, 1.5));
   }
 
-  private checkCollisions() {
-    console.log(this.pipes);
-    console.log(this.birdX, this.birdY);
+  // private checkCollisions() {
+  //   const realBirdX = this.birdX+this.bird.width;
+  //   console.log(this.pipes);
+    
+  //   return this.pipes.some((pipe) => {
+  //     if(!this.pipeWidth) return;
+  //     const {xDir} = pipe;
+  //     if(xDir <= realBirdX && xDir+this.pipeWidth >= this.birdX){
+  //       console.log('1: ',xDir, '2: ',realBirdX, '3: ',this.birdX);
+  //       return true;
+  //     };
+  //     return false;
+  //   });
+  // }
+
+  private failed() {
+    this.isCollisioned = true;
+    if (this.clickListener && this.keyupListener) {
+      window.removeEventListener('keyup', this.keyupListener);
+      window.removeEventListener('click', this.clickListener);
+    }
   }
 }
