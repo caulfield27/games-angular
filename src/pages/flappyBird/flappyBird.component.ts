@@ -39,6 +39,7 @@ export class FlappyBird implements AfterViewInit {
   speedY = 0;
   gravity = 1200;
   jumpImpulse = -350;
+  collisionedPipeIndex: number | null = null;
 
   // methods
   ngAfterViewInit(): void {
@@ -102,7 +103,8 @@ export class FlappyBird implements AfterViewInit {
       }
     } else {
       xDir =
-        this.pipes[idx - 1]?.xDir - (this.pipeGap + this.pipeWidth) || (width+width/2);
+        this.pipes[idx - 1]?.xDir - (this.pipeGap + this.pipeWidth) ||
+        width + width / 2;
     }
 
     return {
@@ -147,9 +149,19 @@ export class FlappyBird implements AfterViewInit {
 
     if (this.prevBirdY) {
       this.clearBird(this.prevBirdY);
+
+      if (this.isCollisioned) {
+        this.drawPipe(this.collisionedPipeIndex!);
+      };
     }
 
-     
+    if (!this.isCollisioned && this.pipes.length) {
+      this.isCollisioned = this.checkCollisions();
+
+      if (this.isCollisioned) {
+        this.failed();
+      }
+    }
 
     this.drawBird();
     requestAnimationFrame((time: number) => this.moveBird(time));
@@ -257,20 +269,24 @@ export class FlappyBird implements AfterViewInit {
     return Math.max(-0.35, Math.min(angle, 1.5));
   }
 
-  // private checkCollisions() {
-  //   const realBirdX = this.birdX+this.bird.width;
-  //   console.log(this.pipes);
-    
-  //   return this.pipes.some((pipe) => {
-  //     if(!this.pipeWidth) return;
-  //     const {xDir} = pipe;
-  //     if(xDir <= realBirdX && xDir+this.pipeWidth >= this.birdX){
-  //       console.log('1: ',xDir, '2: ',realBirdX, '3: ',this.birdX);
-  //       return true;
-  //     };
-  //     return false;
-  //   });
-  // }
+  private checkCollisions() {
+    const realBirdX = this.birdX + this.bird.width;
+    return this.pipes.some((pipe, idx) => {
+      if (!this.pipeWidth || !this.pipeGap || !this.canvas) return;
+      const {height} = this.canvas;
+      const { xDir, topHeight, bottomHeight } = pipe;
+      const gap = height - (topHeight+bottomHeight);
+      if (
+        xDir <= realBirdX &&
+        xDir + this.pipeWidth >= this.birdX &&
+        (this.birdY <= topHeight || this.birdY >= (topHeight + gap))
+      ) {
+        this.collisionedPipeIndex = idx;
+        return true;
+      }
+      return false;
+    });
+  }
 
   private failed() {
     this.isCollisioned = true;
