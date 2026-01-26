@@ -4,5 +4,6 @@ export const defaultPipe: Pipe = {
     topHeight: 0,
     bottomHeight: 0,
     xDir: 0,
-    prevX: 0
+    prevX: 0,
+    id: 0
 }

@@ -1,10 +1,13 @@
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { Pipe } from './types';
+import { Bird, BirdType, Pipe } from './types';
 import { defaultPipe } from './constants';
+import { NgClass, NgStyle } from '@angular/common';
+import { LucideAngularModule, Play, Sun, Moon } from 'lucide-angular';
 
 @Component({
   selector: 'flappy-bird',
   templateUrl: './flappyBird.component.html',
+  imports: [NgStyle, NgClass, LucideAngularModule],
 })
 export class FlappyBird implements AfterViewInit {
   // dom
@@ -14,16 +17,59 @@ export class FlappyBird implements AfterViewInit {
   canvas: null | HTMLCanvasElement = null;
   container: null | HTMLDivElement = null;
 
+  // lucide icons
+  readonly PlayIcon = Play;
+  readonly SunIcon = Sun;
+  readonly MoonIcon = Moon;
+
   // images
   bird: HTMLImageElement = new Image();
   pipe: HTMLImageElement = new Image();
+  numberImage: Record<string, HTMLImageElement> = {
+    '0': new Image(),
+    '1': new Image(),
+    '2': new Image(),
+    '3': new Image(),
+    '4': new Image(),
+    '5': new Image(),
+    '6': new Image(),
+    '7': new Image(),
+    '8': new Image(),
+    '9': new Image(),
+  };
+
+  // audio
+  dieSound: HTMLAudioElement | null = null;
+  hitSound: HTMLAudioElement | null = null;
+  pointSound: HTMLAudioElement | null = null;
+  wingSound: HTMLAudioElement | null = null;
 
   // constants
+  readonly isMobile = window.innerWidth < 768;
   readonly birdFallSpeed: number = 4;
   readonly pipeSpeed: number = 100;
   readonly landHeight: number = 112;
+  readonly birds: Bird[] = [
+    {
+      name: 'Sunny',
+      src: '/flappyBird/yellowbird.png',
+      type: 'yellow',
+    },
+    {
+      name: 'Sky',
+      src: '/flappyBird/bluebird.png',
+      type: 'blue',
+    },
+    {
+      name: 'Ruby',
+      src: '/flappyBird/redbird.png',
+      type: 'red',
+    },
+  ];
 
   // variables
+  selectedBird: BirdType = this.birds[0].type;
+  selectedBackground: 'day' | 'night' = 'day';
   keyupListener: ((e: KeyboardEvent) => void) | null = null;
   clickListener: (() => void) | null = null;
   isCollisioned: boolean = false;
@@ -31,7 +77,7 @@ export class FlappyBird implements AfterViewInit {
   pipeGap: number | null = null;
   prevBirdTimestamp: number = 0;
   prevPipeTimestamp: number = 0;
-  birdX: number = 50;
+  birdX: number = 100;
   birdY: number = 0;
   prevBirdY: number | null = null;
   prevJumpPoint: number | null = null;
@@ -40,6 +86,9 @@ export class FlappyBird implements AfterViewInit {
   gravity = 1200;
   jumpImpulse = -350;
   collisionedPipeIndex: number | null = null;
+  score = 0;
+  prevPipeId: number | null = null;
+  isGameStart: boolean = false;
 
   // methods
   ngAfterViewInit(): void {
@@ -62,29 +111,68 @@ export class FlappyBird implements AfterViewInit {
     this.canvas.width = this.container.clientWidth;
     this.canvas.height = this.container.clientHeight;
     this.ctx = this.canvas.getContext('2d');
-    this.bird.src = '/flappyBird/yellowbird.png';
-    this.pipe.src = '/flappyBird/pipe-red.png';
+    this.birdY = (this.canvas.height - this.landHeight) / 2;
+
+    this.bird.src = this.birds[0].src;
+    this.pipe.src =
+      this.selectedBackground === 'day'
+        ? '/flappyBird/pipe-green.png'
+        : '/flappyBird/pipe-green.png';
+    for (const key in this.numberImage) {
+      this.numberImage[key].src = `/flappyBird/${key}.png`;
+    }
 
     this.pipe.onload = () => {
       this.pipeWidth = this.pipe.width;
       this.pipeGap = this.pipeWidth * 2.5;
-      this.generatePipes();
-      requestAnimationFrame((time: number) => this.movePipes(time));
     };
 
-    requestAnimationFrame((time: number) => this.moveBird(time));
-    this.drawBird();
+    this.bird.onload = () => {
+      this.drawBird();
+    };
+
     this.keyupListener = (e) => this.handleKeyPress(e);
-    this.clickListener = () => this.jump();
     window.addEventListener('keyup', this.keyupListener);
+  }
+
+  public startGame() {
+    if (!this.pipeWidth) return;
+    this.dieSound = new Audio('/flappyBird/die.wav');
+    this.hitSound = new Audio('/flappyBird/hit.wav');
+    this.pointSound = new Audio('/flappyBird/point.wav');
+    this.wingSound = new Audio('/flappyBird/wing.wav');
+
+    this.generatePipes();
+    requestAnimationFrame(() => this.drawScore());
+    requestAnimationFrame((time: number) => this.movePipes(time));
+    requestAnimationFrame((time: number) => this.moveBird(time));
+
+    this.clickListener = () => this.jump();
     window.addEventListener('click', this.clickListener);
   }
+
+  public changeBackground(bg: 'day' | 'night') {
+    this.selectedBackground = bg;
+    this.pipe.src =
+      bg === 'day'
+        ? '/flappyBird/pipe-green.png'
+        : '/flappyBird/pipe-green.png';
+  }
+
+  public selectBird(birdType: BirdType) {
+    this.selectedBird = birdType;
+    const bird = this.birds.find((bird) => bird.type === birdType);
+    if (bird) {
+      this.bird.src = bird.src;
+    };
+  };
 
   private getPipePosition(
     width: number,
     height: number,
     idx: number,
     isFirstGenerate: boolean,
+    id?: number,
   ): Pipe {
     if (!this.pipeGap || !this.pipeWidth) return defaultPipe;
 
@@ -104,7 +192,7 @@ export class FlappyBird implements AfterViewInit {
     } else {
       xDir =
         this.pipes[idx - 1]?.xDir - (this.pipeGap + this.pipeWidth) ||
-        width + width / 2;
+        width * 2;
     }
 
     return {
@@ -112,11 +200,13 @@ export class FlappyBird implements AfterViewInit {
       bottomHeight,
       xDir,
       prevX: null,
+      id: id ?? idx + 1,
     };
   }
 
   private drawBird() {
     if (!this.ctx) return;
+
     const angle = this.getBirdRotation();
     const w = this.bird.width;
     const h = this.bird.height;
@@ -135,6 +225,12 @@ export class FlappyBird implements AfterViewInit {
   }
 
   private moveBird(timeStamp: number) {
+    if (!this.prevBirdTimestamp) {
+      this.prevBirdTimestamp = timeStamp;
+      requestAnimationFrame((time: number) => this.moveBird(time));
+      return;
+    }
+
     const delta = (timeStamp - this.prevBirdTimestamp) / 1000;
     this.prevBirdTimestamp = timeStamp;
     this.speedY += this.gravity * delta;
@@ -144,6 +240,7 @@ export class FlappyBird implements AfterViewInit {
     const realH = height - this.landHeight;
     if (this.birdY + this.bird.height / 2 >= realH) {
       this.failed();
+      this.dieSound?.play();
       return;
     }
 
@@ -152,7 +249,7 @@ export class FlappyBird implements AfterViewInit {
 
       if (this.isCollisioned) {
         this.drawPipe(this.collisionedPipeIndex!);
-      };
+      }
     }
 
     if (!this.isCollisioned && this.pipes.length) {
@@ -174,6 +271,12 @@ export class FlappyBird implements AfterViewInit {
   }
 
   private jump() {
+    if (!this.isGameStart) {
+      this.isGameStart = true;
+      this.startGame();
+    }
+
+    this.wingSound?.play();
     this.speedY = this.jumpImpulse;
   }
 
@@ -193,12 +296,15 @@ export class FlappyBird implements AfterViewInit {
     }
 
     const last = this.pipes[this.pipes.length - 1];
+    this.checkProgress(last.xDir + this.pipeWidth, last.id);
+
     if (last.xDir + this.pipeWidth < 0) {
       this.pipes[this.pipes.length - 1] = this.getPipePosition(
         this.canvas!.width,
         this.canvas!.height,
         this.pipes.length - 1,
         false,
+        last.id,
       );
       this.pipes.unshift(this.pipes.pop()!);
     }
@@ -273,13 +379,14 @@ export class FlappyBird implements AfterViewInit {
     const realBirdX = this.birdX + this.bird.width;
     return this.pipes.some((pipe, idx) => {
       if (!this.pipeWidth || !this.pipeGap || !this.canvas) return;
-      const {height} = this.canvas;
+      const { height } = this.canvas;
       const { xDir, topHeight, bottomHeight } = pipe;
-      const gap = height - (topHeight+bottomHeight);
+
       if (
         xDir <= realBirdX &&
         xDir + this.pipeWidth >= this.birdX &&
-        (this.birdY <= topHeight || this.birdY >= (topHeight + gap))
+        (this.birdY <= topHeight ||
+          this.birdY >= height - (bottomHeight + this.landHeight))
       ) {
         this.collisionedPipeIndex = idx;
         return true;
@@ -288,11 +395,43 @@ export class FlappyBird implements AfterViewInit {
     });
   }
 
+  private checkProgress(pipeX: number, id: number) {
+    if (pipeX < this.birdX && id !== this.prevPipeId) {
+      this.pointSound?.play();
+      this.score++;
+      this.prevPipeId = id;
+    }
+  }
+
   private failed() {
     this.isCollisioned = true;
+    this.hitSound?.play();
     if (this.clickListener && this.keyupListener) {
       window.removeEventListener('keyup', this.keyupListener);
       window.removeEventListener('click', this.clickListener);
     }
+  }
+
+  private drawScore() {
+    if (!this.canvas || !this.pipeWidth || this.isCollisioned) return;
+    const numbers = String(this.score).split('');
+    let x = this.canvas.width / 2;
+    const y = (this.canvas.height - this.landHeight) / 5;
+
+    let width = x;
+
+    for (let i = 0; i < numbers.length; i++) {
+      width += numbers[i] === '1' ? 16 : 24;
+    }
+
+    this.ctx!.clearRect(x, y, width, 36);
+
+    for (let i = 0; i < numbers.length; i++) {
+      const num = numbers[i];
+      this.ctx!.drawImage(this.numberImage[num], x, y);
+      x += num === '1' ? 16 : 24;
+    }
+
+    requestAnimationFrame(() => this.drawScore());
   }
 }
