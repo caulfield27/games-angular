@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { Bird, BirdType, Pipe } from './types';
 import { defaultPipe } from './constants';
 import { NgClass, NgStyle } from '@angular/common';
@@ -9,7 +9,7 @@ import { LucideAngularModule, Play, Sun, Moon } from 'lucide-angular';
   templateUrl: './flappyBird.component.html',
   imports: [NgStyle, NgClass, LucideAngularModule],
 })
-export class FlappyBird implements AfterViewInit {
+export class FlappyBird implements AfterViewInit, OnDestroy {
   // dom
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
@@ -95,6 +95,12 @@ export class FlappyBird implements AfterViewInit {
     this.init();
   }
 
+  ngOnDestroy(): void {
+    if(this.keyupListener){
+
+    }
+  }
+
   private generatePipes() {
     if (!this.canvas || !this.pipeWidth || !this.pipeGap) return;
     const { height, width } = this.canvas;
@@ -135,6 +141,18 @@ export class FlappyBird implements AfterViewInit {
     window.addEventListener('keyup', this.keyupListener);
   }
 
+  public reset(){
+    if(this.keyupListener){
+      window.removeEventListener('keyup', this.keyupListener);
+    };
+    if(this.clickListener){
+      window.removeEventListener('click', this.clickListener);
+    };
+
+    this.isGameStart = false;
+    this.isCollisioned = false;
+  }
+  
   public startGame() {
     if (!this.pipeWidth) return;
     this.dieSound = new Audio('/flappyBird/die.wav');
@@ -309,7 +327,7 @@ export class FlappyBird implements AfterViewInit {
       this.pipes.unshift(this.pipes.pop()!);
     }
 
-    if (this.isCollisioned) return;
+    if (this.isCollisioned || !this.isGameStart) return;
     requestAnimationFrame((time: number) => this.movePipes(time));
   }
 
