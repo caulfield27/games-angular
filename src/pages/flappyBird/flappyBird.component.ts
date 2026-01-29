@@ -1,8 +1,16 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
 import { Bird, BirdType, Pipe } from './types';
 import { defaultPipe } from './constants';
 import { NgClass, NgStyle } from '@angular/common';
 import { LucideAngularModule, Play, Sun, Moon } from 'lucide-angular';
+import Swal from 'sweetalert2';
+import { launchConfetti } from '@/shared/utils/utils';
 
 @Component({
   selector: 'flappy-bird',
@@ -49,6 +57,8 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   readonly birdFallSpeed: number = 4;
   readonly pipeSpeed: number = 100;
   readonly landHeight: number = 112;
+  readonly jumpImpulse: number = -350;
+  readonly gravity: number = 1200;
   readonly birds: Bird[] = [
     {
       name: 'Sunny',
@@ -68,10 +78,9 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   ];
 
   // variables
+  currentBestScore = Number(localStorage.getItem('fb-best-score')) || 0;
   selectedBird: BirdType = this.birds[0].type;
   selectedBackground: 'day' | 'night' = 'day';
-  keyupListener: ((e: KeyboardEvent) => void) | null = null;
-  clickListener: (() => void) | null = null;
   isCollisioned: boolean = false;
   pipeWidth: number | null = null;
   pipeGap: number | null = null;
@@ -82,11 +91,9 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   prevBirdY: number | null = null;
   prevJumpPoint: number | null = null;
   pipes: Pipe[] = [];
-  speedY = 0;
-  gravity = 1200;
-  jumpImpulse = -350;
+  speedY: number = 0;
   collisionedPipeIndex: number | null = null;
-  score = 0;
+  score: number = 0;
   prevPipeId: number | null = null;
   isGameStart: boolean = false;
 
@@ -96,9 +103,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if(this.keyupListener){
-
-    }
+    this.reset();
   }
 
   private generatePipes() {
@@ -118,6 +123,10 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.canvas.height = this.container.clientHeight;
     this.ctx = this.canvas.getContext('2d');
     this.birdY = (this.canvas.height - this.landHeight) / 2;
+    this.dieSound = new Audio('/flappyBird/die.wav');
+    this.hitSound = new Audio('/flappyBird/hit.wav');
+    this.pointSound = new Audio('/flappyBird/point.wav');
+    this.wingSound = new Audio('/flappyBird/wing.wav');
 
     this.bird.src = this.birds[0].src;
     this.pipe.src =
@@ -129,52 +138,52 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     }
 
     this.pipe.onload = () => {
-      this.pipeWidth = this.pipe.width;
-      this.pipeGap = this.pipeWidth * 2.5;
+      if (!this.pipeWidth) {
+        this.pipeWidth = this.pipe.width;
+        this.pipeGap = this.pipeWidth * 2.5;
+        this.generatePipes();
+      }
     };
 
     this.bird.onload = () => {
       this.drawBird();
     };
 
-    this.keyupListener = (e) => this.handleKeyPress(e);
-    window.addEventListener('keyup', this.keyupListener);
+    window.onkeyup = (e) => this.handleKeyPress(e);
   }
 
-  public reset(){
-    if(this.keyupListener){
-      window.removeEventListener('keyup', this.keyupListener);
-    };
-    if(this.clickListener){
-      window.removeEventListener('click', this.clickListener);
-    };
+  public reset() {
+    if (!this.canvas) return;
+
+    this.ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    window.onclick = null;
 
     this.isGameStart = false;
     this.isCollisioned = false;
-  }
-  
-  public startGame() {
-    if (!this.pipeWidth) return;
-    this.dieSound = new Audio('/flappyBird/die.wav');
-    this.hitSound = new Audio('/flappyBird/hit.wav');
-    this.pointSound = new Audio('/flappyBird/point.wav');
-    this.wingSound = new Audio('/flappyBird/wing.wav');
-
+    this.birdY = (this.canvas.height - this.landHeight) / 2;
+    this.score = 0;
+    this.prevPipeId = null;
+    this.collisionedPipeIndex = null;
+    this.speedY = 0;
+    this.pipes = [];
+    this.prevBirdTimestamp = 0;
+    this.prevPipeTimestamp = 0;
     this.generatePipes();
+  }
+
+  public startGame() {
+    if (!this.pipeWidth || this.isGameStart) return;
     requestAnimationFrame(() => this.drawScore());
     requestAnimationFrame((time: number) => this.movePipes(time));
     requestAnimationFrame((time: number) => this.moveBird(time));
-
-    this.clickListener = () => this.jump();
-    window.addEventListener('click', this.clickListener);
+    window.onclick = () => this.jump(false);
   }
 
   public changeBackground(bg: 'day' | 'night') {
     this.selectedBackground = bg;
     this.pipe.src =
-      bg === 'day'
-        ? '/flappyBird/pipe-green.png'
-        : '/flappyBird/pipe-green.png';
+      bg === 'day' ? '/flappyBird/pipe-green.png' : '/flappyBird/pipe-red.png';
   }
 
   public selectBird(birdType: BirdType) {
@@ -182,8 +191,8 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     const bird = this.birds.find((bird) => bird.type === birdType);
     if (bird) {
       this.bird.src = bird.src;
-    };
-  };
+    }
+  }
 
   private getPipePosition(
     width: number,
@@ -243,6 +252,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   }
 
   private moveBird(timeStamp: number) {
+    if (!this.isGameStart) return;
     if (!this.prevBirdTimestamp) {
       this.prevBirdTimestamp = timeStamp;
       requestAnimationFrame((time: number) => this.moveBird(time));
@@ -257,8 +267,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     const height = this.canvas?.height ?? 0;
     const realH = height - this.landHeight;
     if (this.birdY + this.bird.height / 2 >= realH) {
-      this.failed();
-      this.dieSound?.play();
+      this.failed(true);
       return;
     }
 
@@ -274,7 +283,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
       this.isCollisioned = this.checkCollisions();
 
       if (this.isCollisioned) {
-        this.failed();
+        this.failed(false);
       }
     }
 
@@ -284,14 +293,14 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
 
   private handleKeyPress(e: KeyboardEvent) {
     if (e.key === ' ') {
-      this.jump();
+      this.jump(true);
     }
   }
 
-  private jump() {
+  private jump(isSpace: boolean) {
     if (!this.isGameStart) {
+      isSpace && this.startGame();
       this.isGameStart = true;
-      this.startGame();
     }
 
     this.wingSound?.play();
@@ -300,6 +309,11 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
 
   private movePipes(timeStamp: number) {
     if (!this.ctx || !this.pipeWidth) return;
+    if (!this.prevPipeTimestamp) {
+      this.prevPipeTimestamp = timeStamp;
+      requestAnimationFrame((ts: number) => this.movePipes(ts));
+      return;
+    }
 
     const delta = (timeStamp - this.prevPipeTimestamp) / 1000;
     this.prevPipeTimestamp = timeStamp;
@@ -314,6 +328,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     }
 
     const last = this.pipes[this.pipes.length - 1];
+
     this.checkProgress(last.xDir + this.pipeWidth, last.id);
 
     if (last.xDir + this.pipeWidth < 0) {
@@ -421,17 +436,40 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     }
   }
 
-  private failed() {
-    this.isCollisioned = true;
+  private failed(isOver: boolean) {
+    if (!this.isCollisioned) {
+      this.isCollisioned = true;
+    }
+
     this.hitSound?.play();
-    if (this.clickListener && this.keyupListener) {
-      window.removeEventListener('keyup', this.keyupListener);
-      window.removeEventListener('click', this.clickListener);
+    window.onkeyup = null;
+    window.onclick = null;
+
+    if (isOver) {
+      this.dieSound?.play();
+      setTimeout(() => {
+        if (this.score > this.currentBestScore) {
+          this.currentBestScore = this.score;
+          localStorage.setItem('fb-best-score', String(this.currentBestScore));
+          launchConfetti(1000);
+          Swal.fire({
+            icon: 'success',
+            title: 'Вы побили свой рекорд',
+            text: `Ваш новый рекорд: ${this.currentBestScore}`,
+          }).then(() => this.reset());
+        } else {
+          Swal.fire({
+            title: 'Игра окончена!',
+            text: `Ваш счёт: ${this.score}, текущий рекорд: ${this.currentBestScore}`,
+          }).then(() => this.reset());
+        }
+      }, 500);
     }
   }
 
   private drawScore() {
     if (!this.canvas || !this.pipeWidth || this.isCollisioned) return;
+
     const numbers = String(this.score).split('');
     let x = this.canvas.width / 2;
     const y = (this.canvas.height - this.landHeight) / 5;
