@@ -13,6 +13,13 @@
       class="absolute bottom-0 left-0 w-full h-[20svh] bg-repeat-x bg-bottom"
       style="background-image: url(&quot;/flappyBird/base.png&quot;)"
     ></div>
+    @if (isGameStart) {
+      <div class="absolute left-1/2 -translate-x-1/2 top-[10%] z-50 flex flex-row">
+        @for (score of scores; track $index) {
+          <img [src]="'/flappyBird/' + score + '.png'" [alt]="score" />
+        }
+      </div>
+    }
     <canvas class="absolute inset-0" #canvas></canvas>
   </div>
 </div>

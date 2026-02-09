@@ -6,7 +6,6 @@ import { GamesFiltersService } from '../../services/filters.service';
   selector: 'game-card',
   imports: [RouterLink],
   templateUrl: './gameCard.component.html',
-  styleUrl: './gameCard.component.scss',
 })
 export class GameCard {
   constructor(public filters: GamesFiltersService) { };

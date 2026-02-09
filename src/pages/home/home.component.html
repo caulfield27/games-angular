@@ -1,6 +1,7 @@
-<div class="main_page_wrapper">
-  <div class="main_page_filters">
-    <div class="main_page_input_wrapper">
+<header class="w-full p-4 max-w-[1120px] m-auto max-[480px]:min-w-0">
+  <div class="w-full flex justify-between items-center">
+    <img src="/ico/logo192x192.png" alt="logo" class="w-12 h-12" />
+    <div class="relative">
       <input
         #searchInput
         (focus)="onFocus($event)"
@@ -8,27 +9,54 @@
         (input)="onSearch($event)"
         type="search"
         placeholder="Поиск..."
+        class="min-w-[500px] max-[768px]:min-w-[300px] max-[480px]:min-w-full border-none outline-none bg-white rounded-md shadow-[0_2px_0_#0000001c] px-3 py-2 text-center text-[18px] font-semibold text-[var(--primary-text-color)] placeholder:text-center placeholder:text-[18px] placeholder:font-semibold max-[480px]:placeholder:text-sm max-[480px]:placeholder:font-medium"
       />
-      <search-icon class="main_page_search_icon" />
+      <search-icon
+        class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[20px] text-gray-500"
+      />
     </div>
-    <div class="main_page_tags_container">
+    <div>
+      <button class="bg-[#262633] !text-white px-3 py-1 rounded-md">Войти</button>
+    </div>
+  </div>
+</header>
+
+<div
+  class="py-[30px] px-4 max-w-[1120px] mx-auto flex flex-col gap-[50px] justify-center items-center max-[480px]:py-8 max-[480px]:px-4 max-[480px]:gap-6"
+>
+  <div
+    class="flex flex-col gap-6 justify-center items-center max-[480px]:gap-3"
+  >
+    <div
+      class="min-w-[600px] max-[480px]:min-w-0 max-[480px]:w-full flex flex-wrap justify-center items-center gap-2.5"
+    >
       @for (tag of filters.activeTags(); track tag) {
-         <span>
-          {{tag}}
-          <button (click)="onTagClear(tag)">&#10006;</button>
+        <span
+          class="px-2 py-2 rounded-[10px] border border-gray-300 bg-white !text-[16px] font-semibold flex items-center gap-2 cursor-default"
+        >
+          {{ tag }}
+          <button
+            (click)="onTagClear(tag)"
+            class="border-none outline-none bg-transparent text-base cursor-pointer rounded-md px-1 py-[2px] flex items-center justify-center hover:bg-gray-200 !text-[16px]"
+          >
+            &#10006;
+          </button>
         </span>
       }
     </div>
   </div>
-  <div class="main_page_container">
+
+  <div
+    class="flex flex-wrap justify-center items-start gap-[30px] max-[480px]:flex-col max-[480px]:items-center"
+  >
     @for (game of filters.gamesArray(); track game.name) {
-    <game-card
-      [name]="game.name"
-      [href]="game.href"
-      [image]="game.image"
-      [tags]="game.tags"
-      [searchInput]="getSearchValue()"
-    />
+      <game-card
+        [name]="game.name"
+        [href]="game.href"
+        [image]="game.image"
+        [tags]="game.tags"
+        [searchInput]="getSearchValue()"
+      />
     }
   </div>
 </div>

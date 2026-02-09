@@ -4,3 +4,4 @@ export * from './memoryGame/memoryGame.component';
 export * from './minesweeper/minesweeper.component';
 export * from './tetris/tetris.component';
 export * from './flappyBird/flappyBird.component';
+export * from './chess/chess.component';

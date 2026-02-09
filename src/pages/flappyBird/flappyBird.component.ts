@@ -8,7 +8,7 @@ import {
 import { Bird, BirdType, Pipe } from './types';
 import { defaultPipe } from './constants';
 import { NgClass, NgStyle } from '@angular/common';
-import { LucideAngularModule, Play, Sun, Moon } from 'lucide-angular';
+import { LucideAngularModule, Play, Sun, Moon, View } from 'lucide-angular';
 import Swal from 'sweetalert2';
 import { launchConfetti } from '@/shared/utils/utils';
 
@@ -33,18 +33,6 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   // images
   bird: HTMLImageElement = new Image();
   pipe: HTMLImageElement = new Image();
-  numberImage: Record<string, HTMLImageElement> = {
-    '0': new Image(),
-    '1': new Image(),
-    '2': new Image(),
-    '3': new Image(),
-    '4': new Image(),
-    '5': new Image(),
-    '6': new Image(),
-    '7': new Image(),
-    '8': new Image(),
-    '9': new Image(),
-  };
 
   // audio
   dieSound: HTMLAudioElement | null = null;
@@ -78,6 +66,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   ];
 
   // variables
+  scores: string[] = ['0'];
   currentBestScore = Number(localStorage.getItem('fb-best-score')) || 0;
   selectedBird: BirdType = this.birds[0].type;
   selectedBackground: 'day' | 'night' = 'day';
@@ -133,9 +122,6 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
       this.selectedBackground === 'day'
         ? '/flappyBird/pipe-green.png'
         : '/flappyBird/pipe-green.png';
-    for (const key in this.numberImage) {
-      this.numberImage[key].src = `/flappyBird/${key}.png`;
-    }
 
     this.pipe.onload = () => {
       if (!this.pipeWidth) {
@@ -174,7 +160,6 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
 
   public startGame() {
     if (!this.pipeWidth || this.isGameStart) return;
-    requestAnimationFrame(() => this.drawScore());
     requestAnimationFrame((time: number) => this.movePipes(time));
     requestAnimationFrame((time: number) => this.moveBird(time));
     window.onclick = () => this.jump(false);
@@ -235,6 +220,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     if (!this.ctx) return;
 
     const angle = this.getBirdRotation();
+    
     const w = this.bird.width;
     const h = this.bird.height;
 
@@ -419,7 +405,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
         xDir <= realBirdX &&
         xDir + this.pipeWidth >= this.birdX &&
         (this.birdY <= topHeight ||
-          this.birdY >= height - (bottomHeight + this.landHeight))
+          this.birdY+(this.bird.height/2) >= height - (bottomHeight + this.landHeight))
       ) {
         this.collisionedPipeIndex = idx;
         return true;
@@ -432,7 +418,8 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     if (pipeX < this.birdX && id !== this.prevPipeId) {
       this.pointSound?.play();
       this.score++;
-      this.prevPipeId = id;
+      this.scores = String(this.score).split('');
+      this.prevPipeId = id; 
     }
   }
 
@@ -464,30 +451,9 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
           }).then(() => this.reset());
         }
       }, 500);
+    }else{
+      this.speedY = this.jumpImpulse;
     }
   }
 
-  private drawScore() {
-    if (!this.canvas || !this.pipeWidth || this.isCollisioned) return;
-
-    const numbers = String(this.score).split('');
-    let x = this.canvas.width / 2;
-    const y = (this.canvas.height - this.landHeight) / 5;
-
-    let width = x;
-
-    for (let i = 0; i < numbers.length; i++) {
-      width += numbers[i] === '1' ? 16 : 24;
-    }
-
-    this.ctx!.clearRect(x, y, width, 36);
-
-    for (let i = 0; i < numbers.length; i++) {
-      const num = numbers[i];
-      this.ctx!.drawImage(this.numberImage[num], x, y);
-      x += num === '1' ? 16 : 24;
-    }
-
-    requestAnimationFrame(() => this.drawScore());
-  }
 }
