@@ -33,4 +33,9 @@ interface IPagesMetadata{
   icoPath: string;
 }
 
-export type {LevelType, ILevel, IDropdownOption, ILevelOption, IPagesMetadata}
+interface IAuthPayload{
+  username: string;
+  password: string
+}
+
+export type {LevelType, ILevel, IDropdownOption, ILevelOption, IPagesMetadata, IAuthPayload}

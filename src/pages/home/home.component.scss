@@ -1,5 +1,6 @@
 body{
   background-color: #EEF4F7;
+  scroll-behavior: smooth;
 }
 
 * {
@@ -10,5 +11,11 @@ body{
 
   @media screen and (max-width: 480px) {
     font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .game-card{
+    width: 100%;
   }
 }

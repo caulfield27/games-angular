@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { SearchIcon } from '../../icons/search/search.component';
 import { GameCard } from './components/gameCard/gameCard.component';
 import { GamesFiltersService } from './services/filters.service';
+import { AuthService } from '@/shared/services/auth.service';
 
 @Component({
   selector: 'home-page',
@@ -13,10 +14,13 @@ import { GamesFiltersService } from './services/filters.service';
 export class HomePage {
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
-  constructor(public filters: GamesFiltersService) { }
+  constructor(
+    public filters: GamesFiltersService,
+    public auth: AuthService,
+  ) {}
 
   getSearchValue() {
-    return this.searchInputRef?.nativeElement?.value ?? "";
+    return this.searchInputRef?.nativeElement?.value ?? '';
   }
 
   onTagClear(tag: string) {
@@ -36,5 +40,9 @@ export class HomePage {
   onBlur(event: FocusEvent) {
     const target = event.target as HTMLInputElement;
     target.placeholder = 'Поиск...';
+  }
+
+  onModalOpen() {
+    this.auth.isModalOpen.set(true);
   }
 }

@@ -1,6 +1,6 @@
-<header class="w-full p-4 max-w-[1120px] m-auto max-[480px]:min-w-0">
+<header class="w-full p-5 max-w-[1220px] m-auto max-[480px]:min-w-0 border-b border-[#d8e3e9]">
   <div class="w-full flex justify-between items-center">
-    <img src="/ico/logo192x192.png" alt="logo" class="w-12 h-12" />
+    <img src="/ico/logo192x192.png" alt="logo" class="block w-12 h-12 max-sm:hidden" />
     <div class="relative">
       <input
         #searchInput
@@ -9,20 +9,20 @@
         (input)="onSearch($event)"
         type="search"
         placeholder="Поиск..."
-        class="min-w-[500px] max-[768px]:min-w-[300px] max-[480px]:min-w-full border-none outline-none bg-white rounded-md shadow-[0_2px_0_#0000001c] px-3 py-2 text-center text-[18px] font-semibold text-[var(--primary-text-color)] placeholder:text-center placeholder:text-[18px] placeholder:font-semibold max-[480px]:placeholder:text-sm max-[480px]:placeholder:font-medium"
+        class="min-w-[500px] max-md:min-w-0 max-sm:w-[250px] max-[400px]:w-[180px] border-none outline-none bg-white rounded-md shadow-[0_2px_0_#0000001c] px-3 py-2 text-center text-[18px] font-semibold text-[var(--primary-text-color)] placeholder:text-center placeholder:text-[18px] placeholder:font-semibold max-[480px]:placeholder:text-sm max-[480px]:placeholder:font-medium"
       />
       <search-icon
         class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[20px] text-gray-500"
       />
     </div>
     <div>
-      <button class="bg-[#262633] !text-white px-3 py-1 rounded-md">Войти</button>
+      <button (click)="onModalOpen()" class="bg-[#262633] !text-white px-3 py-1 rounded-md !font-normal">Войти</button>
     </div>
   </div>
 </header>
 
 <div
-  class="py-[30px] px-4 max-w-[1120px] mx-auto flex flex-col gap-[50px] justify-center items-center max-[480px]:py-8 max-[480px]:px-4 max-[480px]:gap-6"
+  class="py-[30px] px-4 max-w-[1220px] mx-auto flex flex-col gap-[50px] justify-center items-center max-[480px]:py-8 max-[480px]:px-4 max-[480px]:gap-6"
 >
   <div
     class="flex flex-col gap-6 justify-center items-center max-[480px]:gap-3"
@@ -51,6 +51,7 @@
   >
     @for (game of filters.gamesArray(); track game.name) {
       <game-card
+        class="game-card"
         [name]="game.name"
         [href]="game.href"
         [image]="game.image"
