@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { LucideAngularModule, House } from 'lucide-angular';
@@ -6,9 +6,10 @@ import { handleAppBackground } from '@/shared/utils/utils';
 import { SeoService } from '../shared/services/seo.service';
 import { AuthModal } from '@/shared/components/authModal/authModal.component';
 import { AuthService } from '@/shared/services/auth.service';
+import { User } from '@/shared/types/types';
 
 @Component({
-  selector: 'bootstrap',
+  selector: 'layout',
   imports: [RouterOutlet, LucideAngularModule, AuthModal],
   template: `
     @if (!isHome) {
@@ -26,7 +27,7 @@ import { AuthService } from '@/shared/services/auth.service';
     }
   `,
 })
-export class Bootstrap {
+export class Layout implements OnInit {
   constructor(
     private router: Router,
     private seoService: SeoService,
@@ -45,6 +46,18 @@ export class Bootstrap {
   }
   isHome: boolean = true;
   readonly house = House;
+
+  ngOnInit(): void {
+    this.authService
+      .getMe()
+      .then((res) => {
+        const user = res.data?.data as User | undefined;
+        if (user) {
+          this.authService.user.set(user);
+        }
+      })
+      .catch(console.error);
+  }
 
   goHome() {
     this.router.navigate(['/']);

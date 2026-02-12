@@ -1,23 +1,131 @@
-<header class="w-full p-5 max-w-[1220px] m-auto max-[480px]:min-w-0 border-b border-[#d8e3e9]">
-  <div class="w-full flex justify-between items-center">
-    <img src="/ico/logo192x192.png" alt="logo" class="block w-12 h-12 max-sm:hidden" />
-    <div class="relative">
-      <input
-        #searchInput
-        (focus)="onFocus($event)"
-        (blur)="onBlur($event)"
-        (input)="onSearch($event)"
-        type="search"
-        placeholder="Поиск..."
-        class="min-w-[500px] max-md:min-w-0 max-sm:w-[250px] max-[400px]:w-[180px] border-none outline-none bg-white rounded-md shadow-[0_2px_0_#0000001c] px-3 py-2 text-center text-[18px] font-semibold text-[var(--primary-text-color)] placeholder:text-center placeholder:text-[18px] placeholder:font-semibold max-[480px]:placeholder:text-sm max-[480px]:placeholder:font-medium"
-      />
-      <search-icon
-        class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[20px] text-gray-500"
-      />
+<header class="bg-blue-600 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div
+        class="flex items-center space-x-2 cursor-pointer group flex-shrink-0"
+      >
+        <div
+          class="bg-white p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200"
+        >
+          <lucide-icon
+            [img]="GamepadIcon"
+            class="w-6 h-6 text-blue-600"
+            [strokeWidth]="2.5"
+          />
+        </div>
+        <span class="hidden sm:inline text-xl sm:text-2xl font-bold text-white">
+          GameHub
+        </span>
+        <span class="sm:hidden text-lg font-bold text-white"> GH </span>
+      </div>
+
+      <div class="hidden md:block flex-1 max-w-2xl mx-8">
+        <div class="relative">
+          <lucide-icon
+            [img]="SearchIcon"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+          />
+          <input
+            #searchInput
+            (focus)="onFocus($event)"
+            (blur)="onBlur($event)"
+            (input)="onSearch($event)"
+            type="search"
+            placeholder="Поиск..."
+            class="w-full pl-14 pr-4 py-2.5 bg-white/90 border border-white rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-200"
+          />
+        </div>
+      </div>
+
+      <div class="hidden sm:block">
+        @if (auth.isAuthed()) {
+          <button
+            class="flex items-center space-x-2 bg-white/20 hover:bg-white/30 border border-white rounded-lg px-4 py-2 transition-all duration-200 group"
+          >
+            <div
+              class="w-8 h-8 rounded-full bg-white flex items-center justify-center"
+            >
+              <lucide-icon
+                [img]="UserIcon"
+                class="w-5 h-5 text-blue-600"
+                [strokeWidth]="2.5"
+              />
+            </div>
+            <span
+              class="text-white font-medium group-hover:text-blue-100 transition-colors"
+            >
+              {{auth.user()?.username ?? 'player'}}
+            </span>
+          </button>
+        } @else {
+          <button
+            (click)="onModalOpen()"
+            class="flex items-center space-x-2 bg-white hover:bg-blue-50 text-blue-600 font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+          >
+            <lucide-icon
+              [img]="LoginIcon"
+              class="w-5 h-5"
+              [strokeWidth]="2.5"
+            />
+            <span>Войти</span>
+          </button>
+        }
+      </div>
+
+      <div class="sm:hidden flex items-center space-x-2">
+        <button
+          (click)="toggleMenu()"
+          class="p-2 text-white hover:bg-blue-700 rounded-lg transition-colors"
+        >
+          @if (isMenuOpen) {
+            <lucide-icon [img]="Xicon" class="w-6 h-6" />
+          } @else {
+            <lucide-icon [img]="MenuIcon" class="w-6 h-6" />
+          }
+        </button>
+      </div>
     </div>
-    <div>
-      <button (click)="onModalOpen()" class="bg-[#262633] !text-white px-3 py-1 rounded-md !font-normal">Войти</button>
-    </div>
+
+    @if (isMenuOpen) {
+      <div class="sm:hidden pb-4 space-y-3">
+        <div class="relative">
+          <lucide-icon
+            [img]="SearchIcon"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+          />
+          <input
+            #searchInput
+            (focus)="onFocus($event)"
+            (blur)="onBlur($event)"
+            (input)="onSearch($event)"
+            type="search"
+            placeholder="Поиск..."
+            class="w-full pl-14 pr-4 py-2.5 bg-white/90 border border-white rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-200"
+          />
+        </div>
+        <div class="flex gap-2 pt-2">
+          @if (auth.isAuthed()) {
+            <button
+              class="flex-1 flex items-center justify-center space-x-2 bg-white/20 hover:bg-white/30 border border-white text-white rounded-lg px-4 py-2 transition-all duration-200 font-medium"
+            >
+              <lucide-icon [img]="UserIcon" class="w-5 h-5" />
+              <span>{{auth.user()?.username ?? ""}}</span>
+            </button>
+          } @else {
+            <button
+              class="flex-1 bg-white hover:bg-blue-50 text-blue-600 font-semibold py-2 rounded-lg transition-all duration-200 shadow-lg"
+            >
+              Войти
+            </button>
+            <button
+              class="flex-1 bg-white/20 hover:bg-white/30 border border-white text-white font-semibold py-2 rounded-lg transition-all duration-200"
+            >
+              Зарегистрироваться
+            </button>
+          }
+        </div>
+      </div>
+    }
   </div>
 </header>
 

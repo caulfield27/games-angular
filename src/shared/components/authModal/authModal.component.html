@@ -49,22 +49,22 @@
       </div>
 
       @if (activeTab === "login") {
-        <form class="space-y-4">
+        <form (submit)="handleLogin($event)" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Почта
+              Имя пользователя
             </label>
             <div class="relative">
               <lucide-icon
-                [img]="MailIcon"
+                [img]="UserIcon"
                 class="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
                 size="20"
               />
               <input
-                type="email"
-                value=""
+                type="text"
+                name="username"
                 class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
-                placeholder="Введите свою почту"
+                placeholder="Введите свой никнейм"
                 required
               />
             </div>
@@ -82,6 +82,7 @@
               />
               <input
                 type="password"
+                name="password"
                 class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свой пароль"
                 required
@@ -96,14 +97,19 @@
           </div>
 
           <button
+            [disabled]="isLogging"
             type="submit"
             class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
           >
-            Войти
+            @if (isLogging) {
+              Выполняется...
+            } @else {
+              Войти
+            }
           </button>
         </form>
       } @else if (activeTab === "register") {
-        <form class="space-y-4">
+        <form (submit)="handleRegister($event)" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               Никнейм
@@ -116,6 +122,7 @@
               />
               <input
                 type="text"
+                name="username"
                 class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свой никнейм"
                 required
@@ -135,6 +142,7 @@
               />
               <input
                 type="email"
+                name="email"
                 class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свою почту"
                 required
@@ -154,6 +162,7 @@
               />
               <input
                 type="password"
+                name="password"
                 class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
                 placeholder="Создайте пароль"
                 required
@@ -177,10 +186,15 @@
           </div>
 
           <button
+            [disabled]="isRegistring"
             type="submit"
             class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
           >
-            Создать аккаунт
+            @if (isRegistring) {
+              Выполняется...
+            } @else {
+              Создать аккаунт
+            }
           </button>
         </form>
       }

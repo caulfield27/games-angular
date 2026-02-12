@@ -149,6 +149,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.isCollisioned = false;
     this.birdY = (this.canvas.height - this.landHeight) / 2;
     this.score = 0;
+    this.scores = ['0'];
     this.prevPipeId = null;
     this.collisionedPipeIndex = null;
     this.speedY = 0;
@@ -220,7 +221,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     if (!this.ctx) return;
 
     const angle = this.getBirdRotation();
-    
+
     const w = this.bird.width;
     const h = this.bird.height;
 
@@ -405,7 +406,8 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
         xDir <= realBirdX &&
         xDir + this.pipeWidth >= this.birdX &&
         (this.birdY <= topHeight ||
-          this.birdY+(this.bird.height/2) >= height - (bottomHeight + this.landHeight))
+          this.birdY + this.bird.height / 2 >=
+            height - (bottomHeight + this.landHeight))
       ) {
         this.collisionedPipeIndex = idx;
         return true;
@@ -419,7 +421,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
       this.pointSound?.play();
       this.score++;
       this.scores = String(this.score).split('');
-      this.prevPipeId = id; 
+      this.prevPipeId = id;
     }
   }
 
@@ -451,9 +453,8 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
           }).then(() => this.reset());
         }
       }, 500);
-    }else{
+    } else {
       this.speedY = this.jumpImpulse;
     }
   }
-
 }

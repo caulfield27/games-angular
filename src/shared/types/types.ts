@@ -35,7 +35,15 @@ interface IPagesMetadata{
 
 interface IAuthPayload{
   username: string;
-  password: string
+  password: string;
+  email?: string
 }
 
-export type {LevelType, ILevel, IDropdownOption, ILevelOption, IPagesMetadata, IAuthPayload}
+interface User{
+  id: number;
+  username: string;
+  email: string;
+  avatar: number | null;
+}
+
+export type {LevelType, ILevel, IDropdownOption, ILevelOption, IPagesMetadata, IAuthPayload, User}

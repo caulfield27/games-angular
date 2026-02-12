@@ -3,16 +3,6 @@ body{
   scroll-behavior: smooth;
 }
 
-* {
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  color: var(--primary-text-color);
-  font-size: 24px;
-
-  @media screen and (max-width: 480px) {
-    font-size: 20px;
-  }
-}
 
 @media screen and (max-width: 480px) {
   .game-card{
