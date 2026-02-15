@@ -1,38 +1,27 @@
 import { IField } from '../types/types';
 import { ILevel, LevelType } from '../../../shared/types/types';
 
-export function getLevels(width: number): ILevel {
+export function getLevels(): ILevel {
   return {
     easy: {
       label: 'Лёгкий',
-      rows: 10,
+      rows: 8,
       cols: 8,
       mines: 10,
-      size: width <= 480 ? '25px' : '45px',
-      mineSize: width <= 480 ? '20px' : '35px',
-      flagSize: width <= 480 ? '15px' : '35px',
       hintAmount: 1,
     },
     medium: {
       label: 'Средний',
-      rows: width <= 480 ? 14 : 18,
-      cols: 14,
+      rows: 16,
+      cols: 16,
       mines: 40,
-      size:
-        width <= 480 && width > 400 ? '25px' : width <= 400 ? '20px' : '35px',
-      mineSize: width <= 480 ? '15px' : '30px',
-      flagSize: width <= 480 ? '15px' : '25px',
       hintAmount: 3,
     },
     hard: {
       label: 'Сложный',
-      rows: width <= 480 ? 16 : 24,
-      cols: 20,
+      rows: 30,
+      cols: 16,
       mines: 99,
-      size:
-        width <= 480 && width > 385 ? '20px' : width < 385 ? '17px' : '25px',
-      mineSize: width <= 480 ? '10px' : '20px',
-      flagSize: width <= 480 ? '12px' : '20px',
       hintAmount: 5,
     },
   };

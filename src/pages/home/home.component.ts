@@ -55,7 +55,7 @@ export class HomePage {
 
   onBlur(event: FocusEvent) {
     const target = event.target as HTMLInputElement;
-    target.placeholder = 'Поиск...';
+    target.placeholder = 'Найти игру...';
   }
 
   onModalOpen() {

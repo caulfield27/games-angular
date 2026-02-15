@@ -29,7 +29,6 @@ import { IDropdownOption, ILevelOption } from '../../shared/types/types';
     HappySmile,
     SadSmile,
     LucideAngularModule,
-    Dropdown,
   ],
 })
 export class Minesweeper implements AfterViewInit, OnDestroy {
@@ -40,23 +39,29 @@ export class Minesweeper implements AfterViewInit, OnDestroy {
   constructor(public boardService: BoardService) {}
 
   ngAfterViewInit(): void {
-    this.updateVariables();
+    this.updateBoardSize();
+    window.addEventListener('resize', () => this.updateBoardSize());
   }
 
-  updateVariables() {
+  updateBoardSize() {
+    const maxWidth = window.innerWidth * 0.78; // максимальная ширина board
+    const maxHeight = window.innerHeight * 0.65; // максимальная высота board
+
     const { levels, level } = this.boardService;
-    this.container.nativeElement.style.setProperty(
-      '--cols',
-      String(levels[level().value].cols)
-    );
-    this.container.nativeElement.style.setProperty(
-      '--rows',
-      String(levels[level().value].rows)
-    );
-    this.container.nativeElement.style.setProperty(
-      '--size',
-      String(levels[level().value].size)
-    );
+    const cols = levels[level().value].cols;
+    const rows = levels[level().value].rows;
+
+    // размер клетки под текущий экран
+    const sizeByWidth = maxWidth / cols;
+    const sizeByHeight = maxHeight / rows;
+
+    // выбираем минимальный, чтобы не вылезло ни по ширине, ни по высоте
+    const cellSize = Math.floor(Math.min(sizeByWidth, sizeByHeight));
+
+    // устанавливаем CSS переменные
+    this.container.nativeElement.style.setProperty('--cell', cellSize + 'px');
+    this.container.nativeElement.style.setProperty('--cols', cols.toString());
+    this.container.nativeElement.style.setProperty('--rows', rows.toString());
   }
 
   onFieldCheck(e: MouseEvent, idx: number) {
@@ -120,7 +125,7 @@ export class Minesweeper implements AfterViewInit, OnDestroy {
 
   handleLevelSelect(option: IDropdownOption) {
     this.boardService.level.set(option as ILevelOption);
-    this.updateVariables();
+    this.updateBoardSize();
     this.boardService.restart();
   }
 

@@ -24,13 +24,13 @@
           <button (click)="moveUp()">
             <lucide-icon size="30" [img]="ArrowUp" />
           </button>
-          <button (click)="moveRight()">
+          <button (pointerdown)="onMouseDown('right')" (pointerup)="onMouseUp()">
             <lucide-icon size="30" [img]="ArrowRight" />
           </button>
-          <button (click)="moveDown()">
+          <button (pointerdown)="onMouseDown('down')" (pointerup)="onMouseUp()">
             <lucide-icon size="30" [img]="ArrowDown" />
           </button>
-          <button (click)="moveLeft()">
+          <button (pointerdown)="onMouseDown('left')" (pointerup)="onMouseUp()">
             <lucide-icon size="30" [img]="ArrowLeft" />
           </button>
         </div>
@@ -73,13 +73,13 @@
             <button (click)="moveUp()">
               <lucide-icon size="25" [img]="ArrowUp" />
             </button>
-            <button (click)="moveRight()">
+            <button (pointerdown)="onMouseDown('right')" (pointerup)="onMouseUp()">
               <lucide-icon size="25" [img]="ArrowRight" />
             </button>
-            <button (click)="moveDown()">
+            <button (pointerdown)="onMouseDown('down')" (pointerup)="onMouseUp()">
               <lucide-icon size="25" [img]="ArrowDown" />
             </button>
-            <button (click)="moveLeft()">
+            <button (pointerdown)="onMouseDown('left')" (pointerup)="onMouseUp()">
               <lucide-icon size="25" [img]="ArrowLeft" />
             </button>
           </div>

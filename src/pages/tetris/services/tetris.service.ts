@@ -42,7 +42,7 @@ export class TetrisService {
   private isBoardFilled: boolean = false;
   private colorsHash: Map<string, string> = new Map();
   private listener: ((event: KeyboardEvent) => void) | null = null;
-  private duration: number = 1000;
+  private duration: number = 800;
   private prevTimestamp: number = 0;
   public gameStopped = signal<boolean>(false);
   public gameStarted = signal<boolean>(false);
@@ -52,12 +52,15 @@ export class TetrisService {
     this.canvas = canvas;
     this.infoCanvas = infoCanvas;
 
-    // const dpr = Math.round(window.devicePixelRatio);
-    // this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
-    // this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
+    const dpr = Math.round(window.devicePixelRatio);
+    this.canvas.width = this.CELL_SIZE * this.GRID_ROWS * dpr;
+    this.canvas.height = this.CELL_SIZE * this.GRID_COLS * dpr;
 
-    // this.infoCanvas.width = this.NEXT_CELL_SIZE * 4 * dpr;
-    // this.infoCanvas.height = this.NEXT_CELL_SIZE * 4 * dpr;
+    this.infoCanvas.width = this.NEXT_CELL_SIZE * 4 * dpr;
+    this.infoCanvas.height = this.NEXT_CELL_SIZE * 4 * dpr;
+
+    const ctx = this.canvas.getContext('2d');
+    ctx!.scale(dpr, dpr);
 
     this.canvas.width = this.CELL_SIZE * this.GRID_ROWS;
     this.canvas.height = this.CELL_SIZE * this.GRID_COLS;

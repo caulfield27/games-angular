@@ -15,6 +15,7 @@ import {
   Play,
   Pause,
 } from 'lucide-angular';
+import { Move } from './types';
 
 @Component({
   selector: 'tetris',
@@ -29,6 +30,9 @@ export class Tetris implements AfterViewInit, OnDestroy {
   readonly ArrowUp = ArrowBigUp;
   readonly Play = Play;
   readonly Pause = Pause;
+
+  private currentAnimationFrameId: number | null = null;
+  private prevTs: number | null = null;
 
   constructor(public tetrisService: TetrisService) {}
 
@@ -50,16 +54,41 @@ export class Tetris implements AfterViewInit, OnDestroy {
     this.tetrisService.gameStopped.set(true);
   }
 
-  moveLeft() {
-    this.tetrisService.moveFigure('left');
-  }
-  moveRight() {
-    this.tetrisService.moveFigure('right');
-  }
-  moveDown() {
-    this.tetrisService.moveFigure('down');
-  }
   moveUp() {
     this.tetrisService.moveFigure('up');
+  }
+
+  requestMove(ts: number, move: Move) {
+    if (this.prevTs === null) {
+      this.tetrisService.moveFigure(move);
+      this.prevTs = ts;
+      this.currentAnimationFrameId = requestAnimationFrame((ts) =>
+        this.requestMove(ts, move)
+      );
+      return;
+    }
+
+    const delta = ts - this.prevTs;
+
+    if (delta > 100) {
+      this.tetrisService.moveFigure(move);
+      this.prevTs = ts;
+    }
+    this.currentAnimationFrameId = requestAnimationFrame((ts) =>
+      this.requestMove(ts, move)
+    );
+  }
+
+  onMouseDown(move: Move) {
+    this.currentAnimationFrameId = requestAnimationFrame((ts) =>
+      this.requestMove(ts, move)
+    );
+  }
+
+  onMouseUp() {
+    if (this.currentAnimationFrameId != null) {
+      cancelAnimationFrame(this.currentAnimationFrameId);
+      this.prevTs = null;
+    }
   }
 }

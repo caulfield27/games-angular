@@ -12,7 +12,7 @@ import { User } from '@/shared/types/types';
   selector: 'layout',
   imports: [RouterOutlet, LucideAngularModule, AuthModal],
   template: `
-    @if (!isHome) {
+    <!-- @if (!isHome) {
       <button
         class="z-10 fixed top-3 left-3 flex flex-row gap-2 justify-center items-center p-3 rounded-xl bg-yellow-400 font-semibold text-[#464646] hover:bg-yellow-300"
         (click)="goHome()"
@@ -20,7 +20,7 @@ import { User } from '@/shared/types/types';
         <lucide-icon [img]="house"></lucide-icon>
         Вернуться на главную
       </button>
-    }
+    } -->
     <router-outlet />
     @if (authService.isModalOpen()) {
       <auth-modal />

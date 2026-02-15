@@ -1,12 +1,12 @@
 <div class="page_container">
   <div class="mainsweeper_wrapper">
     <div class="my_dropdown_wrapper">
-      <dropdown
+      <!-- <dropdown
         [options]="options"
         [value]="boardService.level()"
         [onSelect]="handleLevelSelect.bind(this)"
-      ></dropdown>
-      @if (boardService.isGameStart()) {
+      ></dropdown> -->
+      <!-- @if (boardService.isGameStart()) {
       <div class="hint_wrapper">
         <button
           (click)="handleUseHint()"
@@ -20,7 +20,7 @@
           <span>{{ boardService.hintAmount() }}</span>
         </button>
       </div>
-      }
+      } -->
     </div>
     <div class="game_board">
       <div class="tablo">
@@ -63,11 +63,9 @@
         >
           @if(field.isFlaged){
           <flag-icon
-            [width]="boardService.levels[boardService.level().value].flagSize"
           />
           }@else if (field.isOpen && field.isMine) {
           <mine-icon
-            [width]="boardService.levels[boardService.level().value].mineSize"
           />
           }
           {{ field?.minesAround ?? "" }}

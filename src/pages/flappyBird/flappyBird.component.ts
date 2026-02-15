@@ -144,6 +144,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.ctx!.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     window.onclick = null;
+    window.onkeyup = (e) => this.handleKeyPress(e);
 
     this.isGameStart = false;
     this.isCollisioned = false;
@@ -384,7 +385,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.ctx.rotate(angle);
 
     const realH = angle < 0 ? h + 16 : h + 5;
-    this.ctx.clearRect(-w / 2 - 5, -h / 2 - 5, w + 5, realH);
+    this.ctx.clearRect(-w / 2 - 5, -h / 2 - 5, w+6, realH);
 
     this.ctx.restore();
   }

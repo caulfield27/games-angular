@@ -11,7 +11,7 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/logo.ico',
   },
   '/minesweeper': {
-    background_url_path: '/pagesBackground/minesweeper_bg.jpg',
+    background_url_path: null,
     title: 'Сапёр — Классическая логическая онлайн игра',
     description:
       'Классическая игра сапёр онлайн — раскрывайте клетки, избегайте мин, улучшайте навыки логики и реакции. Играйте бесплатно в браузере.',
@@ -47,7 +47,6 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/Tetris.ico',
   },
   '/flappy-bird': {
-    // background_url_path: '/pagesBackground/flappy-bird.jpg',
     background_url_path: null ,
     title: 'Flappy Bird — Классическая аркадная онлайн игра',
     description:

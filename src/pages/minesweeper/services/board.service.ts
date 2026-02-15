@@ -10,7 +10,7 @@ import { ILevelOption } from '../../../shared/types/types';
 })
 export class BoardService {
   level = signal<ILevelOption>(dropdownOptions[0]);
-  levels = getLevels(window.innerWidth);
+  levels = getLevels();
   isGameStart = signal<boolean>(false);
   isGameOver: boolean = false;
   fields = signal(getFields(this.levels[this.level().value]));
