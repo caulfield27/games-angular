@@ -187,7 +187,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     height = height - this.landHeight;
     const randomTopPos = (Math.round(Math.random() * 6) || 1) * 10;
     const topHeight = (randomTopPos / 100) * height;
-    const bottomHeight = height - (topHeight + 0.2 * height);
+    const bottomHeight = height - (topHeight + 0.18 * height);
     let xDir;
     if (!isFirstGenerate) {
       const before = this.pipes[0];

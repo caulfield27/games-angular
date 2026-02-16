@@ -24,13 +24,13 @@
           <button (click)="moveUp()">
             <lucide-icon size="30" [img]="ArrowUp" />
           </button>
-          <button (pointerdown)="onMouseDown('right')" (pointerup)="onMouseUp()">
+          <button (pointerdown)="onMouseDown('right')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
             <lucide-icon size="30" [img]="ArrowRight" />
           </button>
-          <button (pointerdown)="onMouseDown('down')" (pointerup)="onMouseUp()">
+          <button (pointerdown)="onMouseDown('down')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
             <lucide-icon size="30" [img]="ArrowDown" />
           </button>
-          <button (pointerdown)="onMouseDown('left')" (pointerup)="onMouseUp()">
+          <button (pointerdown)="onMouseDown('left')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
             <lucide-icon size="30" [img]="ArrowLeft" />
           </button>
         </div>
@@ -73,13 +73,13 @@
             <button (click)="moveUp()">
               <lucide-icon size="25" [img]="ArrowUp" />
             </button>
-            <button (pointerdown)="onMouseDown('right')" (pointerup)="onMouseUp()">
+            <button (pointerdown)="onMouseDown('right')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
               <lucide-icon size="25" [img]="ArrowRight" />
             </button>
-            <button (pointerdown)="onMouseDown('down')" (pointerup)="onMouseUp()">
+            <button (pointerdown)="onMouseDown('down')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
               <lucide-icon size="25" [img]="ArrowDown" />
             </button>
-            <button (pointerdown)="onMouseDown('left')" (pointerup)="onMouseUp()">
+            <button (pointerdown)="onMouseDown('left')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
               <lucide-icon size="25" [img]="ArrowLeft" />
             </button>
           </div>
