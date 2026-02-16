@@ -27,7 +27,8 @@ import { User } from '@/shared/types/types';
     }
   `,
 })
-export class Layout implements OnInit {
+// export class Layout implements OnInit {
+export class Layout {
   constructor(
     private router: Router,
     private seoService: SeoService,
@@ -47,17 +48,17 @@ export class Layout implements OnInit {
   isHome: boolean = true;
   readonly house = House;
 
-  ngOnInit(): void {
-    this.authService
-      .getMe()
-      .then((res) => {
-        const user = res.data?.data as User | undefined;
-        if (user) {
-          this.authService.user.set(user);
-        }
-      })
-      .catch(console.error);
-  }
+  // ngOnInit(): void {
+  //   this.authService
+  //     .getMe()
+  //     .then((res) => {
+  //       const user = res.data?.data as User | undefined;
+  //       if (user) {
+  //         this.authService.user.set(user);
+  //       }
+  //     })
+  //     .catch(console.error);
+  // }
 
   goHome() {
     this.router.navigate(['/']);

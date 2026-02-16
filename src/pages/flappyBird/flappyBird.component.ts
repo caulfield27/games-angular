@@ -42,10 +42,9 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
 
   // constants
   readonly isMobile = window.innerWidth < 768;
-  readonly birdFallSpeed: number = 4;
-  readonly pipeSpeed: number = 100;
+  readonly pipeSpeed: number = 130;
   readonly landHeight: number = 112;
-  readonly jumpImpulse: number = -350;
+  readonly jumpImpulse: number = -365;
   readonly gravity: number = 1200;
   readonly birds: Bird[] = [
     {
@@ -73,18 +72,15 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   isCollisioned: boolean = false;
   pipeWidth: number | null = null;
   pipeGap: number | null = null;
-  prevBirdTimestamp: number = 0;
-  prevPipeTimestamp: number = 0;
   birdX: number = 100;
   birdY: number = 0;
-  prevBirdY: number | null = null;
-  prevJumpPoint: number | null = null;
   pipes: Pipe[] = [];
   speedY: number = 0;
   collisionedPipeIndex: number | null = null;
   score: number = 0;
   prevPipeId: number | null = null;
   isGameStart: boolean = false;
+  prevTimestap: number = 0;
 
   // methods
   ngAfterViewInit(): void {
@@ -155,16 +151,14 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.collisionedPipeIndex = null;
     this.speedY = 0;
     this.pipes = [];
-    this.prevBirdTimestamp = 0;
-    this.prevPipeTimestamp = 0;
+    this.prevTimestap = 0;
     this.generatePipes();
   }
 
   public startGame() {
     if (!this.pipeWidth || this.isGameStart) return;
-    requestAnimationFrame((time: number) => this.movePipes(time));
-    requestAnimationFrame((time: number) => this.moveBird(time));
     window.onclick = () => this.jump(false);
+    requestAnimationFrame((time) => this.gameLoop(time));
   }
 
   public changeBackground(bg: 'day' | 'night') {
@@ -193,7 +187,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     height = height - this.landHeight;
     const randomTopPos = (Math.round(Math.random() * 6) || 1) * 10;
     const topHeight = (randomTopPos / 100) * height;
-    const bottomHeight = height - (topHeight + 0.25 * height);
+    const bottomHeight = height - (topHeight + 0.2 * height);
     let xDir;
     if (!isFirstGenerate) {
       const before = this.pipes[0];
@@ -236,35 +230,48 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.ctx.drawImage(this.bird, -w / 2, -h / 2);
 
     this.ctx.restore();
-    this.prevBirdY = this.birdY;
   }
 
-  private moveBird(timeStamp: number) {
-    if (!this.isGameStart) return;
-    if (!this.prevBirdTimestamp) {
-      this.prevBirdTimestamp = timeStamp;
-      requestAnimationFrame((time: number) => this.moveBird(time));
+  private gameLoop(timeStamp: number) {
+    if (!this.prevTimestap) {
+      this.prevTimestap = timeStamp;
+      requestAnimationFrame((t) => this.gameLoop(t));
       return;
     }
 
-    const delta = (timeStamp - this.prevBirdTimestamp) / 1000;
-    this.prevBirdTimestamp = timeStamp;
+    const delta = (timeStamp - this.prevTimestap) / 1000;
+    this.prevTimestap = timeStamp;
+
+    const height = this.canvas?.height ?? 0;
+    const realH = height - this.landHeight;
+
+    if (this.isGameStart && !(this.birdY + this.bird.height / 2 >= realH)) {
+      this.ctx?.clearRect(
+        0,
+        0,
+        this.canvas?.width || 0,
+        this.canvas?.height || 0,
+      );
+      this.movePipes(delta);
+      this.moveBird(delta);
+      requestAnimationFrame((t) => this.gameLoop(t));
+    }
+  }
+
+  private moveBird(delta: number) {
     this.speedY += this.gravity * delta;
     this.birdY += this.speedY * delta;
 
     const height = this.canvas?.height ?? 0;
     const realH = height - this.landHeight;
     if (this.birdY + this.bird.height / 2 >= realH) {
+      this.drawBird();
       this.failed(true);
       return;
     }
 
-    if (this.prevBirdY) {
-      this.clearBird(this.prevBirdY);
-
-      if (this.isCollisioned) {
-        this.drawPipe(this.collisionedPipeIndex!);
-      }
+    if (this.isCollisioned) {
+      this.drawPipe(this.collisionedPipeIndex!);
     }
 
     if (!this.isCollisioned && this.pipes.length) {
@@ -276,7 +283,6 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     }
 
     this.drawBird();
-    requestAnimationFrame((time: number) => this.moveBird(time));
   }
 
   private handleKeyPress(e: KeyboardEvent) {
@@ -295,25 +301,17 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.speedY = this.jumpImpulse;
   }
 
-  private movePipes(timeStamp: number) {
+  private movePipes(delta: number) {
     if (!this.ctx || !this.pipeWidth) return;
-    if (!this.prevPipeTimestamp) {
-      this.prevPipeTimestamp = timeStamp;
-      requestAnimationFrame((ts: number) => this.movePipes(ts));
-      return;
-    }
-
-    const delta = (timeStamp - this.prevPipeTimestamp) / 1000;
-    this.prevPipeTimestamp = timeStamp;
-
     for (let i = 0; i < this.pipes.length; i++) {
-      const pipe = this.pipes[i];
-      pipe.xDir -= this.pipeSpeed * delta;
-      if (pipe.prevX) {
-        this.clearPipe(pipe.prevX, pipe.topHeight, pipe.bottomHeight);
+      if (!this.isCollisioned) {
+        const pipe = this.pipes[i];
+        pipe.xDir -= this.pipeSpeed * delta;
       }
       this.drawPipe(i);
     }
+
+    if (this.isCollisioned) return;
 
     const last = this.pipes[this.pipes.length - 1];
 
@@ -329,65 +327,32 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
       );
       this.pipes.unshift(this.pipes.pop()!);
     }
-
-    if (this.isCollisioned || !this.isGameStart) return;
-    requestAnimationFrame((time: number) => this.movePipes(time));
   }
 
   private drawPipe(idx: number) {
     if (!this.ctx || !this.pipeWidth) return;
-    const { height } = this.canvas!;
-    const realHeight = height - this.landHeight;
 
-    const currentPipe = this.pipes[idx];
-    const { topHeight, bottomHeight, xDir } = currentPipe;
-    const bottomY = topHeight + (realHeight - (topHeight + bottomHeight));
-
-    const centerX = xDir + this.pipeWidth / 2;
-    const centerY = topHeight / 2;
+    const pipe = this.pipes[idx];
+    const x = pipe.xDir | 0;
 
     this.ctx.save();
-    this.ctx.translate(centerX, centerY);
-    this.ctx.rotate(Math.PI);
+    this.ctx.scale(1, -1);
     this.ctx.drawImage(
       this.pipe,
-      -this.pipeWidth / 2,
-      -topHeight / 2,
+      x,
+      -pipe.topHeight,
       this.pipeWidth,
-      topHeight,
+      pipe.topHeight,
     );
     this.ctx.restore();
-    this.ctx.drawImage(this.pipe, xDir, bottomY, this.pipeWidth, bottomHeight);
 
-    currentPipe.prevX = xDir;
-  }
-
-  private clearPipe(x: number, topH: number, bottomH: number) {
-    if (!this.ctx || !this.pipeWidth) return;
-    const { height } = this.canvas!;
-    const realH = height - this.landHeight;
-    const bottomY = topH + (realH - (topH + bottomH));
-    this.ctx.clearRect(x - 6, 0, this.pipeWidth + 12, topH + 6);
-    this.ctx.clearRect(x - 6, bottomY - 6, this.pipeWidth + 12, bottomH + 6);
-  }
-
-  private clearBird(y: number) {
-    if (!this.ctx) return;
-    const angle = this.getBirdRotation();
-    const w = this.bird.width;
-    const h = this.bird.height;
-
-    const cx = this.birdX + w / 2;
-    const cy = y + h / 2;
-
-    this.ctx.save();
-    this.ctx.translate(cx, cy);
-    this.ctx.rotate(angle);
-
-    const realH = angle < 0 ? h + 16 : h + 5;
-    this.ctx.clearRect(-w / 2 - 5, -h / 2 - 5, w+6, realH);
-
-    this.ctx.restore();
+    this.ctx.drawImage(
+      this.pipe,
+      x,
+      this.canvas!.height - this.landHeight - pipe.bottomHeight,
+      this.pipeWidth,
+      pipe.bottomHeight,
+    );
   }
 
   private getBirdRotation(): number {
