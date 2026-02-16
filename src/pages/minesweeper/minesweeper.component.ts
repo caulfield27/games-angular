@@ -13,7 +13,6 @@ import { NgClass } from '@angular/common';
 import { HappySmile } from './icons/happySmile.component';
 import { SadSmile } from './icons/sadSmile.component';
 import { Lightbulb, LucideAngularModule } from 'lucide-angular';
-import { Dropdown } from '../../shared/components/dropdown/dropdown.component';
 import { dropdownOptions } from './constants';
 import { IDropdownOption, ILevelOption } from '../../shared/types/types';
 
@@ -39,29 +38,23 @@ export class Minesweeper implements AfterViewInit, OnDestroy {
   constructor(public boardService: BoardService) {}
 
   ngAfterViewInit(): void {
-    this.updateBoardSize();
-    window.addEventListener('resize', () => this.updateBoardSize());
+    this.updateVariables();
   }
 
-  updateBoardSize() {
-    const maxWidth = window.innerWidth * 0.78; // максимальная ширина board
-    const maxHeight = window.innerHeight * 0.65; // максимальная высота board
-
+  updateVariables() {
     const { levels, level } = this.boardService;
-    const cols = levels[level().value].cols;
-    const rows = levels[level().value].rows;
-
-    // размер клетки под текущий экран
-    const sizeByWidth = maxWidth / cols;
-    const sizeByHeight = maxHeight / rows;
-
-    // выбираем минимальный, чтобы не вылезло ни по ширине, ни по высоте
-    const cellSize = Math.floor(Math.min(sizeByWidth, sizeByHeight));
-
-    // устанавливаем CSS переменные
-    this.container.nativeElement.style.setProperty('--cell', cellSize + 'px');
-    this.container.nativeElement.style.setProperty('--cols', cols.toString());
-    this.container.nativeElement.style.setProperty('--rows', rows.toString());
+    this.container.nativeElement.style.setProperty(
+      '--cols',
+      String(levels[level().value].cols),
+    );
+    this.container.nativeElement.style.setProperty(
+      '--rows',
+      String(levels[level().value].rows),
+    );
+    this.container.nativeElement.style.setProperty(
+      '--size',
+      String(levels[level().value].size),
+    );
   }
 
   onFieldCheck(e: MouseEvent, idx: number) {
@@ -96,9 +89,16 @@ export class Minesweeper implements AfterViewInit, OnDestroy {
 
     if (fields[idx].isMine) {
       this.boardService.isFailed.set(true);
-      this.boardService.isGameOver = true;
       this.boardService.stopTimer();
-      this.boardService.gameOver(idx, true);
+      this.boardService.fields.update((prev) =>
+        prev.map((field, i) =>
+          idx === i ? { ...field, isOpen: true, failed: true } : field,
+        ),
+      );
+      setTimeout(() => {
+        this.boardService.isGameOver = true;
+        this.boardService.gameOver(idx, true);
+      }, 500);
       return;
     }
 
@@ -125,7 +125,7 @@ export class Minesweeper implements AfterViewInit, OnDestroy {
 
   handleLevelSelect(option: IDropdownOption) {
     this.boardService.level.set(option as ILevelOption);
-    this.updateBoardSize();
+    this.updateVariables();
     this.boardService.restart();
   }
 

@@ -1,27 +1,38 @@
 import { IField } from '../types/types';
 import { ILevel, LevelType } from '../../../shared/types/types';
 
-export function getLevels(): ILevel {
+export function getLevels(width: number): ILevel {
   return {
     easy: {
       label: 'Лёгкий',
-      rows: 8,
+      rows: 10,
       cols: 8,
       mines: 10,
+      size: width <= 600 ? '25px' : '45px',
+      mineSize: width <= 600 ? '20px' : '35px',
+      flagSize: width <= 600 ? '15px' : '35px',
       hintAmount: 1,
     },
     medium: {
       label: 'Средний',
-      rows: 16,
-      cols: 16,
+      rows: width <= 600 ? 14 : 18,
+      cols: 14,
       mines: 40,
+      size:
+        width <= 600 && width > 400 ? '25px' : width <= 400 ? '20px' : '35px',
+      mineSize: width <= 600 ? '15px' : '30px',
+      flagSize: width <= 600 ? '15px' : '25px',
       hintAmount: 3,
     },
     hard: {
       label: 'Сложный',
-      rows: 30,
-      cols: 16,
+      rows: width <= 600 ? 16 : 24,
+      cols: 20,
       mines: 99,
+      size:
+        width <= 600 && width > 385 ? '20px' : width < 385 ? '17px' : '25px',
+      mineSize: width <= 600 ? '10px' : '20px',
+      flagSize: width <= 600 ? '12px' : '20px',
       hintAmount: 5,
     },
   };
@@ -56,16 +67,16 @@ export function getFields(level: LevelType): IField[] {
     const edgeCase = leftEdge.has(i)
       ? 1
       : rightEdge.has(i)
-      ? 2
-      : bottomLeft
-      ? 3
-      : bottomRight
-      ? 4
-      : topLeft
-      ? 5
-      : topRight
-      ? 6
-      : 7;
+        ? 2
+        : bottomLeft
+          ? 3
+          : bottomRight
+            ? 4
+            : topLeft
+              ? 5
+              : topRight
+                ? 6
+                : 7;
     return {
       id: i + 1,
       isMine: false,

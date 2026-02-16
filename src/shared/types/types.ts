@@ -14,6 +14,9 @@ type LevelType = {
   rows: number;
   cols: number;
   mines: number;
+  size: string;
+  mineSize: string;
+  flagSize: string;
   hintAmount: number;
 };
 

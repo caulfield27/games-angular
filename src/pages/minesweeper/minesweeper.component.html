@@ -5,21 +5,26 @@
         [options]="options"
         [value]="boardService.level()"
         [onSelect]="handleLevelSelect.bind(this)"
-      ></dropdown> -->
-      <!-- @if (boardService.isGameStart()) {
-      <div class="hint_wrapper">
-        <button
-          (click)="handleUseHint()"
-          [ngClass]="[
-            'hint_btn',
-            boardService.hintAmount() === 0 ? 'disabled' : ''
-          ]"
-          id="hint_btn"
-        >
-          <lucide-icon [img]="Bulb" size="45" color="#ffff48" [absoluteStrokeWidth]="true"></lucide-icon>
-          <span>{{ boardService.hintAmount() }}</span>
-        </button>
-      </div>
+      ></dropdown>
+      @if (boardService.isGameStart()) {
+        <div class="hint_wrapper">
+          <button
+            (click)="handleUseHint()"
+            [ngClass]="[
+              'hint_btn',
+              boardService.hintAmount() === 0 ? 'disabled' : '',
+            ]"
+            id="hint_btn"
+          >
+            <lucide-icon
+              [img]="Bulb"
+              size="45"
+              color="#ffff48"
+              [absoluteStrokeWidth]="true"
+            ></lucide-icon>
+            <span>{{ boardService.hintAmount() }}</span>
+          </button>
+        </div>
       } -->
     </div>
     <div class="game_board">
@@ -33,10 +38,10 @@
             class="smile_container"
             role="button"
           >
-            @if(boardService.isFailed()){
-            <sad-smile />
-            }@else {
-            <happy-smile />
+            @if (boardService.isFailed()) {
+              <sad-smile />
+            } @else {
+              <happy-smile />
             }
           </div>
           <div class="timer_container">
@@ -45,31 +50,37 @@
         </div>
       </div>
       <div #container class="mainsweeper_container">
-        @for(field of boardService.fields(); track field.id){
-        <button
-          (contextmenu)="onFieldCheck($event, $index)"
-          (click)="onFieldClick($index)"
-          [ngClass]="[
-            'field',
-            'field_' + boardService.level().value,
-            'field_' +
-              (field?.minesAround && (field?.minesAround ?? 4) < 4
-                ? field.minesAround
-                : 'default'),
-            field.isOpen ? 'open_field' : '',
-            field?.failed ? 'failed' : '',
-            $index === boardService.hintIdx() ? 'hint' : ''
-          ]"
-        >
-          @if(field.isFlaged){
-          <flag-icon
-          />
-          }@else if (field.isOpen && field.isMine) {
-          <mine-icon
-          />
-          }
-          {{ field?.minesAround ?? "" }}
-        </button>
+        @for (field of boardService.fields(); track field.id) {
+          <button
+            (contextmenu)="onFieldCheck($event, $index)"
+            (click)="onFieldClick($index)"
+            [ngClass]="[
+              'field',
+              'field_' + boardService.level().value,
+              'field_' +
+                (field?.minesAround && (field?.minesAround ?? 4) < 4
+                  ? field.minesAround
+                  : 'default'),
+              field.isOpen ? 'open_field' : '',
+              field?.failed ? 'failed' : '',
+              $index === boardService.hintIdx() ? 'hint' : '',
+            ]"
+          >
+            @if (field.isFlaged) {
+              <flag-icon
+                [width]="
+                  boardService.levels[boardService.level().value].flagSize
+                "
+              />
+            } @else if (field.isOpen && field.isMine) {
+              <mine-icon
+                [width]="
+                  boardService.levels[boardService.level().value].mineSize
+                "
+              />
+            }
+            {{ field?.minesAround ?? "" }}
+          </button>
         }
       </div>
     </div>
