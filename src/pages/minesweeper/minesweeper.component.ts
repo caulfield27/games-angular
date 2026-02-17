@@ -7,14 +7,13 @@ import {
 } from '@angular/core';
 import { BoardService } from './services/board.service';
 import { Tablo } from './components/tablo/tablo.component';
-import { FlagIcon } from './icons/flag.component';
-import { MineIcon } from './icons/mine.component';
 import { NgClass } from '@angular/common';
 import { HappySmile } from './icons/happySmile.component';
 import { SadSmile } from './icons/sadSmile.component';
 import { Lightbulb, LucideAngularModule } from 'lucide-angular';
 import { dropdownOptions } from './constants';
 import { IDropdownOption, ILevelOption } from '../../shared/types/types';
+import { Dropdown } from '@/shared/components/dropdown/dropdown.component';
 
 @Component({
   selector: 'minesweeper',
@@ -22,12 +21,11 @@ import { IDropdownOption, ILevelOption } from '../../shared/types/types';
   styleUrl: './minesweeper.component.scss',
   imports: [
     Tablo,
-    FlagIcon,
-    MineIcon,
     NgClass,
     HappySmile,
     SadSmile,
     LucideAngularModule,
+    Dropdown,
   ],
 })
 export class Minesweeper implements AfterViewInit, OnDestroy {

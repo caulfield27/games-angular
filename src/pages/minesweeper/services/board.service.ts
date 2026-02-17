@@ -26,7 +26,7 @@ export class BoardService {
       prev.map((field, i) => {
         if (i === idx) return { ...field, isOpen: true };
         return field;
-      })
+      }),
     );
     const fields = this.fields();
 
@@ -76,8 +76,8 @@ export class BoardService {
         mines.add(minePosition);
         this.fields.update((prev) =>
           prev.map((field, idx) =>
-            idx === minePosition ? { ...field, isMine: true } : field
-          )
+            idx === minePosition ? { ...field, isMine: true } : field,
+          ),
         );
       }
     }
@@ -163,9 +163,9 @@ export class BoardService {
     this.isGameOver = false;
     this.flagCounter.set(this.levels[this.level().value].mines);
     this.seconds.set(0);
-    this.hintAmount.set(this.levels[this.level().value].hintAmount)
+    this.hintAmount.set(this.levels[this.level().value].hintAmount);
     this.hintIdx.set(-1);
-    this.isFailed.set(false)
+    this.isFailed.set(false);
     this.stopTimer();
   }
 
@@ -182,7 +182,7 @@ export class BoardService {
       prev.map((field, i) => {
         if (i === idx) return { ...field, isFlaged: !field.isFlaged };
         return field;
-      })
+      }),
     );
   }
 
@@ -191,7 +191,7 @@ export class BoardService {
       prev.map((field, i) => {
         if (i === idx) return { ...field, minesAround };
         return field;
-      })
+      }),
     );
   }
 
@@ -220,7 +220,7 @@ export class BoardService {
             }
 
             return field;
-          })
+          }),
         );
       }
     });

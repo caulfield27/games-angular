@@ -1,7 +1,7 @@
 <div class="page_container">
   <div class="mainsweeper_wrapper">
     <div class="my_dropdown_wrapper">
-      <!-- <dropdown
+      <dropdown
         [options]="options"
         [value]="boardService.level()"
         [onSelect]="handleLevelSelect.bind(this)"
@@ -25,7 +25,7 @@
             <span>{{ boardService.hintAmount() }}</span>
           </button>
         </div>
-      } -->
+      }
     </div>
     <div class="game_board">
       <div class="tablo">
@@ -67,17 +67,9 @@
             ]"
           >
             @if (field.isFlaged) {
-              <flag-icon
-                [width]="
-                  boardService.levels[boardService.level().value].flagSize
-                "
-              />
+              <img src="/minesweeper/flag.png" alt="flag" />
             } @else if (field.isOpen && field.isMine) {
-              <mine-icon
-                [width]="
-                  boardService.levels[boardService.level().value].mineSize
-                "
-              />
+              <img src="/minesweeper/bomb.png" alt="bomb" />
             }
             {{ field?.minesAround ?? "" }}
           </button>

@@ -1,14 +1,12 @@
-.page_container {
-  height: 100svh;
+.page_container{
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-size: cover;
   padding: 80px 32px 32px 32px;
 
-  background: #262626;
-
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 500px) {
     padding: 80px 16px 16px 16px;
   }
 }
@@ -21,7 +19,7 @@
   gap: 20px;
   overflow: hidden;
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 480px) {
     display: flex;
     flex-direction: column;
   }
@@ -32,10 +30,11 @@
   grid-column: 1;
   justify-self: end;
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 480px) {
     margin-top: 0;
   }
 }
+
 
 .mainsweeper_container {
   display: grid;
@@ -45,34 +44,60 @@
   overflow: hidden;
   border-radius: 2px;
   position: relative;
-  gap: 4px;
+  border-right: 10px solid #fff;
+  border-bottom: 10px solid #fff;
+  border-left: 10px solid #878787;
+  border-top: 10px solid #878787;
 
-  @media screen and (max-width: 600px) {
-    gap: 2px;
+  @media screen and (max-width: 480px) {
+    border-right: 3px solid #fff;
+    border-bottom: 3px solid #fff;
+    border-left: 3px solid #878787;
+    border-top: 3px solid #878787;
   }
 }
 
 .game_board {
-  border-radius: 4px;
   grid-column: 2/3;
   justify-self: center;
   align-items: center;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: #171717;
+  border-top: 15px solid #fff;
+  border-left: 15px solid #fff;
+  border-bottom: 15px solid #878787;
+  border-right: 15px solid #878787;
+  background: gainsboro;
   padding: 10px;
+
+  @media screen and (max-width: 480px) {
+    border-top: 5px solid #fff;
+    border-left: 5px solid #fff;
+    border-bottom: 5px solid #878787;
+    border-right: 5px solid #878787;
+  }
 }
 
 .tablo {
   width: 100%;
+  border-right: 10px solid #fff;
+  border-bottom: 10px solid #fff;
+  border-left: 10px solid #878787;
+  border-top: 10px solid #878787;
+
+  @media screen and (max-width: 480px) {
+    border-right: 3px solid #fff;
+    border-bottom: 3px solid #fff;
+    border-left: 3px solid #878787;
+    border-top: 3px solid #878787;
+  }
 }
 
 .tablo_content {
-  border-radius: 4px;
   width: 100%;
   height: 100%;
-  background: #262626;
+  background: gainsboro;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -82,14 +107,47 @@
 
 .field_easy {
   font-size: 2vw;
+  border-top: 4px solid #fff;
+  border-left: 4px solid #fff;
+  border-bottom: 4px solid #878787;
+  border-right: 4px solid #878787;
+
+  @media screen and (max-width: 480px) {
+    border-top: 2px solid #fff;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #878787;
+    border-right: 2px solid #878787;
+  }
 }
 
 .field_medium {
   font-size: 1.5vw;
+  border-top: 3px solid #fff;
+  border-left: 3px solid #fff;
+  border-bottom: 3px solid #878787;
+  border-right: 3px solid #878787;
+
+  @media screen and (max-width: 480px) {
+    border-top: 1px solid #fff;
+    border-left: 1px solid #fff;
+    border-bottom: 1px solid #878787;
+    border-right: 1px solid #878787;
+  }
 }
 
 .field_hard {
   font-size: 1vw;
+  border-top: 2px solid #fff;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #878787;
+  border-right: 2px solid #878787;
+
+  @media screen and (max-width: 480px) {
+    border-top: 1px solid #fff;
+    border-left: 1px solid #fff;
+    border-bottom: 1px solid #878787;
+    border-right: 1px solid #878787;
+  }
 }
 
 .field {
@@ -100,79 +158,53 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  user-select: none;
-  background: #262626;
-  border-radius: 4px;
-  transition:
-    background 0.12s,
-    transform 0.08s;
+  background: #bfbfbf;
 
   &:active {
-    scale: 0.92;
+    scale: 0.9;
   }
 
-  &:hover {
-    background: #171717;
-  }
-
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 480px) {
     font-size: 16px;
   }
 }
 
 .open_field {
-  background: #171717 !important;
-  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.9);
+  border: 1px solid #bfbfbf;
+  background: #e2e2e2 !important;
   pointer-events: none;
 }
 
 .failed {
-  background: #ff3b3b !important;
-  animation: boom 0.25s ease;
+  border-bottom: 1px solid #a00c0c;
+  background: #e00707 !important;
 }
 
-@keyframes boom {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
-  }
+.hint{
+  background-color: #45de45;
 }
 
-.hint {
-  background: #1f3a2a !important;
+.field_1{
+  color: #0B24FB;
+}
+.field_2{
+  color: #0E7A11;
+}
+.field_3{
+  color: #852123;
+}
+.field_default{
+  color: #FC0D1B;
 }
 
-.field_1 {
-  color: #7aa2f7;
-}
-.field_2 {
-  color: #8bd5a5;
-}
-.field_3 {
-  color: #f7768e;
-}
-.field_4 {
-  color: #bb9af7;
-}
-.field_5 {
-  color: #e0af68;
-}
-.field_default {
-  color: #c0caf5;
-}
 
 .smile_container {
   cursor: pointer;
   padding: 3px;
-  border-bottom: 5px solid #0a0a0a;
-  border-right: 5px solid #0a0a0a;
-  border-left: 5px solid #404040;
-  border-top: 5px solid #404040;
+  border-bottom: 5px solid #878787;
+  border-right: 5px solid #878787;
+  border-left: 5px solid #fff;
+  border-top: 5px solid #fff;
 
   &:active {
     scale: 0.95;
@@ -211,12 +243,13 @@
   cursor: pointer;
   position: relative;
 
-  span {
+  span{
     position: absolute;
     left: 50%;
     top: 5%;
     transform: translate(-50%);
-    color: #5b21b6;
+    color: #ffff48;
     font-weight: 600;
+
   }
 }
