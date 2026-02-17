@@ -1,3 +1,40 @@
-<div>
-    <h1>Шахматы</h1>
+<div class="h-[100svh] w-full bg-neutral-800 flex justify-center items-center">
+  @if (chessService.gameType() === null) {
+    <div
+      class="bg-neutral-900 min-w-[500px] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
+    >
+      <div class="w-full flex flex-col gap-5">
+        <button
+          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
+        >
+          <lucide-angular class="text-blue-500" [img]="GlobeIcon" />
+          Играть онлайн
+        </button>
+        <button
+          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
+        >
+          <lucide-angular class="text-amber-500" [img]="HandshakeIcon" />
+          Играть c другом
+        </button>
+        <button
+          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
+        >
+          <lucide-angular class="text-blue-300" [img]="BotIcon" />
+          Играть с ботами
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div>
+      <div class="grid grid-cols-8 grid-rows-8">
+        @for (square of chessService.board(); track $index) {
+          <div [style.background]="getSquareColor($index)">
+            @if (isFigure(square)) {
+              <img width="60" height="60" [src]="square.image" [alt]="square.figure" />
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
 </div>
