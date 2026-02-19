@@ -1,0 +1,39 @@
+.allowed_chess_cell {
+  position: relative;
+}
+
+.allowed_chess_cell::after {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  content: "";
+  width: calc(var(--chess-cell) / 2.5);
+  height: calc(var(--chess-cell) / 2.5);
+
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.take_chess_cell {
+    position: relative;
+}
+
+.take_chess_cell::after{
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  content: "";
+  width: var(--chess-cell);
+  height: var(--chess-cell);
+
+  border-radius: 50%;
+  border: 6px solid rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}

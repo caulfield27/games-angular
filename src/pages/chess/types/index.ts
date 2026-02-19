@@ -1,7 +1,7 @@
 import { Figure } from "../classes/figure";
 
 export type GameType = 'bot' | 'online' | 'friend';
-export enum FigureEnum {
+export enum Piece {
   KING = 'king',
   QUEEN = 'queen',
   ROOK = 'rook',
@@ -14,4 +14,13 @@ export enum Color {
   WHITE = 'white',
 }
 
-export type Board = Figure | null;
+export enum SquareColor {
+  BLACK = '#404040',
+  WHITE = '#f5f5f4'
+}
+
+export interface Square{
+  figure: Figure | null;
+  canMove: boolean;
+  isPlayer: boolean;
+}

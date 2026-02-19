@@ -1,20 +1,44 @@
-import { Component, effect } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  effect,
+  ElementRef,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { LucideAngularModule, Bot, Handshake, Globe } from 'lucide-angular';
+import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from './service/chess.service';
 import { Figure } from './classes/figure';
+import { Color, Square } from './types';
+import { get1Dposition, get2Dposition, getSquareBg } from './utils';
+import { getCoordinates } from '@/shared/utils/getCoordinates';
+import { NgStyle, NgClass } from '@angular/common';
 
 @Component({
   selector: 'chess',
   templateUrl: './chess.component.html',
-  imports: [LucideAngularModule],
+  styleUrl: './chess.component.css',
+  imports: [LucideAngularModule, CdkDrag, NgStyle, NgClass],
 })
-export class Chess {
+export class Chess implements AfterViewInit {
   // icons
   readonly BotIcon = Bot;
   readonly HandshakeIcon = Handshake;
   readonly GlobeIcon = Globe;
 
+  // dom
+  @ViewChild('board') board!: ElementRef<HTMLDivElement>;
+  @ViewChild('cell') cell!: ElementRef<HTMLDivElement>;
+
+  // states
+  cellSize: number = 60;
+  currentFigure: Figure | null = null;
+
   constructor(public chessService: ChessService) {
+    chessService.playerPicesColor =
+      Math.round(Math.random()) === 0 ? Color.WHITE : Color.BLACK;
+
     effect(() => {
       switch (chessService.gameType()) {
         case 'bot':
@@ -30,31 +54,59 @@ export class Chess {
     });
   }
 
+  ngAfterViewInit(): void {
+    const width = this.cell.nativeElement.clientWidth;
+    if (width) {
+      const root = document.documentElement;
+      root.style.setProperty('--chess-cell', width + 'px');
+      this.cellSize = width;
+    }
+  }
+
+  public getBg(idx: number) {
+    return getSquareBg(idx);
+  }
+
+  public getGridArea(idx: number, position: [number, number] | null) {
+    if (position) {
+      return { gridColumn: position[1] + 1, gridRow: position[0] + 1 };
+    }
+
+    const [gridRow, gridColumn] = get2Dposition(idx) ?? [-1,-1];
+    return { gridColumn: gridColumn + 1, gridRow: gridRow + 1 };
+  }
+
   public isFigure(data: Figure | null) {
     return data instanceof Figure;
   }
 
-  public getSquareColor(idx: number) {
-    const isEven = idx % 2 === 0;
-    switch (true) {
-      case idx >= 0 && idx < 8:
-        return isEven ? '#f5f5f4' : '#404040';
-      case idx >= 8 && idx < 16:
-        return isEven ? '#404040' : '#f5f5f4';
-      case idx >= 16 && idx < 24:
-        return isEven ? '#f5f5f4' : '#404040';
-      case idx >= 24 && idx < 32:
-        return isEven ? '#404040' : '#f5f5f4';
-      case idx >= 32 && idx < 40:
-        return isEven ? '#f5f5f4' : '#404040';
-      case idx >= 40 && idx < 48:
-        return isEven ? '#404040' : '#f5f5f4';
-      case idx >= 48 && idx < 56:
-        return isEven ? '#f5f5f4' : '#404040';
-      case idx >= 56 && idx < 64:
-        return isEven ? '#404040' : '#f5f5f4';
-      default:
-        return '#f5f5f4';
-    }
+  public onDragEnd(event: CdkDragEnd<Square>) {
+    event.source.reset();
+    if (!this.currentFigure) return;
+    const { x, y } = getCoordinates(
+      this.board.nativeElement,
+      event.dropPoint,
+      this.cellSize,
+      8,
+    );
+    const goalIndex = get1Dposition([y, x]) ?? -1;
+    if (!this.chessService.board()[goalIndex]?.canMove) return;
+    this.chessService.moveFigure(this.currentFigure, goalIndex);
+    this.chessService.updateSquares([]);
+  }
+
+  onPieceChoose(piece: Square) {
+    if (!piece.isPlayer) return;
+    this.currentFigure = piece.figure;
+    const allowedSquares = piece.figure!.showAllowedSquares(
+      this.chessService.board(),
+    );
+    this.chessService.updateSquares(allowedSquares);
+  }
+
+  onMove(piece: Square, index: number) {
+    if (!piece.canMove || !this.currentFigure) return;
+    this.chessService.moveFigure(this.currentFigure, index);
+    this.chessService.updateSquares([]);
   }
 }

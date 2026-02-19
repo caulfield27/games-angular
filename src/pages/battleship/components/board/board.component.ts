@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { IShip, sendMessageType } from '../../types/types';
 import { NgStyle, NgClass } from '@angular/common';
 import { CdkDrag, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
-import { getCoordinates } from '../../utils/getCoordinates';
+import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { BoardService } from '../../services/board.service';
 import { BattleshipService, WebSocketService } from '../../services';
 

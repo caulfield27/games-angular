@@ -1,7 +1,7 @@
 import { Component, effect, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
 import { sendMessageType } from '../../types/types';
-import { getCoordinates } from '../../utils/getCoordinates';
+import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { WebSocketService, BattleshipService } from '../../services';
 
 @Component({

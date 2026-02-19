@@ -1,79 +1,71 @@
 import { Injectable, signal } from '@angular/core';
+import { Color, GameType, Piece, Square, SquareColor } from '../types';
 import { Figure } from '../classes/figure';
-import { Board, Color, FigureEnum, GameType } from '../types';
+import { Player } from '../classes/player';
+import { AuthService } from '@/shared/services/auth.service';
+import { OPPONENT_PIECE, PLAYER_PIECE } from '../constants';
+import { get1Dposition, get2Dposition } from '../utils';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChessService {
-  public board;
   public gameType = signal<GameType | null>('bot');
-  constructor() {
-    this.board = signal<Board[]>([
-      new Figure(FigureEnum.ROOK, Color.BLACK, [0, 0]),
-      new Figure(FigureEnum.KNIGHT, Color.BLACK, [0, 1]),
-      new Figure(FigureEnum.BISHOP, Color.BLACK, [0, 2]),
-      new Figure(FigureEnum.QUEEN, Color.BLACK, [0, 3]),
-      new Figure(FigureEnum.KING, Color.BLACK, [0, 4]),
-      new Figure(FigureEnum.BISHOP, Color.BLACK, [0, 5]),
-      new Figure(FigureEnum.KNIGHT, Color.BLACK, [0, 6]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [0, 7]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 0]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 1]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 2]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 3]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 4]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 5]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 6]),
-      new Figure(FigureEnum.PAWN, Color.BLACK, [1, 7]),
+  public playerPicesColor: Color = Color.WHITE;
+  public board;
+  public player;
+  public opponent;
+  constructor(private auth: AuthService) {
+    this.player = new Player(this.playerPicesColor, auth.user());
+    this.opponent = new Player(
+      this.playerPicesColor === Color.WHITE ? Color.BLACK : Color.WHITE,
       null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      new Figure(FigureEnum.ROOK, Color.WHITE, [6, 0]),
-      new Figure(FigureEnum.KNIGHT, Color.WHITE, [6, 1]),
-      new Figure(FigureEnum.BISHOP, Color.WHITE, [6, 2]),
-      new Figure(FigureEnum.QUEEN, Color.WHITE, [6, 3]),
-      new Figure(FigureEnum.KING, Color.WHITE, [6, 4]),
-      new Figure(FigureEnum.BISHOP, Color.WHITE, [6, 5]),
-      new Figure(FigureEnum.KNIGHT, Color.WHITE, [6, 6]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [6, 7]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 0]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 1]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 2]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 3]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 4]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 5]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 6]),
-      new Figure(FigureEnum.PAWN, Color.WHITE, [7, 7]),
-    ]);
+    );
+    this.board = signal<Square[]>(this.generateBoard());
+  }
+
+  private generateBoard(): Square[] {
+    return new Array(64).fill(null).map((square, idx) => {
+      square = {
+        figure: null,
+        isPlayer: false,
+        canMove: false,
+      };
+      if (idx > 47) {
+        square.isPlayer = true;
+        const piece = idx < 56 ? Piece.PAWN : (PLAYER_PIECE[idx] ?? Piece.PAWN);
+        square.figure = new Figure(
+          piece,
+          this.player.color,
+          get2Dposition(idx)!,
+        );
+      } else if (idx < 16) {
+        const piece =
+          idx > 7 ? Piece.PAWN : (OPPONENT_PIECE[idx] ?? Piece.PAWN);
+        square.figure = new Figure(
+          piece,
+          this.opponent.color,
+          get2Dposition(idx)!,
+        );
+      }
+      return square;
+    });
+  }
+
+  public updateSquares(squares: number[]) {
+    this.board.update((prev) =>
+      prev.map((s, idx) => ({ ...s, canMove: squares.includes(idx) })),
+    );
+  }
+
+  public moveFigure(figure: Figure, index: number) {
+    const prevIndex = get1Dposition(figure.position())!;
+    figure.move(index);
+    const updatedBoard = this.board();
+    [updatedBoard[prevIndex], updatedBoard[index]] = [
+      updatedBoard[index],
+      updatedBoard[prevIndex],
+    ];
+    this.board.set(updatedBoard);
   }
 }

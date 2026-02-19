@@ -1,6 +1,8 @@
 export function getCoordinates(
   field: HTMLDivElement,
-  pointer: { x: number; y: number }
+  pointer: { x: number; y: number },
+  cellSize = 30,
+  maxSize = 9,
 ): {
   x: number;
   y: number;
@@ -10,13 +12,12 @@ export function getCoordinates(
   const relX = pointer.x - gridRect.left;
   const relY = pointer.y - gridRect.top;
 
-  const cellSize = 30;
 
   const col = Math.floor(relX / cellSize);
   const row = Math.floor(relY / cellSize);
 
-  const x = Math.max(0, Math.min(9, col));
-  const y = Math.max(0, Math.min(9, row));
+  const x = Math.max(0, Math.min(maxSize, col));
+  const y = Math.max(0, Math.min(maxSize, row));
 
   return { x, y };
 }

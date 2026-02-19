@@ -15,6 +15,7 @@
         >
           <lucide-angular class="text-amber-500" [img]="HandshakeIcon" />
           Играть c другом
+          {{ cellSize }}
         </button>
         <button
           class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
@@ -26,11 +27,39 @@
     </div>
   } @else {
     <div>
-      <div class="grid grid-cols-8 grid-rows-8">
+      <div class="grid grid-cols-8 grid-rows-8" id="board" #board>
         @for (square of chessService.board(); track $index) {
-          <div [style.background]="getSquareColor($index)">
-            @if (isFigure(square)) {
-              <img width="60" height="60" [src]="square.image" [alt]="square.figure" />
+          <div
+            (click)="onMove(square, $index)"
+            [ngClass]="
+              square.canMove && isFigure(square.figure)
+                ? 'take_chess_cell'
+                : square.canMove
+                  ? 'allowed_chess_cell'
+                  : ''
+            "
+            [style.background]="getBg($index)"
+            #cell
+            [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
+          >
+            @if (isFigure(square.figure)) {
+              <div
+                (pointerdown)="onPieceChoose(square)"
+                role="button"
+                [cdkDragDisabled]="!square.isPlayer"
+                cdkDrag
+                cdkDragBoundary="#board"
+                class="touch-none z-10"
+                (cdkDragEnded)="onDragEnd($event)"
+                [cdkDragData]="square"
+              >
+                <img
+                  width="60"
+                  height="60"
+                  [src]="square.figure.image"
+                  [alt]="square.figure.piece"
+                />
+              </div>
             }
           </div>
         }
