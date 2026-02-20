@@ -24,3 +24,5 @@ export interface Square{
   canMove: boolean;
   isPlayer: boolean;
 }
+
+export type MoveDirection = 'up' | 'upleft' | 'upright' | 'down' | 'downleft' | 'downright' | 'left' | 'right';

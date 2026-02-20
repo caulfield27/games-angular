@@ -31,13 +31,7 @@
         @for (square of chessService.board(); track $index) {
           <div
             (click)="onMove(square, $index)"
-            [ngClass]="
-              square.canMove && isFigure(square.figure)
-                ? 'take_chess_cell'
-                : square.canMove
-                  ? 'allowed_chess_cell'
-                  : ''
-            "
+            [ngClass]="getContainerClasses(square)"
             [style.background]="getBg($index)"
             #cell
             [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"

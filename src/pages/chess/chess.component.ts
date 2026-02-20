@@ -3,7 +3,6 @@ import {
   Component,
   effect,
   ElementRef,
-  signal,
   ViewChild,
 } from '@angular/core';
 import { LucideAngularModule, Bot, Handshake, Globe } from 'lucide-angular';
@@ -63,6 +62,7 @@ export class Chess implements AfterViewInit {
     }
   }
 
+  // css classes
   public getBg(idx: number) {
     return getSquareBg(idx);
   }
@@ -72,8 +72,16 @@ export class Chess implements AfterViewInit {
       return { gridColumn: position[1] + 1, gridRow: position[0] + 1 };
     }
 
-    const [gridRow, gridColumn] = get2Dposition(idx) ?? [-1,-1];
+    const [gridRow, gridColumn] = get2Dposition(idx) ?? [-1, -1];
     return { gridColumn: gridColumn + 1, gridRow: gridRow + 1 };
+  }
+
+  public getContainerClasses(square: Square) {
+    const isFigure = this.isFigure(square.figure);
+    return {
+      take_chess_cell: square.canMove && isFigure,
+      allowed_chess_cell: square.canMove && !isFigure
+    };
   }
 
   public isFigure(data: Figure | null) {
@@ -98,7 +106,7 @@ export class Chess implements AfterViewInit {
   onPieceChoose(piece: Square) {
     if (!piece.isPlayer) return;
     this.currentFigure = piece.figure;
-    const allowedSquares = piece.figure!.showAllowedSquares(
+    const allowedSquares = piece.figure!.getAllowedSquares(
       this.chessService.board(),
     );
     this.chessService.updateSquares(allowedSquares);
