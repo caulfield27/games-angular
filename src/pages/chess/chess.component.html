@@ -30,12 +30,18 @@
       <div class="grid grid-cols-8 grid-rows-8" id="board" #board>
         @for (square of chessService.board(); track $index) {
           <div
+            class="relative"
             (click)="onMove(square, $index)"
-            [ngClass]="getContainerClasses(square)"
             [style.background]="getBg($index)"
             #cell
             [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
           >
+            @if (square.canMove && isFigure(square.figure)) {
+              <div class="take_square"></div>
+            }
+            @if (square.canMove && !isFigure(square.figure)) {
+              <div class="available_square"></div>
+            }
             @if (isFigure(square.figure)) {
               <div
                 (pointerdown)="onPieceChoose(square)"
@@ -43,7 +49,7 @@
                 [cdkDragDisabled]="!square.isPlayer"
                 cdkDrag
                 cdkDragBoundary="#board"
-                class="touch-none z-10"
+                class="touch-none relative z-[2] cursor-grab"
                 (cdkDragEnded)="onDragEnd($event)"
                 [cdkDragData]="square"
               >

@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { EmbeddedViewRef, signal } from '@angular/core';
 import { PIECE_IMAGE_PATH } from '../constants';
 import { Color, Piece, Square, MoveDirection } from '../types';
 import { get1Dposition, get2Dposition } from '../utils';
@@ -8,20 +8,23 @@ export class Figure {
   public position;
   public image: string;
   public color: Color;
+  public isMoved: boolean;
   constructor(piece: Piece, color: Color, position: [number, number]) {
     this.piece = piece;
     this.position = signal<[number, number]>(position);
     this.image = PIECE_IMAGE_PATH[piece + color];
     this.color = color;
+    this.isMoved = false;
   }
 
   public move(index: number) {
+    if (!this.isMoved) this.isMoved = true;
     this.position.set(get2Dposition(index)!);
   }
 
   private kingForbiddenMoves(board: Square[]) {
     const forbidden: number[] = [];
-    for(const square of board) {
+    for (const square of board) {
       const figure = square.figure;
       if (figure instanceof Figure && figure.color !== this.color) {
         const opPosition = figure.position();
@@ -146,6 +149,7 @@ export class Figure {
     board: Square[],
     position: [number, number],
     color: Color = this.color,
+    isProtectionCheck: boolean = false,
   ) {
     const [y, x] = position;
 
@@ -168,8 +172,13 @@ export class Figure {
     }
 
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
-    if (lastFigure instanceof Figure && lastFigure.color !== color) {
-      arr.push(get1Dposition([startY, startX])!);
+    if (lastFigure instanceof Figure) {
+      if (
+        (isProtectionCheck && lastFigure.color === color) ||
+        (!isProtectionCheck && lastFigure.color !== color)
+      ) {
+        arr.push(get1Dposition([startY, startX])!);
+      }
     }
 
     return arr;
@@ -180,6 +189,7 @@ export class Figure {
     board: Square[],
     position: [number, number],
     color: Color = this.color,
+    isProtectionCheck: boolean = false,
   ) {
     const [y, x] = position;
     let startX = move === 'left' ? x - 1 : move === 'right' ? x + 1 : x;
@@ -202,8 +212,13 @@ export class Figure {
     }
 
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
-    if (lastFigure instanceof Figure && lastFigure.color !== color) {
-      arr.push(get1Dposition([startY, startX])!);
+    if (lastFigure instanceof Figure) {
+      if (
+        (isProtectionCheck && lastFigure.color === color) ||
+        (!isProtectionCheck && lastFigure.color !== color)
+      ) {
+        arr.push(get1Dposition([startY, startX])!);
+      }
     }
 
     return arr;
@@ -214,24 +229,83 @@ export class Figure {
     board: Square[],
     position: [number, number],
     color: Color = this.color,
+    isProtectionCheck: boolean = false,
   ) {
     const arr: number[] = [];
     if (!forbidden.includes('left'))
-      arr.push(...this.getRookFields('left', board, position, color));
+      arr.push(
+        ...this.getRookFields(
+          'left',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     if (!forbidden.includes('right'))
-      arr.push(...this.getRookFields('right', board, position, color));
+      arr.push(
+        ...this.getRookFields(
+          'right',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     if (!forbidden.includes('down'))
-      arr.push(...this.getRookFields('down', board, position, color));
+      arr.push(
+        ...this.getRookFields(
+          'down',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     if (!forbidden.includes('up'))
-      arr.push(...this.getRookFields('up', board, position, color));
+      arr.push(
+        ...this.getRookFields('up', board, position, color, isProtectionCheck),
+      );
     if (!forbidden.includes('upleft'))
-      arr.push(...this.getBishopFields('leftup', board, position, color));
+      arr.push(
+        ...this.getBishopFields(
+          'leftup',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     if (!forbidden.includes('downleft'))
-      arr.push(...this.getBishopFields('leftdown', board, position, color));
+      arr.push(
+        ...this.getBishopFields(
+          'leftdown',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     if (!forbidden.includes('upright'))
-      arr.push(...this.getBishopFields('rightup', board, position, color));
+      arr.push(
+        ...this.getBishopFields(
+          'rightup',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     if (!forbidden.includes('downright'))
-      arr.push(...this.getBishopFields('rightdown', board, position, color));
+      arr.push(
+        ...this.getBishopFields(
+          'rightdown',
+          board,
+          position,
+          color,
+          isProtectionCheck,
+        ),
+      );
     return arr;
   }
 
@@ -241,6 +315,7 @@ export class Figure {
     position: [number, number],
     isPlayer: boolean = true,
     color: Color = this.color,
+    isProtectionCheck: boolean = false,
   ) {
     const [y, x] = position;
     const hash: Record<'up' | 'upleft' | 'upright', number[]> = {
@@ -248,9 +323,32 @@ export class Figure {
       upleft: [],
       upright: [],
     };
+
+    if (!isPlayer) {
+      const up3 = get1Dposition([y + 1, x + 1]) ?? -1;
+      const up4 = get1Dposition([y + 1, x - 1]) ?? -1;
+      const up3Figure = board[up3]?.figure;
+      const up4Figure = board[up4]?.figure;
+
+      if (up3Figure === null) hash.upleft.push(up3);
+      if (up3Figure instanceof Figure) {
+        if (isProtectionCheck && up3Figure.color === color) {
+          hash['upleft'].push(up3);
+        }
+      }
+
+      if (up4Figure === null) hash.upright.push(up4);
+      if (up4Figure instanceof Figure) {
+        if (isProtectionCheck && up4Figure.color === color) {
+          hash['upright'].push(up4);
+        }
+      }
+      return hash;
+    }
+
     if (!forbidden.includes('up')) {
-      const up1 = get1Dposition([isPlayer ? y - 1 : y + 1, x]) ?? -1;
-      const up2 = get1Dposition([isPlayer ? y - 2 : y + 2, x]) ?? -1;
+      const up1 = get1Dposition([y - 1, x]) ?? -1;
+      const up2 = get1Dposition([y - 2, x]) ?? -1;
       const up1Figure = board[up1]?.figure;
       const up2Figure = board[up2]?.figure;
       if (up1Figure === null) {
@@ -263,9 +361,7 @@ export class Figure {
     }
 
     if (!forbidden.includes('upleft')) {
-      const up3 =
-        get1Dposition([isPlayer ? y - 1 : y + 1, isPlayer ? x - 1 : x + 1]) ??
-        -1;
+      const up3 = get1Dposition([y - 1, x - 1]) ?? -1;
       const up3Figure = board[up3]?.figure;
       if (up3Figure instanceof Figure && up3Figure.color !== color) {
         hash['upleft'].push(up3);
@@ -273,9 +369,7 @@ export class Figure {
     }
 
     if (!forbidden.includes('upright')) {
-      const up4 =
-        get1Dposition([isPlayer ? y - 1 : y + 1, isPlayer ? x + 1 : x - 1]) ??
-        -1;
+      const up4 = get1Dposition([y - 1, x + 1]) ?? -1;
       const up4Figure = board[up4]?.figure;
       if (up4Figure instanceof Figure && up4Figure.color !== color) {
         hash['upright'].push(up4);
@@ -289,7 +383,7 @@ export class Figure {
     board: Square[],
     position: [number, number],
     color: Color = this.color,
-    isProtectCheck:boolean = false
+    isProtectionCheck: boolean = false,
   ) {
     const allowed: number[] = [];
     const [y, x] = position;
@@ -309,18 +403,13 @@ export class Figure {
       if (index === null) continue;
       const figure = board[index].figure;
 
-      if (
-        figure === null ||
-        (figure instanceof Figure)
-      ) {
-        if(figure === null){
+      if (figure === null) allowed.push(index);
+      if (figure instanceof Figure) {
+        if (
+          (isProtectionCheck && color === figure.color) ||
+          (!isProtectionCheck && color !== figure.color)
+        ) {
           allowed.push(index);
-        }else{
-          if(isProtectCheck && figure.color === color){
-            allowed.push(index) 
-          }else if(!isProtectCheck && figure.color !== color){
-            
-          }
         }
       }
     }
@@ -332,6 +421,7 @@ export class Figure {
     board: Square[],
     position: [number, number],
     color: Color,
+    isProtectionCheck: boolean = false,
   ) {
     const allowed: number[] = [];
     const directions: [number, number][] = [
@@ -354,42 +444,120 @@ export class Figure {
 
       const targetFigure = board[index]?.figure;
 
-      if (
-        targetFigure === null ||
-        (targetFigure instanceof Figure && targetFigure.color !== color)
-      ) {
-        if (targetFigure === null) {
+      if (targetFigure === null) allowed.push(index);
+      if (targetFigure instanceof Figure) {
+        if (
+          (isProtectionCheck && color === targetFigure.color) ||
+          (!isProtectionCheck &&
+            color !== targetFigure.color &&
+            !this.isProtected(targetFigure, board))
+        ) {
           allowed.push(index);
-        } else {
-
         }
+      }
+    }
+
+    if (isProtectionCheck || this.isMoved) return allowed;
+
+    const rookRight = board[63].figure;
+    const rookLeft = board[56].figure;
+    const kingIndex = get1Dposition(position)!;
+
+    if (rookLeft instanceof Figure && !rookLeft.isMoved) {
+      if (
+        board[kingIndex - 1].figure === null &&
+        board[kingIndex - 2].figure === null &&
+        board[kingIndex - 3].figure === null
+      ) {
+        allowed.push(kingIndex - 2);
+      }
+    }
+
+    if (rookRight instanceof Figure && !rookRight.isMoved) {
+      if (
+        board[kingIndex + 1].figure === null &&
+        board[kingIndex + 2].figure === null
+      ) {
+        allowed.push(kingIndex + 2);
       }
     }
 
     return allowed;
   }
 
-  // private isProtected(figure: Figure, board: Square[]){
-  //   const figureIndex = get1Dposition(figure.position());
+  private isProtected(figure: Figure, board: Square[]): boolean {
+    const figureIndex = get1Dposition(figure.position());
+    return board.some((square) => {
+      const { figure: guardFigure } = square;
+      if (guardFigure instanceof Figure && guardFigure.color === figure.color) {
+        const protectedSquares: number[] = [];
+        const position = guardFigure.position();
+        const color = guardFigure.color;
+        switch (figure.piece) {
+          case Piece.BISHOP:
+            protectedSquares.push(
+              ...this.getBishopFields('leftdown', board, position, color, true),
+              ...this.getBishopFields('leftup', board, position, color, true),
+              ...this.getBishopFields(
+                'rightdown',
+                board,
+                position,
+                color,
+                true,
+              ),
+              ...this.getBishopFields('rightup', board, position, color, true),
+            );
+            break;
+          case Piece.KING:
+            protectedSquares.push(
+              ...this.getKingFields(board, position, color, true),
+            );
+            break;
+          case Piece.KNIGHT:
+            protectedSquares.push(
+              ...this.getKnightFields(board, position, color, true),
+            );
+            break;
+          case Piece.PAWN:
+            protectedSquares.push(
+              ...this.getPawnFields([], board, position, false, color, true)
+                .upleft,
+              ...this.getPawnFields([], board, position, false, color, true)
+                .upright,
+            );
+            break;
+          case Piece.QUEEN:
+            protectedSquares.push(
+              ...this.getQueenFields([], board, position, color, true),
+            );
+            break;
+          case Piece.ROOK:
+            protectedSquares.push(
+              ...this.getRookFields('up', board, position, color, true),
+              ...this.getRookFields('down', board, position, color, true),
+              ...this.getRookFields('left', board, position, color, true),
+              ...this.getRookFields('right', board, position, color, true),
+            );
+            break;
+        }
 
-  //   for(const square of board){
-  //     const figure = 
-  //   }
-  // }
+        return protectedSquares.includes(figureIndex!);
+      } else {
+        return false;
+      }
+    });
+  }
 
   public getAllowedSquares(board: Square[]) {
     const allowedSquares: number[] = [];
     const position = this.position();
 
     if (this.piece === Piece.KING) {
-      // const [y, x] = position;
-      // const forbidden = this.kingForbiddenMoves(board);
-      // c;
-      // if (
-      //   board[get1Dposition([y + 1, x]) ?? -1]?.figure === null &&
-      //   forbidden.includes()
-      // )
-      //   return allowedSquares;
+      const forbidden = this.kingForbiddenMoves(board);
+      const fields = this.getKingFields(board, position, this.color).filter(
+        (field) => !forbidden.includes(field),
+      );
+      return fields;
     }
 
     const forbidden = this.guardsForbiddenMoves(board);
@@ -440,5 +608,9 @@ export class Figure {
         break;
     }
     return allowedSquares;
+  }
+
+  public isCheck(board: Square[]){
+    
   }
 }

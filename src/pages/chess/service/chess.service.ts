@@ -58,14 +58,48 @@ export class ChessService {
     );
   }
 
+  isCheck(color: Color){
+  }
+
+  private isCastle(figure: Figure, index: number) {
+    return figure.piece === Piece.KING && (index === 58 || index === 62);
+  }
+
   public moveFigure(figure: Figure, index: number) {
     const prevIndex = get1Dposition(figure.position())!;
-    figure.move(index);
     const updatedBoard = this.board();
-    [updatedBoard[prevIndex], updatedBoard[index]] = [
-      updatedBoard[index],
-      updatedBoard[prevIndex],
-    ];
+
+    figure.move(index);
+
+    if (this.isCastle(figure, index)) {
+      if (index === 62) {
+        const rightRook = updatedBoard[63];
+        rightRook.figure?.move(index - 1);
+        updatedBoard[63] = {
+          figure: null,
+          isPlayer: false,
+          canMove: false,
+        };
+        updatedBoard[index - 1] = rightRook;
+      } else {
+        const leftRook = updatedBoard[56];
+        leftRook.figure?.move(index + 1);
+        updatedBoard[56] = {
+          figure: null,
+          isPlayer: false,
+          canMove: false,
+        };
+        updatedBoard[index + 1] = leftRook;
+      }
+    }
+
+    const prevSquare = updatedBoard[prevIndex];
+    updatedBoard[prevIndex] = {
+      figure: null,
+      isPlayer: false,
+      canMove: false,
+    };
+    updatedBoard[index] = prevSquare;
     this.board.set(updatedBoard);
   }
 }

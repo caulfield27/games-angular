@@ -12,13 +12,13 @@ import { Figure } from './classes/figure';
 import { Color, Square } from './types';
 import { get1Dposition, get2Dposition, getSquareBg } from './utils';
 import { getCoordinates } from '@/shared/utils/getCoordinates';
-import { NgStyle, NgClass } from '@angular/common';
+import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'chess',
   templateUrl: './chess.component.html',
   styleUrl: './chess.component.css',
-  imports: [LucideAngularModule, CdkDrag, NgStyle, NgClass],
+  imports: [LucideAngularModule, CdkDrag, NgStyle],
 })
 export class Chess implements AfterViewInit {
   // icons
@@ -74,14 +74,6 @@ export class Chess implements AfterViewInit {
 
     const [gridRow, gridColumn] = get2Dposition(idx) ?? [-1, -1];
     return { gridColumn: gridColumn + 1, gridRow: gridRow + 1 };
-  }
-
-  public getContainerClasses(square: Square) {
-    const isFigure = this.isFigure(square.figure);
-    return {
-      take_chess_cell: square.canMove && isFigure,
-      allowed_chess_cell: square.canMove && !isFigure
-    };
   }
 
   public isFigure(data: Figure | null) {
