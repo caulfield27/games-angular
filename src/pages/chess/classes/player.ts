@@ -1,5 +1,5 @@
 import { User } from '@/shared/types/types';
-import { Color, Piece, Square } from '../types';
+import { Color } from '../types';
 
 export class Player {
   public color;

@@ -36,6 +36,13 @@
             #cell
             [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
           >
+            @if($index === lastMove[0] || $index === lastMove[1]){
+              <div class="history"></div>
+            }
+
+            @if ($index === chessService.checkIndex()) {
+              <div class="check"></div>
+            }
             @if (square.canMove && isFigure(square.figure)) {
               <div class="take_square"></div>
             }
@@ -67,3 +74,12 @@
     </div>
   }
 </div>
+
+@if (chessService.isGameEndModalOpen()) {
+  <game-end-modal
+    [data]="chessService.gameEndData()"
+    [isOpen]="chessService.isGameEndModalOpen()"
+    (newGame)="reset()"
+    (close)="reset()"
+  />
+}

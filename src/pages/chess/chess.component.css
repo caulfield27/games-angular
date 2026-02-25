@@ -1,4 +1,4 @@
-.available_square {         
+.available_square {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -11,7 +11,7 @@
   z-index: 1;
 }
 
-.take_square{
+.take_square {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -22,4 +22,24 @@
   border: 6px solid rgba(0, 0, 0, 0.4);
   pointer-events: none;
   z-index: 1;
+}
+
+.check {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: var(--chess-cell);
+  height: var(--chess-cell);
+  background: #f74545;
+  opacity: 0.7;
+}
+
+.history {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: var(--chess-cell);
+  height: var(--chess-cell);
+  background: #fde047;
+  opacity: 0.8;
 }

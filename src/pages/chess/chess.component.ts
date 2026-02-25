@@ -8,17 +8,18 @@ import {
 import { LucideAngularModule, Bot, Handshake, Globe } from 'lucide-angular';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from './service/chess.service';
-import { Figure } from './classes/figure';
-import { Color, Square } from './types';
+import { Figure, Square } from './classes/figure';
+import { Color, History } from './types';
 import { get1Dposition, get2Dposition, getSquareBg } from './utils';
 import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { NgStyle } from '@angular/common';
+import { GameEndModalComponent } from './components';
 
 @Component({
   selector: 'chess',
   templateUrl: './chess.component.html',
   styleUrl: './chess.component.css',
-  imports: [LucideAngularModule, CdkDrag, NgStyle],
+  imports: [LucideAngularModule, CdkDrag, NgStyle, GameEndModalComponent],
 })
 export class Chess implements AfterViewInit {
   // icons
@@ -33,6 +34,7 @@ export class Chess implements AfterViewInit {
   // states
   cellSize: number = 60;
   currentFigure: Figure | null = null;
+  history: History[] = [];
 
   constructor(public chessService: ChessService) {
     chessService.playerPicesColor =
@@ -62,7 +64,6 @@ export class Chess implements AfterViewInit {
     }
   }
 
-  // css classes
   public getBg(idx: number) {
     return getSquareBg(idx);
   }
@@ -89,24 +90,50 @@ export class Chess implements AfterViewInit {
       this.cellSize,
       8,
     );
-    const goalIndex = get1Dposition([y, x]) ?? -1;
-    if (!this.chessService.board()[goalIndex]?.canMove) return;
-    this.chessService.moveFigure(this.currentFigure, goalIndex);
-    this.chessService.updateSquares([]);
+    const newIndex = get1Dposition([y, x]) ?? -1;
+    if (!this.chessService.board()[newIndex]?.canMove) return;
+    this.handleMove(newIndex);
   }
 
-  onPieceChoose(piece: Square) {
-    if (!piece.isPlayer) return;
-    this.currentFigure = piece.figure;
-    const allowedSquares = piece.figure!.getAllowedSquares(
-      this.chessService.board(),
+  get lastMove() {
+    const [fisrt, second] = this.history[this.history.length - 1]?.move ?? [];
+    return [get1Dposition(fisrt ?? []), get1Dposition(second ?? [])];
+  }
+
+  private handleMove(newIndex: number) {
+    if (!this.currentFigure) return;
+
+    const prevPosition = this.currentFigure.position();
+    this.chessService.moveFigure(this.currentFigure, newIndex);
+    this.chessService.updateSquares([]);
+
+    this.history.push({
+      move: [prevPosition, this.currentFigure.position()],
+    });
+
+    const board = this.chessService.board();
+    const oppColor = this.chessService.opponent.color;
+    this.chessService.check(
+      this.currentFigure.getAllowedSquares(board),
+      oppColor,
+      this.currentFigure,
     );
+  }
+
+  public onPieceChoose(piece: Square) {
+    if (!piece.isPlayer || !piece.figure) return;
+    this.currentFigure = piece.figure;
+    const board = this.chessService.board();
+    const allowedSquares = piece.figure.getAllowedSquares(board);
     this.chessService.updateSquares(allowedSquares);
   }
 
-  onMove(piece: Square, index: number) {
+  public onMove(piece: Square, index: number) {
     if (!piece.canMove || !this.currentFigure) return;
-    this.chessService.moveFigure(this.currentFigure, index);
-    this.chessService.updateSquares([]);
+    this.handleMove(index);
+  }
+
+  public reset() {
+    this.chessService.reset();
   }
 }

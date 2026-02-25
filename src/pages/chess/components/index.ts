@@ -1,0 +1,1 @@
+export * from './endGameModal/endGameModal.component';
