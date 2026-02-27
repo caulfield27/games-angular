@@ -1,4 +1,4 @@
-export type GameType = 'bot' | 'online' | 'friend';
+export type GameType = 'bot' | 'online' | 'friend' | 'irl';
 export enum Piece {
   KING = 'king',
   QUEEN = 'queen',

@@ -1,0 +1,59 @@
+<div>
+  <div class="grid grid-cols-8 grid-rows-8 relative" id="board" #board>
+    @for (square of chessService.board(); track $index) {
+      <div
+        class="relative"
+        (click)="onMove(square, $index)"
+        [style.background]="getBg($index)"
+        #cell
+        [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
+      >
+        @if ($index === lastMove[0] || $index === lastMove[1]) {
+          <div class="history"></div>
+        }
+
+        @if ($index === chessService.mateIndex()) {
+          <lucide-icon
+            class="absolute right-0 top-0"
+            [img]="FlagIcon"
+            color="red"
+            size="15"
+          ></lucide-icon>
+        }
+
+        @if (square.canMove && isFigure(square.figure)) {
+          <div class="take_square"></div>
+        }
+        @if (square.canMove && !isFigure(square.figure)) {
+          <div class="available_square"></div>
+        }
+        @if (isFigure(square.figure)) {
+          <div
+            (pointerdown)="onPieceChoose(square)"
+            role="button"
+            [cdkDragDisabled]="isDragDisabled(square.figure)"
+            cdkDrag
+            cdkDragBoundary="#board"
+            class="touch-none relative z-[2] cursor-grab"
+            (cdkDragEnded)="onDragEnd($event)"
+            [cdkDragData]="square"
+          >
+            <img
+              [ngClass]="
+                $index === chessService.checkIndex()
+                  ? 'check'
+                  : $index === chessService.mateIndex()
+                    ? 'mate'
+                    : ''
+              "
+              width="60"
+              height="60"
+              [src]="square.figure.image"
+              [alt]="square.figure.piece"
+            />
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

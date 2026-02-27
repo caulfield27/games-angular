@@ -24,14 +24,29 @@
   z-index: 1;
 }
 
+@keyframes dangerPulse {
+  0% {
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 16px rgba(255, 0, 0, 1),
+      0 0 32px rgba(255, 0, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+  }
+}
+
 .check {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  width: var(--chess-cell);
-  height: var(--chess-cell);
-  background: #f74545;
-  opacity: 0.7;
+  animation: dangerPulse 1s infinite ease-in-out;
+}
+
+.mate {
+  box-shadow:
+    0 0 16px rgba(255, 0, 0, 1),
+    0 0 32px rgba(255, 0, 0, 0.6);
+  border-radius: 6px;
 }
 
 .history {
@@ -40,6 +55,6 @@
   z-index: 1;
   width: var(--chess-cell);
   height: var(--chess-cell);
-  background: #fde047;
+  background: #cbd5e1;
   opacity: 0.8;
 }

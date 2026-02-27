@@ -1,26 +1,21 @@
-import { Color, MoveDirection, Piece } from '../../types';
+import { Color, GameType, MoveDirection, Piece } from '../../types';
 import { get1Dposition } from '../../utils';
 import { Figure, Square } from '../figure';
 
 export class Knight extends Figure {
-  constructor(color: Color, position: [number, number]) {
-    super(Piece.KNIGHT, color, position);
+  constructor(color: Color, position: [number, number], isPlayer: boolean, type: GameType) {
+    super(Piece.KNIGHT, color, position, isPlayer, type);
   }
 
   public override getAllowedSquares(board: Square[]): number[] {
     const forbidden = this.forbiddenMoves(board) as MoveDirection[];
     if (forbidden.length) return [];
-    return this.getAvailableFields(board, this.position(), this.color);
+    return this.getAvailableFields(board);
   }
 
-  public getAvailableFields(
-    board: Square[],
-    position: [number, number],
-    color: Color = this.color,
-    isProtectionCheck: boolean = false,
-  ) {
+  public getAvailableFields(board: Square[]) {
     const allowed: number[] = [];
-    const [y, x] = position;
+    const [y, x] = this.position();
     const directions = [
       [-2, -1],
       [-1, -2],
@@ -36,12 +31,12 @@ export class Knight extends Figure {
       const index = get1Dposition([y + dy, x + dx]);
       if (index === null) continue;
       const figure = board[index].figure;
-
+      
       if (figure === null) allowed.push(index);
       if (figure instanceof Figure) {
         if (
-          (isProtectionCheck && color === figure.color) ||
-          (!isProtectionCheck && color !== figure.color)
+          (!this.isPlayer && this.color === figure.color) ||
+          (this.color !== figure.color)
         ) {
           allowed.push(index);
         }

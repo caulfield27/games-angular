@@ -1,4 +1,4 @@
-import { Color, Piece } from '../../types';
+import { Color, GameType, Piece } from '../../types';
 import { get1Dposition } from '../../utils';
 import { Figure, Square } from '../figure';
 import { Bishop } from './bishop';
@@ -8,17 +8,19 @@ import { Queen } from './queen';
 import { Rook } from './rook';
 
 export class King extends Figure {
-  constructor(color: Color, position: [number, number]) {
-    super(Piece.KING, color, position);
+  constructor(color: Color, position: [number, number], isPlayer: boolean, type: GameType) {
+    super(Piece.KING, color, position, isPlayer, type);
   }
 
-  public override getAllowedSquares(board: Square[]) {
+  public override getAllowedSquares(
+    board: Square[],
+    _: undefined,
+    isCheck: boolean,
+  ) {
     const forbidden = this.forbiddenMoves(board);
-    const fields = this.getAvailableFields(
-      board,
-      this.position(),
-      this.color,
-    ).filter((field) => !forbidden.includes(field));
+    const fields = this.getAvailableFields(board, isCheck).filter(
+      (field) => !forbidden.includes(field),
+    );
     return fields;
   }
 
@@ -27,87 +29,34 @@ export class King extends Figure {
     for (const square of board) {
       const figure = square.figure;
       if (figure instanceof Figure && figure.color !== this.color) {
-        const opPosition = figure.position();
         switch (true) {
           case figure instanceof Bishop:
             forbidden.push(
-              ...figure.getAvailableFields(
-                'leftdown',
-                board,
-                opPosition,
-                figure.color,
-              ),
-              ...figure.getAvailableFields(
-                'leftup',
-                board,
-                opPosition,
-                figure.color,
-              ),
-              ...figure.getAvailableFields(
-                'rightdown',
-                board,
-                opPosition,
-                figure.color,
-              ),
-              ...figure.getAvailableFields(
-                'rightup',
-                board,
-                opPosition,
-                figure.color,
-              ),
+              ...figure.getAvailableFields('leftdown', board),
+              ...figure.getAvailableFields('leftup', board),
+              ...figure.getAvailableFields('rightdown', board),
+              ...figure.getAvailableFields('rightup', board),
             );
             break;
           case figure instanceof King:
-            forbidden.push(
-              ...figure.getAvailableFields(board, opPosition, figure.color),
-            );
+            forbidden.push(...figure.getAvailableFields(board));
             break;
           case figure instanceof Knight:
-            forbidden.push(
-              ...figure.getAvailableFields(board, opPosition, figure.color),
-            );
+            forbidden.push(...figure.getAvailableFields(board));
             break;
           case figure instanceof Pawn:
-            const pawn = figure.getAvailableFields(
-              [],
-              board,
-              opPosition,
-              false,
-              figure.color,
-            );
+            const pawn = figure.getAvailableFields([], board);
             forbidden.push(...pawn.upleft, ...pawn.upright);
             break;
           case figure instanceof Queen:
-            forbidden.push(
-              ...figure.getAvailableFields([], board, opPosition, figure.color),
-            );
+            forbidden.push(...figure.getAvailableFields([], board));
             break;
           case figure instanceof Rook:
             forbidden.push(
-              ...figure.getAvailableFields(
-                'down',
-                board,
-                opPosition,
-                figure.color,
-              ),
-              ...figure.getAvailableFields(
-                'left',
-                board,
-                opPosition,
-                figure.color,
-              ),
-              ...figure.getAvailableFields(
-                'right',
-                board,
-                opPosition,
-                figure.color,
-              ),
-              ...figure.getAvailableFields(
-                'up',
-                board,
-                opPosition,
-                figure.color,
-              ),
+              ...figure.getAvailableFields('down', board),
+              ...figure.getAvailableFields('left', board),
+              ...figure.getAvailableFields('right', board),
+              ...figure.getAvailableFields('up', board),
             );
             break;
         }
@@ -117,13 +66,9 @@ export class King extends Figure {
     return forbidden;
   }
 
-  protected getAvailableFields(
-    board: Square[],
-    position: [number, number],
-    color: Color,
-    isProtectionCheck: boolean = false,
-  ) {
+  protected getAvailableFields(board: Square[], isCheck: boolean = false) {
     const allowed: number[] = [];
+    const position = this.position();
     const directions: [number, number][] = [
       [-1, 0],
       [-1, -1],
@@ -147,9 +92,8 @@ export class King extends Figure {
       if (targetFigure === null) allowed.push(index);
       if (targetFigure instanceof Figure) {
         if (
-          (isProtectionCheck && color === targetFigure.color) ||
-          (!isProtectionCheck &&
-            color !== targetFigure.color &&
+          (!this.isPlayer && this.color === targetFigure.color && !isCheck) ||
+          (this.color !== targetFigure.color &&
             !this.isProtected(targetFigure, board))
         ) {
           allowed.push(index);
@@ -157,7 +101,7 @@ export class King extends Figure {
       }
     }
 
-    if (isProtectionCheck || this.isMoved) return allowed;
+    if (!this.isPlayer || this.isMoved) return allowed;
 
     const rookRight = board[63].figure;
     const rookLeft = board[56].figure;
@@ -191,112 +135,36 @@ export class King extends Figure {
       const { figure: guardFigure } = square;
       if (guardFigure instanceof Figure && guardFigure.color === figure.color) {
         const protectedSquares: number[] = [];
-        const position = guardFigure.position();
-        const color = guardFigure.color;
         switch (true) {
           case guardFigure instanceof Bishop:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields(
-                'leftdown',
-                board,
-                position,
-                color,
-                true,
-              ),
-              ...guardFigure.getAvailableFields(
-                'leftup',
-                board,
-                position,
-                color,
-                true,
-              ),
-              ...guardFigure.getAvailableFields(
-                'rightdown',
-                board,
-                position,
-                color,
-                true,
-              ),
-              ...guardFigure.getAvailableFields(
-                'rightup',
-                board,
-                position,
-                color,
-                true,
-              ),
+              ...guardFigure.getAvailableFields('leftdown', board),
+              ...guardFigure.getAvailableFields('leftup', board),
+              ...guardFigure.getAvailableFields('rightdown', board),
+              ...guardFigure.getAvailableFields('rightup', board),
             );
             break;
           case guardFigure instanceof King:
-            protectedSquares.push(
-              ...guardFigure.getAvailableFields(board, position, color, true),
-            );
+            protectedSquares.push(...guardFigure.getAvailableFields(board));
             break;
           case guardFigure instanceof Knight:
-            protectedSquares.push(
-              ...guardFigure.getAvailableFields(board, position, color, true),
-            );
+            protectedSquares.push(...guardFigure.getAvailableFields(board));
             break;
           case guardFigure instanceof Pawn:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields(
-                [],
-                board,
-                position,
-                false,
-                color,
-                true,
-              ).upleft,
-              ...guardFigure.getAvailableFields(
-                [],
-                board,
-                position,
-                false,
-                color,
-                true,
-              ).upright,
+              ...guardFigure.getAvailableFields([], board).upleft,
+              ...guardFigure.getAvailableFields([], board).upright,
             );
             break;
           case guardFigure instanceof Queen:
-            protectedSquares.push(
-              ...guardFigure.getAvailableFields(
-                [],
-                board,
-                position,
-                color,
-                true,
-              ),
-            );
+            protectedSquares.push(...guardFigure.getAvailableFields([], board));
             break;
           case guardFigure instanceof Rook:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields(
-                'up',
-                board,
-                position,
-                color,
-                true,
-              ),
-              ...guardFigure.getAvailableFields(
-                'down',
-                board,
-                position,
-                color,
-                true,
-              ),
-              ...guardFigure.getAvailableFields(
-                'left',
-                board,
-                position,
-                color,
-                true,
-              ),
-              ...guardFigure.getAvailableFields(
-                'right',
-                board,
-                position,
-                color,
-                true,
-              ),
+              ...guardFigure.getAvailableFields('up', board),
+              ...guardFigure.getAvailableFields('down', board),
+              ...guardFigure.getAvailableFields('left', board),
+              ...guardFigure.getAvailableFields('right', board),
             );
             break;
         }

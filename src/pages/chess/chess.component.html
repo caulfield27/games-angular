@@ -1,77 +1,57 @@
-<div class="h-[100svh] w-full bg-neutral-800 flex justify-center items-center">
+<div
+  class="h-[100svh] w-full bg-neutral-800 flex justify-center items-center relative"
+>
   @if (chessService.gameType() === null) {
     <div
       class="bg-neutral-900 min-w-[500px] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
     >
       <div class="w-full flex flex-col gap-5">
         <button
+          (click)="onGameTypeChoose('online')"
           class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
         >
           <lucide-angular class="text-blue-500" [img]="GlobeIcon" />
           Играть онлайн
         </button>
         <button
+          (click)="onGameTypeChoose('friend')"
           class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
         >
           <lucide-angular class="text-amber-500" [img]="HandshakeIcon" />
           Играть c другом
-          {{ cellSize }}
         </button>
         <button
+          (click)="onGameTypeChoose('bot')"
           class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
         >
           <lucide-angular class="text-blue-300" [img]="BotIcon" />
           Играть с ботами
         </button>
+        <button
+          (click)="onGameTypeChoose('irl')"
+          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl"
+        >
+          <lucide-angular class="text-green-500" [img]="UsersIcon" />
+          Играть вживую
+        </button>
       </div>
     </div>
+  } @else if (chessService.gameType() === "irl") {
+    <button
+      (click)="onGoback()"
+      class="border-0 bg-none outline-none absolute left-[20px] top-[20px]"
+    >
+      <lucide-icon [img]="ArrowIcon" color="#fff" size="30"></lucide-icon>
+    </button>
+    <game></game>
   } @else {
-    <div>
-      <div class="grid grid-cols-8 grid-rows-8" id="board" #board>
-        @for (square of chessService.board(); track $index) {
-          <div
-            class="relative"
-            (click)="onMove(square, $index)"
-            [style.background]="getBg($index)"
-            #cell
-            [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
-          >
-            @if($index === lastMove[0] || $index === lastMove[1]){
-              <div class="history"></div>
-            }
-
-            @if ($index === chessService.checkIndex()) {
-              <div class="check"></div>
-            }
-            @if (square.canMove && isFigure(square.figure)) {
-              <div class="take_square"></div>
-            }
-            @if (square.canMove && !isFigure(square.figure)) {
-              <div class="available_square"></div>
-            }
-            @if (isFigure(square.figure)) {
-              <div
-                (pointerdown)="onPieceChoose(square)"
-                role="button"
-                [cdkDragDisabled]="!square.isPlayer"
-                cdkDrag
-                cdkDragBoundary="#board"
-                class="touch-none relative z-[2] cursor-grab"
-                (cdkDragEnded)="onDragEnd($event)"
-                [cdkDragData]="square"
-              >
-                <img
-                  width="60"
-                  height="60"
-                  [src]="square.figure.image"
-                  [alt]="square.figure.piece"
-                />
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </div>
+    <button
+      (click)="onGoback()"
+      class="border-0 bg-none outline-none absolute left-[20px] top-[20px]"
+    >
+      <lucide-icon [img]="ArrowIcon" color="#fff" size="30"></lucide-icon>
+    </button>
+    <span class="text-white">В процессе разпаботки</span>
   }
 </div>
 
