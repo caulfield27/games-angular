@@ -45,6 +45,14 @@ export class Figure {
     this.position.set(get2Dposition(index)!);
   }
 
+  public getAxisSquares(_: Square[]): number[] {
+    return [];
+  }
+
+  public getDiagonalSquares(_: Square[]): number[] {
+    return [];
+  }
+
   public getAllowedSquares(
     _: Square[],
     __?: History[],
@@ -65,6 +73,26 @@ export class Figure {
       }
       return false;
     });
+  }
+
+  public getPath(toIdx: number, board: Square[], isFullPath: boolean = false) {
+    const squares = isFullPath
+      ? this.getDiagonalSquares(board)
+      : this.getAllowedSquares(board);
+    const fromIdx = get1Dposition(this.position())!;
+    const directions = [1, -1, -8, 8, 9, 7, -9, -7];
+    for (let i = 0; i < directions.length; i++) {
+      const path = [];
+      const start = squares.indexOf(fromIdx + directions[i]);
+      if (start === -1) continue;
+      for (let j = start; j < squares.length; j++) {
+        if (squares[j] === toIdx) return path;
+        if (squares[j] + directions[i] !== squares[j + 1]) break;
+        path.push(squares[j]);
+      }
+    }
+
+    return [];
   }
 
   protected forbiddenMoves(board: Square[]): Forbidden {
@@ -89,6 +117,8 @@ export class Figure {
 
     const forbidden: MoveDirection[] = [];
     const [kingY, kingX] = myKing.position();
+    const kingIndex = get1Dposition(myKing.position())!;
+    const curFigureIndex = get1Dposition(this.position())!;
     const [y, x] = this.position();
 
     if (
@@ -107,27 +137,31 @@ export class Figure {
       return ['downleft', 'downright', 'upleft', 'upright', 'down', 'up'];
     }
 
-    // if (
-    //   kingX + kingY === x + y &&
-    //   bishops.some((b) => b.position()[1] + b.position()[0] === x + y)
-    // ) {
-    //   return ['down', 'up', 'upleft', 'downright', 'left', 'right'];
-    // }
+    if (kingX + kingY === x + y) {
+      if (
+        queens.some((q) =>
+          q.getPath(kingIndex, board, true).includes(curFigureIndex),
+        ) ||
+        bishops.some((b) =>
+          b.getPath(kingIndex, board, true).includes(curFigureIndex),
+        )
+      ) {
+        return ['up', 'down', 'downright', 'upleft', 'left', 'right'];
+      }
+    }
 
-    // const delta3 = Math.abs(kingY - y);
-    // const delta4 = Math.abs(kingX - x);
-
-    // if (
-    //   bishops.some(
-    //     (b) =>
-    //       Math.abs(b.position()[0] - kingY) ===
-    //       Math.abs(b.position()[1] - kingX),
-    //   ) &&
-    //   delta3 === delta4
-    // ) {
-    //   return ['down', 'up', 'upright', 'downleft', 'left', 'right'];
-    // }
-
+    if (kingX - kingY === x - y) {
+      if (
+        queens.some((q) =>
+          q.getPath(kingIndex, board, true).includes(curFigureIndex),
+        ) ||
+        bishops.some((b) =>
+          b.getPath(kingIndex, board, true).includes(curFigureIndex),
+        )
+      ) {
+        return ['up', 'down', 'downleft', 'upright', 'left', 'right'];
+      }
+    }
     return forbidden;
   }
 }

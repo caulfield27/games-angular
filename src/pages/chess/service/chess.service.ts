@@ -37,7 +37,7 @@ export class ChessService {
       null,
     );
     this.moveTurn = signal(Color.WHITE);
-    this.board = signal<Square[]>(this.generateBoard());
+    this.board = signal<Square[]>([]);
   }
 
   private getFigure(piece: Piece, color: Color, position: [number, number]) {
@@ -72,8 +72,7 @@ export class ChessService {
       const board = this.board();
       const checkedFigure = board[fromIdx ?? -1];
       if (checkedFigure.figure instanceof Figure) {
-        const checkedSquares = checkedFigure.figure.getAllowedSquares(board);
-        const path = this.getFigurePath(fromIdx, checkIdx, checkedSquares);
+        const path = checkedFigure.figure.getPath(checkIdx,board);
         path.push(fromIdx);
         const arr = [];
         for (const index of path) {
@@ -102,8 +101,7 @@ export class ChessService {
           undefined,
           true,
         );
-        const from = get1Dposition(targetFigure.position())!;
-        const path = this.getFigurePath(from, i, squares);
+        const path = targetFigure.getPath(i, board);
 
         if (!kingEscapeSquares.length && targetFigure.isSave(board, path)) {
           this.mateIndex.set(i);
@@ -122,23 +120,8 @@ export class ChessService {
     }
   }
 
-  public getFigurePath(fromIdx: number, toIndex: number, squares: number[]) {
-    const directions = [1, -1, -8, 8, 9, 7, -9, -7];
-    for (let i = 0; i < directions.length; i++) {
-      const path = [];
-      const start = squares.indexOf(fromIdx + directions[i]);
-      if (start === -1) continue;
-      for (let j = start; j < squares.length; j++) {
-        if (squares[j] === toIndex) return path;
-        if (squares[j] + directions[i] !== squares[j + 1]) break;
-        path.push(squares[j]);
-      }
-    }
 
-    return [];
-  }
-
-  private generateBoard(): Square[] {
+  public generateBoard(): Square[] {
     return new Array(64).fill(null).map((square, idx) => {
       square = {
         figure: null,

@@ -3,7 +3,12 @@ import { get1Dposition } from '../../utils';
 import { Figure, Square } from '../figure';
 
 export class Rook extends Figure {
-  constructor(color: Color, position: [number, number], isPlayer: boolean, type: GameType) {
+  constructor(
+    color: Color,
+    position: [number, number],
+    isPlayer: boolean,
+    type: GameType,
+  ) {
     super(Piece.ROOK, color, position, isPlayer, type);
   }
 
@@ -25,6 +30,7 @@ export class Rook extends Figure {
   public getAvailableFields(
     move: 'left' | 'right' | 'down' | 'up',
     board: Square[],
+    getAllSquares: boolean = false,
   ) {
     const position = this.position();
     const color = this.color;
@@ -34,7 +40,12 @@ export class Rook extends Figure {
 
     const arr: number[] = [];
 
-    while (board[get1Dposition([startY, startX]) ?? -1]?.figure === null) {
+    while (
+      getAllSquares
+        ? board[get1Dposition([startY, startX]) ?? -1]?.figure === null ||
+          board[get1Dposition([startY, startX]) ?? -1]?.figure instanceof Figure
+        : board[get1Dposition([startY, startX]) ?? -1]?.figure === null
+    ) {
       arr.push(get1Dposition([startY, startX])!);
 
       if (move === 'left') {
@@ -48,11 +59,13 @@ export class Rook extends Figure {
       }
     }
 
+    if (getAllSquares) return arr;
+
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
     if (lastFigure instanceof Figure) {
       if (
         (!this.isPlayer && lastFigure.color === color) ||
-        (lastFigure.color !== color)
+        lastFigure.color !== color
       ) {
         arr.push(get1Dposition([startY, startX])!);
       }

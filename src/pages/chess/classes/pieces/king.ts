@@ -32,10 +32,10 @@ export class King extends Figure {
         switch (true) {
           case figure instanceof Bishop:
             forbidden.push(
-              ...figure.getAvailableFields('leftdown', board),
-              ...figure.getAvailableFields('leftup', board),
-              ...figure.getAvailableFields('rightdown', board),
-              ...figure.getAvailableFields('rightup', board),
+              ...figure.getAvailableFields('leftdown', board, true),
+              ...figure.getAvailableFields('leftup', board, true),
+              ...figure.getAvailableFields('rightdown', board, true),
+              ...figure.getAvailableFields('rightup', board, true),
             );
             break;
           case figure instanceof King:
@@ -49,6 +49,8 @@ export class King extends Figure {
             forbidden.push(...pawn.upleft, ...pawn.upright);
             break;
           case figure instanceof Queen:
+            forbidden.push(...figure.getDiagonalSquares(board));
+            forbidden.push()
             forbidden.push(...figure.getAvailableFields([], board));
             break;
           case figure instanceof Rook:

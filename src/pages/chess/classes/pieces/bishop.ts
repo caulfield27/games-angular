@@ -12,6 +12,15 @@ export class Bishop extends Figure {
     super(Piece.BISHOP, color, position, isPlayer, type);
   }
 
+  public override getDiagonalSquares(board: Square[]): number[] {
+    return [
+      ...this.getAvailableFields('leftup', board, true),
+      ...this.getAvailableFields('leftdown', board, true),
+      ...this.getAvailableFields('rightup', board, true),
+      ...this.getAvailableFields('rightdown', board, true),
+    ];
+  }
+
   public override getAllowedSquares(board: Square[]): number[] {
     const allowed = [];
     const forbidden = this.forbiddenMoves(board) as MoveDirection[];
@@ -30,13 +39,19 @@ export class Bishop extends Figure {
   public getAvailableFields(
     dir: 'leftup' | 'leftdown' | 'rightup' | 'rightdown',
     board: Square[],
+    getAllSqaures: boolean = false,
   ) {
     const [y, x] = this.position();
 
     const arr: number[] = [];
     let startX = dir === 'leftdown' || dir === 'leftup' ? x - 1 : x + 1;
     let startY = dir === 'leftdown' || dir === 'rightdown' ? y + 1 : y - 1;
-    while (board[get1Dposition([startY, startX]) ?? -1]?.figure === null) {
+    while (
+      getAllSqaures
+        ? board[get1Dposition([startY, startX]) ?? -1]?.figure === null ||
+          board[get1Dposition([startY, startX]) ?? -1]?.figure instanceof Figure
+        : board[get1Dposition([startY, startX]) ?? -1]?.figure === null
+    ) {
       arr.push(get1Dposition([startY, startX])!);
       if (dir === 'leftup' || dir === 'leftdown') {
         startX--;
@@ -50,6 +65,8 @@ export class Bishop extends Figure {
         startY--;
       }
     }
+
+    if (getAllSqaures) return arr;
 
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
     if (lastFigure instanceof Figure) {

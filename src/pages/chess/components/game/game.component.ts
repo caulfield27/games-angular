@@ -3,10 +3,11 @@ import { LucideAngularModule, Flag } from 'lucide-angular';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from '../../service/chess.service';
 import { Figure, Square } from '../../classes/figure';
-import { Color, GameType } from '../../types';
+import { Color } from '../../types';
 import { get1Dposition, get2Dposition, getSquareBg } from '../../utils';
 import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { CommonModule } from '@angular/common';
+import { King } from '../../classes/pieces';
 
 @Component({
   selector: 'game',
@@ -84,11 +85,9 @@ export class Game {
     this.chessService.updateSquares([]);
 
     const board = this.chessService.board();
-    const oppColor = this.chessService.opponent.color;
-
     this.chessService.check(
       this.currentFigure.getAllowedSquares(board),
-      oppColor,
+      this.chessService.moveTurn(),
       this.currentFigure,
     );
   }
@@ -97,11 +96,20 @@ export class Game {
     if (!piece.isPlayer || !piece.figure) return;
     this.currentFigure = piece.figure;
     const board = this.chessService.board();
-    const allowedSquares = this.chessService.checkKingSavety(
-      piece.figure.getAllowedSquares(board, this.chessService.history()),
-      this.lastMove[1] ?? -1,
+    const allowedSquares = piece.figure.getAllowedSquares(
+      board,
+      this.chessService.history(),
     );
-    this.chessService.updateSquares(allowedSquares);
+    if (this.currentFigure instanceof King) {
+      this.chessService.updateSquares(allowedSquares);
+    } else {
+      this.chessService.updateSquares(
+        this.chessService.checkKingSavety(
+          allowedSquares,
+          this.lastMove[1] ?? -1,
+        ),
+      );
+    }
   }
 
   public onMove(piece: Square, index: number) {

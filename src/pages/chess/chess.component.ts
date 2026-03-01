@@ -37,6 +37,10 @@ export class Chess {
           break;
         case 'irl':
       }
+
+      if (chessService.gameType() !== null) {
+        chessService.board.set(chessService.generateBoard());
+      }
     });
   }
 
