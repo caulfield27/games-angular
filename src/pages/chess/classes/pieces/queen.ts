@@ -13,36 +13,6 @@ export class Queen extends Figure {
     super(Piece.QUEEN, color, position, isPlayer, type);
   }
 
-  public override getDiagonalSquares(board: Square[]): number[] {
-    const bishop = new Bishop(
-      this.color,
-      this.position(),
-      this.isPlayer,
-      this.gameType,
-    );
-    return [
-      ...bishop.getAvailableFields('leftup', board, true),
-      ...bishop.getAvailableFields('leftdown', board, true),
-      ...bishop.getAvailableFields('rightup', board, true),
-      ...bishop.getAvailableFields('rightdown', board, true),
-    ];
-  }
-
-  public override getAxisSquares(board: Square[]): number[] {
-    const rook = new Rook(
-      this.color,
-      this.position(),
-      this.isPlayer,
-      this.gameType,
-    );
-    return [
-      ...rook.getAvailableFields('up', board, true),
-      ...rook.getAvailableFields('down', board, true),
-      ...rook.getAvailableFields('left', board, true),
-      ...rook.getAvailableFields('right', board, true),
-    ];
-  }
-
   public override getAllowedSquares(board: Square[]): number[] {
     const forbidden = this.forbiddenMoves(board) as MoveDirection[];
     return this.getAvailableFields(forbidden, board);

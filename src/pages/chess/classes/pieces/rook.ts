@@ -29,8 +29,7 @@ export class Rook extends Figure {
 
   public getAvailableFields(
     move: 'left' | 'right' | 'down' | 'up',
-    board: Square[],
-    getAllSquares: boolean = false,
+    board: Square[]
   ) {
     const position = this.position();
     const color = this.color;
@@ -40,12 +39,7 @@ export class Rook extends Figure {
 
     const arr: number[] = [];
 
-    while (
-      getAllSquares
-        ? board[get1Dposition([startY, startX]) ?? -1]?.figure === null ||
-          board[get1Dposition([startY, startX]) ?? -1]?.figure instanceof Figure
-        : board[get1Dposition([startY, startX]) ?? -1]?.figure === null
-    ) {
+    while (board[get1Dposition([startY, startX]) ?? -1]?.figure === null) {
       arr.push(get1Dposition([startY, startX])!);
 
       if (move === 'left') {
@@ -58,8 +52,6 @@ export class Rook extends Figure {
         startY--;
       }
     }
-
-    if (getAllSquares) return arr;
 
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
     if (lastFigure instanceof Figure) {

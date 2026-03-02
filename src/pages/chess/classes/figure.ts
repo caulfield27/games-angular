@@ -45,14 +45,6 @@ export class Figure {
     this.position.set(get2Dposition(index)!);
   }
 
-  public getAxisSquares(_: Square[]): number[] {
-    return [];
-  }
-
-  public getDiagonalSquares(_: Square[]): number[] {
-    return [];
-  }
-
   public getAllowedSquares(
     _: Square[],
     __?: History[],
@@ -75,10 +67,8 @@ export class Figure {
     });
   }
 
-  public getPath(toIdx: number, board: Square[], isFullPath: boolean = false) {
-    const squares = isFullPath
-      ? this.getDiagonalSquares(board)
-      : this.getAllowedSquares(board);
+  public getPath(toIdx: number, board: Square[]) {
+    const squares = this.getAllowedSquares(board);
     const fromIdx = get1Dposition(this.position())!;
     const directions = [1, -1, -8, 8, 9, 7, -9, -7];
     for (let i = 0; i < directions.length; i++) {
@@ -93,6 +83,87 @@ export class Figure {
     }
 
     return [];
+  }
+
+  private saveToMove(
+    board: Square[],
+    direction: MoveDirection,
+    targetPosition: [number, number],
+    guardPosition: number,
+    kingPosition: number,
+  ): boolean {
+    let [y, x] = targetPosition;
+    if (
+      direction === 'down' ||
+      direction === 'up' ||
+      direction === 'left' ||
+      direction === 'right'
+    ) {
+      const dir = direction === 'down' || direction === 'left' ? -1 : 1;
+      if (direction === 'down' || direction === 'up') {
+        y += dir;
+      } else {
+        x += dir;
+      }
+      let index = get1Dposition([y, x]) ?? 99;
+      while (
+        direction === 'down' || direction === 'left'
+          ? index > kingPosition
+          : index < kingPosition
+      ) {
+        if (board[index]?.figure instanceof Figure && index !== guardPosition) {
+          return true;
+        }
+
+        if (direction === 'down' || direction === 'up') {
+          y += dir;
+        } else {
+          x += dir;
+        }
+        index = get1Dposition([y, x]) ?? 99;
+      }
+    } else if (direction === 'upleft' || direction === 'downright') {
+      const dir = direction === 'upleft' ? -1 : 1;
+      y += dir;
+      x += dir;
+
+      let index = get1Dposition([y, x]) ?? 99;
+      while (
+        direction === 'upleft' ? index > kingPosition : index < kingPosition
+      ) {
+        if (board[index]?.figure instanceof Figure && index !== guardPosition) {
+          return true;
+        }
+        y += dir;
+        x += dir;
+        index = get1Dposition([y, x]) ?? 99;
+      }
+    } else if (direction === 'downleft' || direction === 'upright') {
+      if (direction === 'downleft') {
+        y++;
+        x--;
+      } else {
+        y--;
+        x++;
+      }
+      let index = get1Dposition([y, x]) ?? 99;
+      while (
+        direction === 'downleft' ? index > kingPosition : index < kingPosition
+      ) {
+        if (board[index]?.figure instanceof Figure && index !== guardPosition) {
+          return true;
+        }
+        if (direction === 'downleft') {
+          y++;
+          x--;
+        } else {
+          y--;
+          x++;
+        }
+        index = get1Dposition([y, x]) ?? 99;
+      }
+    }
+    return false;
   }
 
   protected forbiddenMoves(board: Square[]): Forbidden {
@@ -121,45 +192,161 @@ export class Figure {
     const curFigureIndex = get1Dposition(this.position())!;
     const [y, x] = this.position();
 
-    if (
-      kingX === x &&
-      (rooks.some((rook) => rook.position()[1] === x) ||
-        queens.some((rook) => rook.position()[1] === x))
-    ) {
-      return ['downleft', 'downright', 'upleft', 'upright', 'left', 'right'];
+    if (kingX === x) {
+      const rook = rooks.find((r) => r.position()[1] === x);
+      if (rook) {
+        const isUp = rook.position()[0] < kingY;
+        if (
+          !this.saveToMove(
+            board,
+            isUp ? 'up' : 'down',
+            rook.position(),
+            curFigureIndex,
+            kingIndex,
+          )
+        ) {
+          return [
+            'downleft',
+            'downright',
+            'upleft',
+            'upright',
+            'left',
+            'right',
+          ];
+        }
+      }
+      const queen = queens.find((q) => q.position()[1] === x);
+      if (queen) {
+        const isUp = queen.position()[0] < kingY;
+        if (
+          !this.saveToMove(
+            board,
+            isUp ? 'up' : 'down',
+            queen.position(),
+            curFigureIndex,
+            kingIndex,
+          )
+        ) {
+          return [
+            'downleft',
+            'downright',
+            'upleft',
+            'upright',
+            'left',
+            'right',
+          ];
+        }
+      }
     }
 
-    if (
-      kingY === y &&
-      (rooks.some((rook) => rook.position()[0] === y) ||
-        queens.some((rook) => rook.position()[0] === y))
-    ) {
-      return ['downleft', 'downright', 'upleft', 'upright', 'down', 'up'];
+    if (kingY === y) {
+      const rook = rooks.find((r) => r.position()[0] === y);
+      if (rook) {
+        const isLeft = rook.position()[1] > kingX;
+        if (
+          !this.saveToMove(
+            board,
+            isLeft ? 'left' : 'right',
+            rook.position(),
+            curFigureIndex,
+            kingIndex,
+          )
+        ) {
+          return ['downleft', 'downright', 'upleft', 'upright', 'down', 'up'];
+        }
+      }
+      const queen = queens.find((q) => q.position()[0] === y);
+      if (queen) {
+        const isLeft = queen.position()[1] > kingX;
+        if (
+          !this.saveToMove(
+            board,
+            isLeft ? 'left' : 'right',
+            queen.position(),
+            curFigureIndex,
+            kingIndex,
+          )
+        ) {
+          return ['downleft', 'downright', 'upleft', 'upright', 'down', 'up'];
+        }
+      }
     }
 
-    if (kingX + kingY === x + y) {
+    const mainDiagonalDelta = kingX + kingY;
+    const secondDiagonalDelta = kingX - kingY;
+    if (mainDiagonalDelta === x + y) {
       if (
-        queens.some((q) =>
-          q.getPath(kingIndex, board, true).includes(curFigureIndex),
-        ) ||
-        bishops.some((b) =>
-          b.getPath(kingIndex, board, true).includes(curFigureIndex),
-        )
+        bishops.some((b) => {
+          const pos = b.position();
+          return (
+            pos[0] + pos[1] === mainDiagonalDelta &&
+            !this.saveToMove(
+              board,
+              kingY < b.position()[0] ? 'upright' : 'downleft',
+              b.position(),
+              curFigureIndex,
+              kingIndex,
+            )
+          );
+        })
+      ) {
+        return ['up', 'down', 'downright', 'upleft', 'left', 'right'];
+      }
+
+      if (
+        queens.some((q) => {
+          const pos = q.position();
+          return (
+            pos[0] + pos[1] === mainDiagonalDelta &&
+            !this.saveToMove(
+              board,
+              kingY < q.position()[0] ? 'upright' : 'downleft',
+              q.position(),
+              curFigureIndex,
+              kingIndex,
+            )
+          );
+        })
       ) {
         return ['up', 'down', 'downright', 'upleft', 'left', 'right'];
       }
     }
 
-    if (kingX - kingY === x - y) {
+    if (secondDiagonalDelta === x - y) {
       if (
-        queens.some((q) =>
-          q.getPath(kingIndex, board, true).includes(curFigureIndex),
-        ) ||
-        bishops.some((b) =>
-          b.getPath(kingIndex, board, true).includes(curFigureIndex),
-        )
+        bishops.some((b) => {
+          const pos = b.position();
+          return (
+            pos[1] - pos[0] === secondDiagonalDelta &&
+            !this.saveToMove(
+              board,
+              kingY < b.position()[0] ? 'upleft' : 'downright',
+              b.position(),
+              curFigureIndex,
+              kingIndex,
+            )
+          );
+        })
       ) {
-        return ['up', 'down', 'downleft', 'upright', 'left', 'right'];
+        return ['up', 'down', 'upright', 'downleft', 'left', 'right'];
+      }
+
+      if (
+        queens.some((q) => {
+          const pos = q.position();
+          return (
+            pos[1] - pos[0] === secondDiagonalDelta &&
+            !this.saveToMove(
+              board,
+              kingY < q.position()[0] ? 'upleft' : 'downright',
+              q.position(),
+              curFigureIndex,
+              kingIndex,
+            )
+          );
+        })
+      ) {
+        return ['up', 'down', 'upright', 'downleft', 'left', 'right'];
       }
     }
     return forbidden;
