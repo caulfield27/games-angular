@@ -43,10 +43,7 @@
 }
 
 .mate {
-  box-shadow:
-    0 0 16px rgba(255, 0, 0, 1),
-    0 0 32px rgba(255, 0, 0, 0.6);
-  border-radius: 6px;
+  background-color: #ef4444;
 }
 
 .history {
@@ -57,4 +54,12 @@
   height: var(--chess-cell);
   background: #cbd5e1;
   opacity: 0.8;
+}
+
+.cdk-drag-preview {
+  z-index: 1000 !important;
+}
+
+.cdk-drag-dragging {
+  z-index: 1000 !important;
 }

@@ -36,7 +36,12 @@ export class Pawn extends Figure {
       upright: [],
     };
 
-    const directions = this.color === Color.WHITE ? [-1, -2, 1] : [1, 2, -1];
+    let directions: number[] = [];
+    if (this.gameType === 'irl') {
+      directions = this.color === Color.WHITE ? [-1, -2, 1] : [1, 2, -1];
+    } else {
+      directions = this.isPlayer ? [-1, -2, 1] : [1, 2, -1];
+    }
     if (!forbidden.includes('up')) {
       const up1 = get1Dposition([y + directions[0], x]) ?? -1;
       const up2 = get1Dposition([y + directions[1], x]) ?? -1;
@@ -66,9 +71,10 @@ export class Pawn extends Figure {
       }
 
       if (
-        up3Figure instanceof Figure &&
-        up3Figure.color === this.color &&
-        !this.isPlayer
+        (up3Figure instanceof Figure &&
+          up3Figure.color === this.color &&
+          !this.isPlayer) ||
+        (up3Figure === null && !this.isPlayer)
       ) {
         hash['upleft'].push(up3);
       }
@@ -77,14 +83,16 @@ export class Pawn extends Figure {
         const lastMove = history[history.length - 1];
         const lastMoveIndex = get1Dposition(lastMove.move[1]) ?? -1;
         const curIndex = get1Dposition(position) ?? -1;
-        if (curIndex - 1 === lastMoveIndex) {
-          const prevY = lastMove.move[0][0];
-          const curY = lastMove.move[1][1];
-          const lastMovedFigure = board[lastMoveIndex];
+        const prevY = lastMove.move[0][0];
+        const curY = lastMove.move[1][0];
+        const dif = prevY === 1 ? -1 : 1;
+        if (curIndex + dif === lastMoveIndex) {
+          const dif = prevY === 1 ? -2 : 2;
+          const lastMovedFigure = board[lastMoveIndex].figure;
           if (
             lastMovedFigure instanceof Pawn &&
             lastMovedFigure.color !== this.color &&
-            curY - 2 === prevY
+            curY + dif === prevY
           ) {
             hash['upleft'].push(up3);
           }
@@ -100,27 +108,30 @@ export class Pawn extends Figure {
       }
 
       if (
-        up4Figure instanceof Figure &&
-        up4Figure.color === this.color &&
-        !this.isPlayer
+        (up4Figure instanceof Figure &&
+          up4Figure.color === this.color &&
+          !this.isPlayer) ||
+        (up4Figure === null && !this.isPlayer)
       ) {
-        hash['upleft'].push(up4);
+        hash['upright'].push(up4);
       }
 
       if (up4Figure === null && history && history[history.length - 1]) {
         const lastMove = history[history.length - 1];
         const lastMoveIndex = get1Dposition(lastMove.move[1]) ?? -1;
         const curIndex = get1Dposition(position) ?? -1;
-        if (curIndex + 1 === lastMoveIndex) {
-          const prevY = lastMove.move[0][0];
-          const curY = lastMove.move[1][1];
-          const lastMovedFigure = board[lastMoveIndex];
+        const prevY = lastMove.move[0][0];
+        const curY = lastMove.move[1][0];
+        const dif = prevY === 1 ? 1 : -1;
+        if (curIndex + dif === lastMoveIndex) {
+          const dif = prevY === 1 ? -2 : 2;
+          const lastMovedFigure = board[lastMoveIndex].figure;
           if (
             lastMovedFigure instanceof Pawn &&
             lastMovedFigure.color !== this.color &&
-            curY - 2 === prevY
+            curY + dif === prevY
           ) {
-            hash['upleft'].push(up4);
+            hash['upright'].push(up4);
           }
         }
       }

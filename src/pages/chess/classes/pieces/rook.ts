@@ -1,6 +1,7 @@
 import { Color, GameType, MoveDirection, Piece } from '../../types';
 import { get1Dposition } from '../../utils';
 import { Figure, Square } from '../figure';
+import { King } from './king';
 
 export class Rook extends Figure {
   constructor(
@@ -29,18 +30,25 @@ export class Rook extends Figure {
 
   public getAvailableFields(
     move: 'left' | 'right' | 'down' | 'up',
-    board: Square[]
+    board: Square[],
+    kingCheck: boolean = false,
   ) {
     const position = this.position();
     const color = this.color;
     const [y, x] = position;
     let startX = move === 'left' ? x - 1 : move === 'right' ? x + 1 : x;
     let startY = move === 'down' ? y + 1 : move === 'up' ? y - 1 : y;
+    let index = get1Dposition([startY, startX]) ?? -1;
 
     const arr: number[] = [];
 
-    while (board[get1Dposition([startY, startX]) ?? -1]?.figure === null) {
-      arr.push(get1Dposition([startY, startX])!);
+    while (
+      board[index]?.figure === null ||
+      (kingCheck &&
+        board[index]?.figure instanceof King &&
+        board[index]?.figure?.color !== color)
+    ) {
+      arr.push(index);
 
       if (move === 'left') {
         startX--;
@@ -51,6 +59,7 @@ export class Rook extends Figure {
       } else if (move === 'up') {
         startY--;
       }
+      index = get1Dposition([startY, startX]) ?? -1;
     }
 
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;

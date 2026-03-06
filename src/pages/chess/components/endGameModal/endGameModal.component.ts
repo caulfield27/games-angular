@@ -11,6 +11,7 @@ export enum GameEndReason {
   Checkmate = 'checkmate',
   Resignation = 'resignation',
   Stalemate = 'stalemate',
+  PositionRepeat = 'repeat',
   Timeout = 'timeout'
 }
 
@@ -177,6 +178,7 @@ export class GameEndModalComponent {
 
       case GameEndState.Draw:
         if (this.data.reason === GameEndReason.Stalemate) return 'Пат';
+        if(this.data.reason === GameEndReason.PositionRepeat) return 'Троектратное повторение позиции'
         return 'Ничья!';
 
       default:

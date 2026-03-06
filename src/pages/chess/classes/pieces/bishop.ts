@@ -1,6 +1,7 @@
 import { Color, GameType, MoveDirection, Piece } from '../../types';
 import { get1Dposition } from '../../utils';
 import { Figure, Square } from '../figure';
+import { King } from './king';
 
 export class Bishop extends Figure {
   constructor(
@@ -29,15 +30,22 @@ export class Bishop extends Figure {
 
   public getAvailableFields(
     dir: 'leftup' | 'leftdown' | 'rightup' | 'rightdown',
-    board: Square[]
+    board: Square[],
+    kingCheck: boolean = false,
   ) {
     const [y, x] = this.position();
 
     const arr: number[] = [];
     let startX = dir === 'leftdown' || dir === 'leftup' ? x - 1 : x + 1;
     let startY = dir === 'leftdown' || dir === 'rightdown' ? y + 1 : y - 1;
-    while (board[get1Dposition([startY, startX]) ?? -1]?.figure === null) {
-      arr.push(get1Dposition([startY, startX])!);
+    let index = get1Dposition([startY, startX]) ?? -1;
+    while (
+      board[index]?.figure === null ||
+      (kingCheck &&
+        board[index]?.figure instanceof King &&
+        board[index]?.figure?.color !== this.color)
+    ) {
+      arr.push(index);
       if (dir === 'leftup' || dir === 'leftdown') {
         startX--;
       } else {
@@ -49,6 +57,7 @@ export class Bishop extends Figure {
       } else {
         startY--;
       }
+      index = get1Dposition([startY, startX]) ?? -1;
     }
 
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;

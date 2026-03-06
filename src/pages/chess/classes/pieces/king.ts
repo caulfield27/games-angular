@@ -8,7 +8,12 @@ import { Queen } from './queen';
 import { Rook } from './rook';
 
 export class King extends Figure {
-  constructor(color: Color, position: [number, number], isPlayer: boolean, type: GameType) {
+  constructor(
+    color: Color,
+    position: [number, number],
+    isPlayer: boolean,
+    type: GameType,
+  ) {
     super(Piece.KING, color, position, isPlayer, type);
   }
 
@@ -32,10 +37,10 @@ export class King extends Figure {
         switch (true) {
           case figure instanceof Bishop:
             forbidden.push(
-              ...figure.getAvailableFields('leftdown', board),
-              ...figure.getAvailableFields('leftup', board),
-              ...figure.getAvailableFields('rightdown', board),
-              ...figure.getAvailableFields('rightup', board),
+              ...figure.getAvailableFields('leftdown', board, true),
+              ...figure.getAvailableFields('leftup', board, true),
+              ...figure.getAvailableFields('rightdown', board, true),
+              ...figure.getAvailableFields('rightup', board, true),
             );
             break;
           case figure instanceof King:
@@ -49,14 +54,14 @@ export class King extends Figure {
             forbidden.push(...pawn.upleft, ...pawn.upright);
             break;
           case figure instanceof Queen:
-            forbidden.push(...figure.getAvailableFields([], board));
+            forbidden.push(...figure.getAvailableFields([], board, true));
             break;
           case figure instanceof Rook:
             forbidden.push(
-              ...figure.getAvailableFields('down', board),
-              ...figure.getAvailableFields('left', board),
-              ...figure.getAvailableFields('right', board),
-              ...figure.getAvailableFields('up', board),
+              ...figure.getAvailableFields('down', board, true),
+              ...figure.getAvailableFields('left', board, true),
+              ...figure.getAvailableFields('right', board, true),
+              ...figure.getAvailableFields('up', board, true),
             );
             break;
         }
@@ -102,12 +107,15 @@ export class King extends Figure {
     }
 
     if (!this.isPlayer || this.isMoved) return allowed;
-
-    const rookRight = board[63].figure;
-    const rookLeft = board[56].figure;
     const kingIndex = get1Dposition(position)!;
+    const leftRookIndex = position[0] === 0 ? 7 : 56;
+    const rightRookIndex = position[0] === 0 ? 0 : 63;
+    const rookRight = board[leftRookIndex].figure;
+    const rookLeft = board[rightRookIndex].figure;
 
     if (rookLeft instanceof Figure && !rookLeft.isMoved) {
+      if (!(rookLeft instanceof Rook) || rookLeft.color !== this.color)
+        return allowed;
       if (
         board[kingIndex - 1].figure === null &&
         board[kingIndex - 2].figure === null &&
@@ -118,6 +126,8 @@ export class King extends Figure {
     }
 
     if (rookRight instanceof Figure && !rookRight.isMoved) {
+      if (!(rookRight instanceof Rook) || rookRight.color !== this.color)
+        return allowed;
       if (
         board[kingIndex + 1].figure === null &&
         board[kingIndex + 2].figure === null
