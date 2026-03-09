@@ -1,24 +1,26 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { LucideAngularModule, Flag } from 'lucide-angular';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { LucideAngularModule, Flag, User } from 'lucide-angular';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from '../../service/chess.service';
 import { Figure, Square } from '../../classes/figure';
-import { Color } from '../../types';
+import { SoundType } from '../../types';
 import { get1Dposition, get2Dposition, getSquareBg } from '../../utils';
 import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { CommonModule } from '@angular/common';
 import { King, Pawn } from '../../classes/pieces';
-import { AudioService } from '@/shared/services/audio.service';
+import { WaitingOpponent } from './_components';
+import { WebsocketService } from '../../service/ws.service';
 
 @Component({
   selector: 'game',
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
-  imports: [LucideAngularModule, CdkDrag, CommonModule],
+  imports: [LucideAngularModule, CdkDrag, CommonModule, WaitingOpponent],
 })
-export class Game implements OnInit {
+export class Game {
   // icons
   readonly FlagIcon = Flag;
+  readonly UserIcon = User;
 
   // dom
   @ViewChild('board') board!: ElementRef<HTMLDivElement>;
@@ -32,20 +34,8 @@ export class Game implements OnInit {
 
   constructor(
     public chessService: ChessService,
-    public audio: AudioService,
-  ) {
-    chessService.playerPicesColor =
-      Math.round(Math.random()) === 0 ? Color.WHITE : Color.BLACK;
-  }
-
-  ngOnInit(): void {
-    this.audio.connect('move', '/audio/chess/move-self.mp3');
-    this.audio.connect('capture', '/audio/chess/capture.mp3');
-    this.audio.connect('check', '/audio/chess/move-check.mp3');
-    this.audio.connect('castle', '/audio/chess/castle.mp3');
-    this.audio.connect('gameEnd', '/audio/chess/game-end.webm');
-    this.audio.connect('promote', '/audio/chess/promote.mp3');
-  }
+    private ws: WebsocketService,
+  ) {}
 
   ngAfterViewInit(): void {
     const width = this.cell.nativeElement.clientWidth;
@@ -118,11 +108,32 @@ export class Game implements OnInit {
       this.chessService.checkPawnPromotion(newIndex);
     if (this.chessService.pawnPromotionIndex() !== null) return;
 
-    this.chessService.moveFigure(this.currentFigure, newIndex);
+    const prevIdx = get1Dposition(this.currentFigure.position());
+    const sound = this.chessService.moveFigure(this.currentFigure, newIndex);
     this.chessService.updateSquares([]);
+    if (!sound) {
+      this.currentFigure = null;
+      return;
+    }
 
-    this.chessService.check(this.chessService.moveTurn());
+    const isCheck = this.chessService.check();
+    this.chessService.audio.play(isCheck ? SoundType.CHECK : sound);
     this.chessService.checkDraw();
+
+    if (
+      this.chessService.gameType() === 'friend' ||
+      this.chessService.gameType() === 'online'
+    ) {
+      this.ws.send({
+        type: 'move',
+        data: {
+          roomId: this.chessService.roomId,
+          from: prevIdx,
+          to: newIndex,
+        },
+      });
+    }
+
     this.currentFigure = null;
   }
 
@@ -136,7 +147,9 @@ export class Game implements OnInit {
     if (
       !piece.isPlayer ||
       !piece.figure ||
-      this.chessService.pawnPromotionIndex() !== null
+      this.chessService.pawnPromotionIndex() !== null ||
+      (piece.isPlayer &&
+        this.chessService.moveTurn() !== this.chessService.player.color)
     )
       return;
     this.currentFigure = piece.figure;
@@ -149,10 +162,7 @@ export class Game implements OnInit {
       this.chessService.updateSquares(allowedSquares);
     } else {
       this.chessService.updateSquares(
-        this.chessService.checkKingSavety(
-          allowedSquares,
-          this.lastMove[1] ?? -1,
-        ),
+        this.chessService.checkKingSavety(allowedSquares),
       );
     }
   }
@@ -170,5 +180,11 @@ export class Game implements OnInit {
   public isDragDisabled(figure: Figure) {
     if (this.chessService.gameType() === 'irl') return false;
     return !figure.isPlayer;
+  }
+
+  public onSelectionCancel() {
+    this.ws.send({ type: 'cancel_selection' });
+    this.chessService.isWaiting.set(false);
+    this.chessService.gameType.set(null);
   }
 }

@@ -11,6 +11,7 @@ import { NgClass, NgStyle } from '@angular/common';
 import { LucideAngularModule, Play, Sun, Moon, View } from 'lucide-angular';
 import Swal from 'sweetalert2';
 import { launchConfetti } from '@/shared/utils/utils';
+import { AudioService } from '@/shared/services/audio.service';
 
 @Component({
   selector: 'flappy-bird',
@@ -18,6 +19,8 @@ import { launchConfetti } from '@/shared/utils/utils';
   imports: [NgStyle, NgClass, LucideAngularModule],
 })
 export class FlappyBird implements AfterViewInit, OnDestroy {
+  constructor(private audio: AudioService) {}
+
   // dom
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('container') containerRef!: ElementRef<HTMLDivElement>;
@@ -33,12 +36,6 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   // images
   bird: HTMLImageElement = new Image();
   pipe: HTMLImageElement = new Image();
-
-  // audio
-  dieSound: HTMLAudioElement | null = null;
-  hitSound: HTMLAudioElement | null = null;
-  pointSound: HTMLAudioElement | null = null;
-  wingSound: HTMLAudioElement | null = null;
 
   // constants
   readonly isMobile = window.innerWidth < 768;
@@ -108,10 +105,11 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     this.canvas.height = this.container.clientHeight;
     this.ctx = this.canvas.getContext('2d');
     this.birdY = (this.canvas.height - this.landHeight) / 2;
-    this.dieSound = new Audio('/flappyBird/die.wav');
-    this.hitSound = new Audio('/flappyBird/hit.wav');
-    this.pointSound = new Audio('/flappyBird/point.wav');
-    this.wingSound = new Audio('/flappyBird/wing.wav');
+    this.audio.connect('die', '/flappyBird/die.wav');
+    this.audio.connect('hit', '/flappyBird/hit.wav');
+    this.audio.connect('point', '/flappyBird/point.wav');
+    this.audio.connect('wing', '/flappyBird/wing.wav');
+    
 
     this.bird.src = this.birds[0].src;
     this.pipe.src =
@@ -297,7 +295,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
       this.isGameStart = true;
     }
 
-    this.wingSound?.play();
+    this.audio.play('wing');
     this.speedY = this.jumpImpulse;
   }
 
@@ -384,7 +382,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
 
   private checkProgress(pipeX: number, id: number) {
     if (pipeX < this.birdX && id !== this.prevPipeId) {
-      this.pointSound?.play();
+      this.audio.play('point');
       this.score++;
       this.scores = String(this.score).split('');
       this.prevPipeId = id;
@@ -396,12 +394,12 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
       this.isCollisioned = true;
     }
 
-    this.hitSound?.play();
+    this.audio.play('hit');
     window.onkeyup = null;
     window.onclick = null;
 
     if (isOver) {
-      this.dieSound?.play();
+      this.audio.play('die');
       setTimeout(() => {
         if (this.score > this.currentBestScore) {
           this.currentBestScore = this.score;

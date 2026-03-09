@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { getToken } from '../utils/auth';
+import { base_url } from '@/api/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = base_url;
   private request;
   constructor() {
     this.request = axios.create({

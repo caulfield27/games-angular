@@ -1,5 +1,15 @@
 import { Injectable, signal } from '@angular/core';
-import { Color, GameType, History, Piece } from '../types';
+import {
+  Color,
+  GameFound,
+  GameType,
+  History,
+  IMessageData,
+  MessageType,
+  MoveData,
+  Piece,
+  SoundType,
+} from '../types';
 import { Figure, Square } from '../classes/figure';
 import { Player } from '../classes/player';
 import { AuthService } from '@/shared/services/auth.service';
@@ -11,18 +21,21 @@ import {
   GameEndReason,
   GameEndState,
 } from '../components/endGameModal/endGameModal.component';
+import { AudioService } from '@/shared/services/audio.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChessService {
+  public roomId: string | null = null;
+  public isWaiting = signal<boolean>(false);
   public history = signal<History[]>([]);
   public gameType = signal<GameType | null>(null);
-  public playerPicesColor: Color = Color.WHITE;
   public board;
-  public player;
-  public opponent;
+  public player: Player = new Player('white', '');
+  public opponent: Player = new Player('black', '');
   public checkIndex = signal<null | number>(null);
+  private checkedFigureIndex: number | null = null;
   public mateIndex = signal<null | number>(null);
   public isGameEndModalOpen = signal<boolean>(false);
   public gameEndData = signal<GameEndData>({
@@ -32,14 +45,51 @@ export class ChessService {
   public pawnPromotionIndex = signal<number | null>(null);
   public moveTurn;
   private historyHash: Record<string, number> = {};
-  constructor(private auth: AuthService) {
-    this.player = new Player(this.playerPicesColor, auth.user());
-    this.opponent = new Player(
-      this.playerPicesColor === Color.WHITE ? Color.BLACK : Color.WHITE,
-      null,
-    );
+  constructor(
+    private auth: AuthService,
+    public audio: AudioService,
+  ) {
     this.moveTurn = signal(Color.WHITE);
     this.board = signal<Square[]>([]);
+    this.audio.connect(SoundType.MOVE, '/audio/chess/move-self.mp3');
+    this.audio.connect(SoundType.CAPTURE, '/audio/chess/capture.mp3');
+    this.audio.connect(SoundType.CHECK, '/audio/chess/move-check.mp3');
+    this.audio.connect(SoundType.CASTLE, '/audio/chess/castle.mp3');
+    this.audio.connect(SoundType.GAMEOVER, '/audio/chess/game-end.webm');
+    this.audio.connect(SoundType.PROMOTE, '/audio/chess/promote.mp3');
+  }
+
+  public onMessage(event: MessageEvent<string>) {
+    const parsedData = JSON.parse(event.data) as IMessageData;
+    const { type } = parsedData;
+
+    switch (type) {
+      case MessageType.GAMESTART:
+        {
+          const data = parsedData.data as GameFound;
+          this.player.color = data.color;
+          this.player.name.set(data.name);
+          this.roomId = data.roomId;
+          this.opponent.color = data.color === 'white' ? 'black' : 'white';
+          this.opponent.name.set(data.opponent);
+          this.board.set(this.generateBoard());
+          this.isWaiting.set(false);
+        }
+        break;
+      case MessageType.MOVE: {
+        const data = parsedData.data as MoveData;
+        const fromC = get2Dposition(data.from)!;
+        const toC = get2Dposition(data.to)!;
+        const from = get1Dposition([7-fromC[0],fromC[1]])!;
+        const to = get1Dposition([7-toC[0], toC[1]])!;
+        const figure = this.board()[from].figure;
+        const sound = this.moveFigure(figure!, to);
+        if (!sound) return;
+        const isCheck = this.check();
+        this.audio.play(isCheck ? SoundType.CHECK : sound);
+        this.checkDraw();
+      }
+    }
   }
 
   private getFigure(piece: Piece, color: Color, position: [number, number]) {
@@ -68,14 +118,14 @@ export class ChessService {
     }
   }
 
-  public checkKingSavety(guardSquares: number[], fromIdx: number) {
+  public checkKingSavety(guardSquares: number[]) {
     const checkIdx = this.checkIndex();
-    if (checkIdx !== null) {
+    if (checkIdx !== null && this.checkedFigureIndex !== null) {
       const board = this.board();
-      const checkedFigure = board[fromIdx ?? -1];
+      const checkedFigure = board[this.checkedFigureIndex];
       if (checkedFigure.figure instanceof Figure) {
         const path = checkedFigure.figure.getPath(checkIdx, board);
-        path.push(fromIdx);
+        path.push(this.checkedFigureIndex);
         const arr = [];
         for (const index of path) {
           if (guardSquares.includes(index)) {
@@ -89,12 +139,14 @@ export class ChessService {
     return guardSquares;
   }
 
-  public check(color: Color, type: 'move' | 'promotion' = 'move') {
+  public check(): boolean {
+    const color = this.moveTurn();
     const board = this.board();
     const king = board.find(
       (s) => s.figure instanceof King && s.figure.color === color,
     );
-    if (!king) return;
+    if (!king) return false;
+    let isChek = false;
     const kingIdx = get1Dposition(king.figure!.position()) ?? -1;
     const kingEscapeSquares = king.figure!.getAllowedSquares(
       board,
@@ -115,17 +167,21 @@ export class ChessService {
           if (!kingEscapeSquares.length && f.figure!.isSave(board, path)) {
             this.mateIndex.set(kingIdx);
             setTimeout(() => {
+              this.audio.play(SoundType.GAMEOVER);
               this.isGameEndModalOpen.set(true);
               this.gameEndData.set({
                 state: GameEndState.PlayerWon,
                 reason: GameEndReason.Checkmate,
               });
-            }, 800);
+            }, 500);
           } else {
             this.checkIndex.set(kingIdx);
+            this.checkedFigureIndex = get1Dposition(f.figure!.position());
           }
+          isChek = true;
         }
       });
+    return isChek;
   }
 
   public generateBoard(): Square[] {
@@ -140,7 +196,7 @@ export class ChessService {
         const piece = idx < 56 ? Piece.PAWN : (PLAYER_PIECE[idx] ?? Piece.PAWN);
         square.figure = this.getFigure(
           piece,
-          this.player.color,
+          this.player.color as Color,
           get2Dposition(idx)!,
         );
       } else if (idx < 16) {
@@ -148,7 +204,7 @@ export class ChessService {
           idx > 7 ? Piece.PAWN : (OPPONENT_PIECE[idx] ?? Piece.PAWN);
         square.figure = this.getFigure(
           piece,
-          this.opponent.color,
+          this.opponent.color as Color,
           get2Dposition(idx)!,
         );
       }
@@ -189,16 +245,22 @@ export class ChessService {
     return false;
   }
 
-  public moveFigure(figure: Figure, index: number) {
+  public moveFigure(figure: Figure, index: number): SoundType | null {
+    let sound = SoundType.MOVE;
+    const isCastle = this.isCastle(figure, index);
     if (this.checkIndex() !== null) {
+      if (isCastle) return null;
       this.checkIndex.set(null);
+      this.checkedFigureIndex = null;
     }
     const prevPosition = figure.position();
     const prevIndex = get1Dposition(figure.position())!;
     const updatedBoard = this.board();
 
-    if (this.isCastle(figure, index))
+    if (isCastle) {
+      sound = SoundType.CASTLE;
       this.handleCastle(index, updatedBoard, figure);
+    }
 
     figure.move(index);
 
@@ -211,6 +273,11 @@ export class ChessService {
       isPlayer: false,
       canMove: false,
     };
+
+    if (updatedBoard[index].figure instanceof Figure) {
+      sound = SoundType.CAPTURE;
+    }
+
     updatedBoard[index] = prevSquare;
     this.history.update((prev) => [
       ...prev,
@@ -224,12 +291,14 @@ export class ChessService {
     this.historyHash[stringifiedBoard] =
       (this.historyHash[stringifiedBoard] || 0) + 1;
     this.updateTurn(updatedBoard);
+    return sound;
   }
 
   public handlePromotionChoose(
     newPiece: 'queen' | 'rook' | 'bishop' | 'knight',
     figure: Figure,
   ) {
+    this.audio.play(SoundType.PROMOTE);
     const index = this.pawnPromotionIndex();
     if (index === null) return;
     const updatedBoard = this.board();
@@ -301,7 +370,7 @@ export class ChessService {
       (this.historyHash[stringifiedBoard] || 0) + 1;
     this.updateTurn(updatedBoard);
     this.updateSquares([]);
-    this.check(this.moveTurn());
+    this.check();
     this.pawnPromotionIndex.set(null);
     this.checkDraw();
   }

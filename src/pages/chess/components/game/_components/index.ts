@@ -1,0 +1,1 @@
+export * from './waiting-opponent/waiting.component';

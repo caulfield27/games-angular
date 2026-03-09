@@ -35,7 +35,7 @@ export interface GameEndData {
 
       <!-- Modal -->
       <div
-        class="relative bg-neutral-800 rounded-2xl shadow-2xl max-w-md w-full border border-neutral-700 modal-scale-animation"
+        class="relative bg-neutral-900 rounded-2xl shadow-2xl max-w-md w-full border border-neutral-700 modal-scale-animation"
         (click)="$event.stopPropagation()">
 
         <!-- Content -->
@@ -61,7 +61,7 @@ export interface GameEndData {
           <div class="flex flex-col gap-3">
             <button
               (click)="onNewGame()"
-              class="w-full bg-white hover:bg-neutral-100 text-neutral-900 font-semibold py-3.5 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95">
+              class="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95">
               Навая игра
             </button>
 

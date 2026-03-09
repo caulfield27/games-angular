@@ -1,4 +1,4 @@
-import { WS_CONNECTION_URL } from '@/api/api.config';
+import { apiRoutes, WS_CONNECTION_URL } from '@/api/api.config';
 import { Injectable, signal } from '@angular/core';
 import {
   IWsIncomeMessage,
@@ -24,7 +24,7 @@ export class WebSocketService {
   public connect() {
     if (this.socket?.readyState === WebSocket.OPEN) return;
     this.state.set('connecting');
-    this.socket = new WebSocket(WS_CONNECTION_URL);
+    this.socket = new WebSocket(apiRoutes.battleship);
 
     this.socket.onopen = () => {
       const userId = uuidv4();

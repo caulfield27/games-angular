@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from 'lucide-angular';
 import { GameType } from './types';
+import { WebsocketService } from './service/ws.service';
 
 @Component({
   selector: 'chess',
@@ -23,8 +24,11 @@ export class Chess {
   readonly GlobeIcon = Globe;
   readonly UsersIcon = Users;
   readonly ArrowIcon = ArrowLeft;
-  constructor(public chessService: ChessService) {
-    effect(() => {
+  constructor(
+    public chessService: ChessService,
+    public ws: WebsocketService,
+  ) {
+    effect(async () => {
       switch (chessService.gameType()) {
         case 'bot':
           //todo
@@ -33,7 +37,10 @@ export class Chess {
           // todo
           break;
         case 'online':
-          //todo
+          chessService.isWaiting.set(true);
+          ws.connect((e) => chessService.onMessage(e)).then(() =>
+            ws.send({ type: 'selection' }),
+          );
           break;
         case 'irl':
       }

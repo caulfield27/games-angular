@@ -20,15 +20,17 @@ import {
 } from '../types/types';
 import Swal from 'sweetalert2';
 import { launchConfetti } from '@/shared/utils/utils';
+import { AudioService } from '@/shared/services/audio.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BattleshipService {
   // contructor
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router, private audio: AudioService) {
+    audio.connect('message', '/audio/battleship/message.wav');
+  }
   // states
-  private audio: HTMLAudioElement | null = null;
   private directions: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
   private initialMatrix: boolean[][] = [];
   private directionsHash: Record<string, number[]> = {
@@ -591,11 +593,6 @@ export class BattleshipService {
         this.gameMetadata.update((prev) => ({ ...prev, opName: name }));
         this.gameSessionData.sessionId = sessionId;
         this.gameStatus.set('found');
-
-        if (!this.audio) {
-          this.audio = new Audio('/audio/message.wav');
-        }
-
         this.selectionLoading.set(false);
         Swal.fire({
           icon: 'success',
@@ -621,9 +618,7 @@ export class BattleshipService {
         const msg = data as string;
 
         if (!this.isChatOpen()) {
-          if (this.audio) {
-            this.audio.play();
-          }
+          this.audio.play('message');
           this.notifications.update((prev) => prev + 1);
         }
         handleMessage(msg, 'opponent');

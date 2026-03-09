@@ -61,52 +61,84 @@
       />
     </div>
   </div>
-  <div class="grid grid-cols-8 grid-rows-8 relative" id="board" #board>
-    @for (square of chessService.board(); track $index) {
-      <div
-        class="relative"
-        (click)="onMove(square, $index)"
-        [style.background]="getBg($index)"
-        #cell
-        [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
-      >
-        @if ($index === lastMove[0] || $index === lastMove[1]) {
-          <div class="history"></div>
-        }
 
-        @if (square.canMove && isFigure(square.figure)) {
-          <div class="take_square"></div>
-        }
-        @if (square.canMove && !isFigure(square.figure)) {
-          <div class="available_square"></div>
-        }
-        @if (isFigure(square.figure)) {
-          <div
-            (pointerdown)="onPieceChoose(square)"
-            role="button"
-            [cdkDragDisabled]="isDragDisabled(square.figure)"
-            cdkDrag
-            cdkDragBoundary="#board"
-            class="touch-none relative z-[2] cursor-grab"
-            (cdkDragEnded)="onDragEnd($event)"
-            [cdkDragData]="square"
-          >
-            <img
-              [ngClass]="
-                $index === chessService.checkIndex()
-                  ? 'check'
-                  : $index === chessService.mateIndex()
-                    ? 'mate'
-                    : ''
-              "
-              width="60"
-              height="60"
-              [src]="square.figure.image"
-              [alt]="square.figure.piece"
-            />
-          </div>
-        }
+  <div class="flex flex-col gap-2">
+    <div
+      class="w-full flex flex-row justify-between items-center text-neutral-50 font-semibold max-[480px]:ml-2"
+    >
+      <div class="flex flex-row gap-2">
+        <div
+          class="p-1.5 rounded-md bg-neutral-700 flex justify-center items-center"
+        >
+          <lucide-icon [img]="UserIcon" />
+        </div>
+        <span>{{ chessService.opponent.name() }}</span>
       </div>
-    }
+      <div></div>
+    </div>
+    <div class="grid grid-cols-8 grid-rows-8 relative" id="board" #board>
+      @for (square of chessService.board(); track $index) {
+        <div
+          class="relative"
+          (click)="onMove(square, $index)"
+          [style.background]="getBg($index)"
+          #cell
+          [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
+        >
+          @if ($index === lastMove[0] || $index === lastMove[1]) {
+            <div class="history"></div>
+          }
+
+          @if (square.canMove && isFigure(square.figure)) {
+            <div class="take_square"></div>
+          }
+          @if (square.canMove && !isFigure(square.figure)) {
+            <div class="available_square"></div>
+          }
+          @if (isFigure(square.figure)) {
+            <div
+              (pointerdown)="onPieceChoose(square)"
+              role="button"
+              [cdkDragDisabled]="isDragDisabled(square.figure)"
+              cdkDrag
+              cdkDragBoundary="#board"
+              class="touch-none relative z-[2] cursor-grab"
+              (cdkDragEnded)="onDragEnd($event)"
+              [cdkDragData]="square"
+            >
+              <img
+                [ngClass]="
+                  $index === chessService.checkIndex()
+                    ? 'check'
+                    : $index === chessService.mateIndex()
+                      ? 'mate'
+                      : ''
+                "
+                width="60"
+                height="60"
+                [src]="square.figure.image"
+                [alt]="square.figure.piece"
+              />
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <div
+      class="w-full flex flex-row justify-between items-center text-neutral-50 font-semibold max-[480px]:ml-2"
+    >
+      <div class="flex flex-row gap-2">
+        <div
+          class="p-1.5 rounded-md bg-neutral-700 flex justify-center items-center"
+        >
+          <lucide-icon [img]="UserIcon" />
+        </div>
+        <span>{{ chessService.player.name() }}</span>
+      </div>
+      <div></div>
+    </div>
   </div>
+  @if (chessService.isWaiting()) {
+    <waiting-opponent (cancel)="onSelectionCancel()" />
+  }
 </div>

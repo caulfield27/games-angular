@@ -2,48 +2,49 @@
   class="h-[100svh] w-full bg-neutral-800 flex justify-center items-center relative"
 >
   @if (chessService.gameType() === null) {
-    <div
-      class="bg-neutral-900 min-w-[500px] max-sm:min-w-[95%] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
-    >
-      <div class="w-full flex flex-col gap-5">
-        <button
-          (click)="onGameTypeChoose('online')"
-          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
+    <div class="w-full h-full flex flex-col gap-8 justify-center items-center">
+      <div class="text-center">
+        <h1
+          class="text-6xl md:text-7xl font-extrabold tracking-widest bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 bg-clip-text text-transparent"
         >
-          <lucide-angular class="text-blue-500" [img]="GlobeIcon" />
-          Играть онлайн
-        </button>
-        <button
-          (click)="onGameTypeChoose('friend')"
-          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-        >
-          <lucide-angular class="text-amber-500" [img]="HandshakeIcon" />
-          Играть c другом
-        </button>
-        <button
-          (click)="onGameTypeChoose('bot')"
-          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-        >
-          <lucide-angular class="text-blue-300" [img]="BotIcon" />
-          Играть с ботами
-        </button>
-        <button
-          (click)="onGameTypeChoose('irl')"
-          class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-        >
-          <lucide-angular class="text-green-500" [img]="UsersIcon" />
-          Играть вживую
-        </button>
+          GRAND CHESS
+        </h1>
+      </div>
+      <div
+        class="bg-neutral-900 min-w-[500px] max-sm:min-w-[95%] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
+      >
+        <div class="w-full flex flex-col gap-5">
+          <button
+            (click)="onGameTypeChoose('online')"
+            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
+          >
+            <lucide-angular class="text-blue-500" [img]="GlobeIcon" />
+            Играть онлайн
+          </button>
+          <button
+            (click)="onGameTypeChoose('friend')"
+            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
+          >
+            <lucide-angular class="text-amber-500" [img]="HandshakeIcon" />
+            Играть c другом
+          </button>
+          <button
+            (click)="onGameTypeChoose('bot')"
+            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
+          >
+            <lucide-angular class="text-blue-300" [img]="BotIcon" />
+            Играть с ботами
+          </button>
+          <button
+            (click)="onGameTypeChoose('irl')"
+            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
+          >
+            <lucide-angular class="text-green-500" [img]="UsersIcon" />
+            Играть вживую
+          </button>
+        </div>
       </div>
     </div>
-  } @else if (chessService.gameType() === "irl") {
-    <button
-      (click)="onGoback()"
-      class="border-0 bg-none outline-none absolute left-[20px] top-[20px]"
-    >
-      <lucide-icon [img]="ArrowIcon" color="#fff" size="30"></lucide-icon>
-    </button>
-    <game></game>
   } @else {
     <button
       (click)="onGoback()"
@@ -51,7 +52,7 @@
     >
       <lucide-icon [img]="ArrowIcon" color="#fff" size="30"></lucide-icon>
     </button>
-    <span class="text-white">В процессе разпаботки</span>
+    <game></game>
   }
 </div>
 

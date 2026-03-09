@@ -12,6 +12,15 @@ export enum Color {
   WHITE = 'white',
 }
 
+export enum SoundType {
+  MOVE = 'move',
+  CAPTURE = 'capture',
+  CHECK = 'check',
+  CASTLE = 'castle',
+  GAMEOVER = 'gameover',
+  PROMOTE = 'promote',
+}
+
 export enum SquareColor {
   BLACK = '#404040',
   WHITE = '#f5f5f4',
@@ -19,9 +28,30 @@ export enum SquareColor {
 
 export interface History {
   move: [[number, number], [number, number]];
-};
+}
 
 export type Forbidden = MoveDirection[] | number[];
+
+export enum MessageType {
+  GAMESTART = 'gameFound',
+  MOVE = 'move',
+}
+export interface IMessageData {
+  type: MessageType;
+  data: unknown;
+}
+
+export interface GameFound {
+  roomId: string;
+  name: string;
+  opponent: string;
+  color: 'black' | 'white';
+}
+
+export interface MoveData {
+  from: number;
+  to: number;
+}
 
 export type MoveDirection =
   | 'up'
