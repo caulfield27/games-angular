@@ -1,0 +1,53 @@
+<div
+  [style]="promotionPosition(chessService.pawnPromotionIndex())"
+  class="z-[1000] w-fit h-fit absolute flex-col !bg-white shadow-[0px_0px_21px_6px_rgba(0,_0,_0,_0.6)]"
+>
+  <div
+    [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
+    role="button"
+    (click)="onPromotionChoose('queen')"
+  >
+    <img
+      [src]="
+        chessService.moveTurn() === 'white' ? '/chess/wq.svg' : '/chess/bq.svg'
+      "
+      alt="chess figure"
+    />
+  </div>
+  <div
+    [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
+    role="button"
+    (click)="onPromotionChoose('rook')"
+  >
+    <img
+      [src]="
+        chessService.moveTurn() === 'white' ? '/chess/wr.svg' : '/chess/br.svg'
+      "
+      alt="chess figure"
+    />
+  </div>
+  <div
+    [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
+    role="button"
+    (click)="onPromotionChoose('knight')"
+  >
+    <img
+      [src]="
+        chessService.moveTurn() === 'white' ? '/chess/wn.svg' : '/chess/bn.svg'
+      "
+      alt="chess figure"
+    />
+  </div>
+  <div
+    [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
+    role="button"
+    (click)="onPromotionChoose('bishop')"
+  >
+    <img
+      [src]="
+        chessService.moveTurn() === 'white' ? '/chess/wb.svg' : '/chess/bb.svg'
+      "
+      alt="chess figure"
+    />
+  </div>
+</div>

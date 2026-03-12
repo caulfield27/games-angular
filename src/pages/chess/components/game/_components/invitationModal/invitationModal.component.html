@@ -1,0 +1,28 @@
+<div
+  class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
+>
+  <div
+    class="bg-neutral-900 text-white rounded-2xl p-10 shadow-2xl text-center min-w-[400px] max-w-[400px] max-sm:min-w-full flex flex-col gap-4"
+  >
+    <h2 class="text-[18px] text-neutral-200">
+      С вами сыграет первый, кто перейдет по этой ссылке
+    </h2>
+    <div
+      class="w-full py-2 px-3 rounded-md bg-neutral-800 flex justify-center items-center"
+    >
+      <span>{{ link }}</span>
+    </div>
+    <button
+      (click)="onCopy()"
+      class="w-full bg-neutral-800 hover:bg-neutral-900 transition rounded-lg py-2 font-medium flex flex-row justify-center items-center gap-2"
+    >
+      Скопировать <lucide-icon [img]="CopyIcon" />
+    </button>
+    <button
+      (click)="onCancel()"
+      class="w-full bg-sky-500 hover:bg-sky-600 transition rounded-lg py-2 font-medium"
+    >
+      Отмена
+    </button>
+  </div>
+</div>

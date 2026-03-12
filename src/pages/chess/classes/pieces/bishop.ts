@@ -63,7 +63,7 @@ export class Bishop extends Figure {
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
     if (lastFigure instanceof Figure) {
       if (
-        (!this.isPlayer && lastFigure.color === this.color) ||
+        (kingCheck && lastFigure.color === this.color) ||
         lastFigure.color !== this.color
       ) {
         arr.push(get1Dposition([startY, startX])!);

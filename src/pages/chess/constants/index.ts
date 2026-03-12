@@ -3,6 +3,14 @@ import { Piece, Color } from '../types';
 export const COLLS = 8;
 export const ROWS = 8;
 
+export const PIECE_VALUE: Record<string, number> = {
+  [Piece.PAWN]: 1,
+  [Piece.BISHOP]: 3,
+  [Piece.KNIGHT]: 3,
+  [Piece.ROOK]: 5,
+  [Piece.QUEEN]: 8,
+};
+
 export const PIECE_IMAGE_PATH: Record<string, string> = {
   [Piece.KING + Color.WHITE]: '/chess/wk.svg',
   [Piece.KING + Color.BLACK]: '/chess/bk.svg',

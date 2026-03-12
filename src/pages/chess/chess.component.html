@@ -3,13 +3,6 @@
 >
   @if (chessService.gameType() === null) {
     <div class="w-full h-full flex flex-col gap-8 justify-center items-center">
-      <div class="text-center">
-        <h1
-          class="text-6xl md:text-7xl font-extrabold tracking-widest bg-gradient-to-r from-sky-400 via-sky-500 to-blue-500 bg-clip-text text-transparent"
-        >
-          GRAND CHESS
-        </h1>
-      </div>
       <div
         class="bg-neutral-900 min-w-[500px] max-sm:min-w-[95%] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
       >
@@ -60,7 +53,6 @@
   <game-end-modal
     [data]="chessService.gameEndData()"
     [isOpen]="chessService.isGameEndModalOpen()"
-    (newGame)="reset()"
     (close)="reset()"
   />
 }

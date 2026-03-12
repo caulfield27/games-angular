@@ -1,67 +1,4 @@
 <div class="relative">
-  <div
-    [style]="promotionPosition(chessService.pawnPromotionIndex())"
-    class="z-[1000] w-fit h-fit absolute flex-col !bg-white shadow-[0px_0px_21px_6px_rgba(0,_0,_0,_0.6)]"
-    #promotionContainer
-  >
-    <div
-      [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
-      role="button"
-      (click)="onPromotionChoose('queen')"
-    >
-      <img
-        [src]="
-          chessService.moveTurn() === 'white'
-            ? '/chess/wq.svg'
-            : '/chess/bq.svg'
-        "
-        alt="chess figure"
-      />
-    </div>
-    <div
-      [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
-      role="button"
-      (click)="onPromotionChoose('rook')"
-    >
-      <img
-        [src]="
-          chessService.moveTurn() === 'white'
-            ? '/chess/wr.svg'
-            : '/chess/br.svg'
-        "
-        alt="chess figure"
-      />
-    </div>
-    <div
-      [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
-      role="button"
-      (click)="onPromotionChoose('knight')"
-    >
-      <img
-        [src]="
-          chessService.moveTurn() === 'white'
-            ? '/chess/wn.svg'
-            : '/chess/bn.svg'
-        "
-        alt="chess figure"
-      />
-    </div>
-    <div
-      [style]="{ width: cellSize + 'px', height: cellSize + 'px' }"
-      role="button"
-      (click)="onPromotionChoose('bishop')"
-    >
-      <img
-        [src]="
-          chessService.moveTurn() === 'white'
-            ? '/chess/wb.svg'
-            : '/chess/bb.svg'
-        "
-        alt="chess figure"
-      />
-    </div>
-  </div>
-
   <div class="flex flex-col gap-2">
     <div
       class="w-full flex flex-row justify-between items-center text-neutral-50 font-semibold max-[480px]:ml-2"
@@ -72,11 +9,32 @@
         >
           <lucide-icon [img]="UserIcon" />
         </div>
-        <span>{{ chessService.opponent.name() }}</span>
+        <div class="flex flex-col justify-between items-start">
+          <span class="text-xs">{{ chessService.opponent.name() }}</span>
+          <div class="flex flex-row">
+            @for (piece of chessService.opponent.takenPieces(); track $index) {
+              <img
+                [style.margin-left]="$index > 0 ? '-5px' : '0px'"
+                width="16"
+                [src]="PIECE_PATH[piece + chessService.player.color]"
+                alt="chess figure"
+              />
+            }
+            @if (chessService.opponent.advantage()) {
+              <span class="text-xs text-neutral-400"
+                >+{{ chessService.opponent.advantage() }}</span
+              >
+            }
+          </div>
+        </div>
       </div>
       <div></div>
     </div>
     <div class="grid grid-cols-8 grid-rows-8 relative" id="board" #board>
+      <promotion-dialog
+        [cellSize]="cellSize"
+        (handlePromotion)="onPromotionChoose($event)"
+      />
       @for (square of chessService.board(); track $index) {
         <div
           class="relative"
@@ -133,12 +91,36 @@
         >
           <lucide-icon [img]="UserIcon" />
         </div>
-        <span>{{ chessService.player.name() }}</span>
+        <div class="flex flex-col justify-between items-start">
+          <span class="text-xs">{{ chessService.player.name() }}</span>
+          <div class="flex flex-row">
+            @for (piece of chessService.player.takenPieces(); track $index) {
+              <img
+                [style.margin-left]="$index > 0 ? '-5px' : '0px'"
+                width="16"
+                [src]="PIECE_PATH[piece + chessService.opponent.color]"
+                alt="chess figure"
+              />
+            }
+            @if (chessService.player.advantage()) {
+              <span class="text-xs text-neutral-400"
+                >+{{ chessService.player.advantage() }}</span
+              >
+            }
+          </div>
+        </div>
       </div>
       <div></div>
     </div>
   </div>
   @if (chessService.isWaiting()) {
     <waiting-opponent (cancel)="onSelectionCancel()" />
+  }
+
+  @if (chessService.invitation().isModalOpen) {
+    <invitation-modal
+      [link]="chessService.invitation().link!"
+      (cancel)="onInvitationCancel()"
+    />
   }
 </div>

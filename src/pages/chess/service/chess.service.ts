@@ -4,10 +4,13 @@ import {
   GameFound,
   GameType,
   History,
+  IInvitation,
   IMessageData,
   MessageType,
   MoveData,
   Piece,
+  PromoteData,
+  PromoteOption,
   SoundType,
 } from '../types';
 import { Figure, Square } from '../classes/figure';
@@ -27,13 +30,17 @@ import { AudioService } from '@/shared/services/audio.service';
   providedIn: 'root',
 })
 export class ChessService {
+  public invitation = signal<IInvitation>({
+    isModalOpen: false,
+    link: null,
+  });
   public roomId: string | null = null;
   public isWaiting = signal<boolean>(false);
   public history = signal<History[]>([]);
   public gameType = signal<GameType | null>(null);
   public board;
-  public player: Player = new Player('white', '');
-  public opponent: Player = new Player('black', '');
+  public player: Player = new Player('white', 'no Alisher');
+  public opponent: Player = new Player('black', 'Alisher');
   public checkIndex = signal<null | number>(null);
   private checkedFigureIndex: number | null = null;
   public mateIndex = signal<null | number>(null);
@@ -59,8 +66,8 @@ export class ChessService {
     this.audio.connect(SoundType.PROMOTE, '/audio/chess/promote.mp3');
   }
 
-  public onMessage(event: MessageEvent<string>) {
-    const parsedData = JSON.parse(event.data) as IMessageData;
+  public onMessage(event: MessageEvent<unknown>) {
+    const parsedData = JSON.parse(event.data as string) as IMessageData;
     const { type } = parsedData;
 
     switch (type) {
@@ -74,21 +81,43 @@ export class ChessService {
           this.opponent.name.set(data.opponent);
           this.board.set(this.generateBoard());
           this.isWaiting.set(false);
+          this.invitation.set({ isModalOpen: false, link: null });
         }
         break;
       case MessageType.MOVE: {
         const data = parsedData.data as MoveData;
         const fromC = get2Dposition(data.from)!;
         const toC = get2Dposition(data.to)!;
-        const from = get1Dposition([7-fromC[0],fromC[1]])!;
-        const to = get1Dposition([7-toC[0], toC[1]])!;
+        const from = get1Dposition([7 - fromC[0], fromC[1]])!;
+        const to = get1Dposition([7 - toC[0], toC[1]])!;
         const figure = this.board()[from].figure;
-        const sound = this.moveFigure(figure!, to);
+        const sound = this.moveFigure(figure!, to, false);
         if (!sound) return;
         const isCheck = this.check();
         this.audio.play(isCheck ? SoundType.CHECK : sound);
         this.checkDraw();
+        break;
       }
+      case MessageType.PROMOTE: {
+        const data = parsedData.data as PromoteData;
+        const [y, x] = get2Dposition(data.idx)!;
+        const [promoteY, promoteX] = get2Dposition(data.promoteIdx)!;
+        const realIndex = get1Dposition([7 - y, x])!;
+        const figure = this.board()[realIndex].figure;
+        if (figure === null) return;
+        this.handlePromotionChoose(
+          data.figure,
+          figure,
+          get1Dposition([7 - promoteY, promoteX]),
+        );
+        break;
+      }
+      case MessageType.OPPONENT_LEAVE:
+        this.isGameEndModalOpen.set(true);
+        this.gameEndData.set({
+          state: GameEndState.PlayerWon,
+          reason: GameEndReason.OpponentLeave,
+        });
     }
   }
 
@@ -153,6 +182,7 @@ export class ChessService {
       undefined,
       true,
     );
+
     board
       .filter(
         (s) =>
@@ -165,12 +195,15 @@ export class ChessService {
         if (squares.includes(kingIdx)) {
           const path = f.figure!.getPath(kingIdx, board);
           if (!kingEscapeSquares.length && f.figure!.isSave(board, path)) {
+            const isWin = this.player.color !== color;
             this.mateIndex.set(kingIdx);
             setTimeout(() => {
               this.audio.play(SoundType.GAMEOVER);
               this.isGameEndModalOpen.set(true);
               this.gameEndData.set({
-                state: GameEndState.PlayerWon,
+                state: isWin
+                  ? GameEndState.PlayerWon
+                  : GameEndState.OpponentWon,
                 reason: GameEndReason.Checkmate,
               });
             }, 500);
@@ -245,7 +278,11 @@ export class ChessService {
     return false;
   }
 
-  public moveFigure(figure: Figure, index: number): SoundType | null {
+  public moveFigure(
+    figure: Figure,
+    index: number,
+    isPlayer: boolean,
+  ): SoundType | null {
     let sound = SoundType.MOVE;
     const isCastle = this.isCastle(figure, index);
     if (this.checkIndex() !== null) {
@@ -275,6 +312,7 @@ export class ChessService {
     };
 
     if (updatedBoard[index].figure instanceof Figure) {
+      this.saveTakenPiece(updatedBoard[index].figure, isPlayer);
       sound = SoundType.CAPTURE;
     }
 
@@ -294,12 +332,20 @@ export class ChessService {
     return sound;
   }
 
+  public saveTakenPiece(figure: Figure, isPlayer: boolean) {
+    if (isPlayer) {
+      this.player.insertTakenPiece(figure.piece, this.opponent);
+    } else {
+      this.opponent.insertTakenPiece(figure.piece, this.player);
+    }
+  }
+
   public handlePromotionChoose(
-    newPiece: 'queen' | 'rook' | 'bishop' | 'knight',
+    newPiece: PromoteOption,
     figure: Figure,
+    index: number | null,
   ) {
     this.audio.play(SoundType.PROMOTE);
-    const index = this.pawnPromotionIndex();
     if (index === null) return;
     const updatedBoard = this.board();
     const prevIndex = get1Dposition(figure.position())!;
@@ -355,6 +401,14 @@ export class ChessService {
       isPlayer: false,
       canMove: false,
     };
+
+    if (updatedBoard[index].figure instanceof Figure) {
+      this.saveTakenPiece(
+        updatedBoard[index].figure,
+        this.moveTurn() === this.player.color,
+      );
+      this.audio.play(SoundType.CAPTURE);
+    }
 
     updatedBoard[index] = { ...prevSquare, figure: newFigure };
     this.history.update((prev) => [
@@ -483,5 +537,14 @@ export class ChessService {
     this.mateIndex.set(null);
     this.history.set([]);
     this.historyHash = {};
+    this.gameType.set(null);
+    this.roomId = null;
+    this.isWaiting.set(false);
+    this.moveTurn.set(Color.WHITE);
+    this.player.takenPieces.set([]);
+    this.player.advantage.set(0);
+    this.opponent.takenPieces.set([]);
+    this.opponent.advantage.set(0);
+    this.invitation.set({ isModalOpen: false, link: null });
   }
 }

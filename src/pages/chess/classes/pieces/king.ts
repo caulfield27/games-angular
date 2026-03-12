@@ -148,10 +148,10 @@ export class King extends Figure {
         switch (true) {
           case guardFigure instanceof Bishop:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields('leftdown', board),
-              ...guardFigure.getAvailableFields('leftup', board),
-              ...guardFigure.getAvailableFields('rightdown', board),
-              ...guardFigure.getAvailableFields('rightup', board),
+              ...guardFigure.getAvailableFields('leftdown', board, true),
+              ...guardFigure.getAvailableFields('leftup', board, true),
+              ...guardFigure.getAvailableFields('rightdown', board, true),
+              ...guardFigure.getAvailableFields('rightup', board, true),
             );
             break;
           case guardFigure instanceof King:
@@ -167,14 +167,16 @@ export class King extends Figure {
             );
             break;
           case guardFigure instanceof Queen:
-            protectedSquares.push(...guardFigure.getAvailableFields([], board));
+            protectedSquares.push(
+              ...guardFigure.getAvailableFields([], board, true),
+            );
             break;
           case guardFigure instanceof Rook:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields('up', board),
-              ...guardFigure.getAvailableFields('down', board),
-              ...guardFigure.getAvailableFields('left', board),
-              ...guardFigure.getAvailableFields('right', board),
+              ...guardFigure.getAvailableFields('up', board, true),
+              ...guardFigure.getAvailableFields('down', board, true),
+              ...guardFigure.getAvailableFields('left', board, true),
+              ...guardFigure.getAvailableFields('right', board, true),
             );
             break;
         }

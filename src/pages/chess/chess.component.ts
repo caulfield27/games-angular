@@ -1,4 +1,4 @@
-import { Component, effect } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { ChessService } from './service/chess.service';
 import { Game, GameEndModalComponent } from './components';
 import {
@@ -11,13 +11,14 @@ import {
 } from 'lucide-angular';
 import { GameType } from './types';
 import { WebsocketService } from './service/ws.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'chess',
   templateUrl: './chess.component.html',
   imports: [GameEndModalComponent, Game, LucideAngularModule],
 })
-export class Chess {
+export class Chess implements OnInit {
   // icons
   readonly BotIcon = Bot;
   readonly HandshakeIcon = Handshake;
@@ -34,15 +35,28 @@ export class Chess {
           //todo
           break;
         case 'friend':
-          // todo
+          const params = new URLSearchParams(window.location.search);
+          const room = params.get('q');
+          if (room) {
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+          } else {
+            const roomId = uuidv4();
+            const link = `${window.location.origin}/chess?q=${roomId}`;
+            chessService.invitation.set({
+              isModalOpen: true,
+              link,
+            });
+            this.connectWs({
+              type: 'invite',
+              data: roomId,
+            });
+          }
           break;
         case 'online':
           chessService.isWaiting.set(true);
-          ws.connect((e) => chessService.onMessage(e)).then(() =>
-            ws.send({ type: 'selection' }),
-          );
+          this.connectWs({ type: 'selection' });
           break;
-        case 'irl':
       }
 
       if (chessService.gameType() !== null) {
@@ -51,15 +65,36 @@ export class Chess {
     });
   }
 
+  ngOnInit(): void {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('q');
+    if (room) {
+      this.chessService.gameType.set('friend');
+      this.chessService.isWaiting.set(true);
+      this.connectWs({
+        type: 'invite',
+        data: room,
+      });
+    }
+  }
+
+  private connectWs(data: unknown) {
+    this.ws
+      .connect((e) => this.chessService.onMessage(e))
+      .then(() => this.ws.send(data));
+  }
+
   public onGameTypeChoose(type: GameType) {
     this.chessService.gameType.set(type);
   }
 
   public reset() {
+    this.ws.close(1000, this.chessService.roomId ?? '');
     this.chessService.reset();
   }
 
   public onGoback() {
-    this.chessService.gameType.set(null);
+    this.ws.close(3000, this.chessService.roomId ?? '');
+    this.chessService.reset();
   }
 }

@@ -1,26 +1,59 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { LucideAngularModule, Flag, User } from 'lucide-angular';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {
+  LucideAngularModule,
+  Flag,
+  User,
+  ChessPawn,
+  ChessBishop,
+  ChessQueen,
+  ChessKnight,
+  ChessRook,
+} from 'lucide-angular';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from '../../service/chess.service';
 import { Figure, Square } from '../../classes/figure';
-import { SoundType } from '../../types';
+import { PromoteOption, SoundType } from '../../types';
 import { get1Dposition, get2Dposition, getSquareBg } from '../../utils';
 import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { CommonModule } from '@angular/common';
 import { King, Pawn } from '../../classes/pieces';
-import { WaitingOpponent } from './_components';
+import {
+  WaitingOpponent,
+  PromotionDialog,
+  InvitationModal,
+} from './_components';
 import { WebsocketService } from '../../service/ws.service';
+import { PIECE_IMAGE_PATH } from '../../constants';
 
 @Component({
   selector: 'game',
   templateUrl: './game.component.html',
   styleUrl: './game.component.css',
-  imports: [LucideAngularModule, CdkDrag, CommonModule, WaitingOpponent],
+  imports: [
+    LucideAngularModule,
+    CdkDrag,
+    CommonModule,
+    WaitingOpponent,
+    PromotionDialog,
+    InvitationModal,
+  ],
 })
-export class Game {
+export class Game implements OnDestroy, OnInit {
   // icons
   readonly FlagIcon = Flag;
   readonly UserIcon = User;
+  readonly PawnIcon = ChessPawn;
+  readonly KnightIcon = ChessKnight;
+  readonly BishopIcon = ChessBishop;
+  readonly QueenIcon = ChessQueen;
+  readonly RookIcon = ChessRook;
+  readonly PIECE_PATH = PIECE_IMAGE_PATH;
 
   // dom
   @ViewChild('board') board!: ElementRef<HTMLDivElement>;
@@ -31,6 +64,7 @@ export class Game {
   // states
   cellSize: number = 60;
   currentFigure: Figure | null = null;
+  beforeUnloadListener: (() => void) | null = null;
 
   constructor(
     public chessService: ChessService,
@@ -46,6 +80,18 @@ export class Game {
     }
   }
 
+  ngOnInit(): void {
+    this.beforeUnloadListener = () => {
+      this.ws.close(3000, this.chessService.roomId ?? '');
+    };
+    window.addEventListener('beforeunload', this.beforeUnloadListener);
+  }
+
+  ngOnDestroy(): void {
+    this.chessService.reset();
+    window.removeEventListener('beforeunload', this.beforeUnloadListener!);
+  }
+
   // getters
   get lastMove() {
     const history = this.chessService.history();
@@ -54,19 +100,6 @@ export class Game {
   }
 
   // methods
-  public promotionPosition(position: number | null) {
-    if (position === null) return { display: 'none' };
-
-    return {
-      left:
-        position < 8
-          ? position * this.cellSize + 'px'
-          : (position % 8) * this.cellSize + 'px',
-      top: position < 8 ? 0 : 4 * this.cellSize + 'px',
-      display: 'flex',
-    };
-  }
-
   public getBg(idx: number) {
     return getSquareBg(idx);
   }
@@ -109,15 +142,20 @@ export class Game {
     if (this.chessService.pawnPromotionIndex() !== null) return;
 
     const prevIdx = get1Dposition(this.currentFigure.position());
-    const sound = this.chessService.moveFigure(this.currentFigure, newIndex);
+    const moveType = this.chessService.moveFigure(
+      this.currentFigure,
+      newIndex,
+      this.chessService.moveTurn() === this.chessService.player.color,
+    );
     this.chessService.updateSquares([]);
-    if (!sound) {
+
+    if (!moveType) {
       this.currentFigure = null;
       return;
     }
 
     const isCheck = this.chessService.check();
-    this.chessService.audio.play(isCheck ? SoundType.CHECK : sound);
+    this.chessService.audio.play(isCheck ? SoundType.CHECK : moveType);
     this.chessService.checkDraw();
 
     if (
@@ -137,9 +175,30 @@ export class Game {
     this.currentFigure = null;
   }
 
-  public onPromotionChoose(piece: 'queen' | 'rook' | 'bishop' | 'knight') {
+  public onPromotionChoose(piece: PromoteOption) {
     if (this.currentFigure === null) return;
-    this.chessService.handlePromotionChoose(piece, this.currentFigure);
+    const prevIdx = get1Dposition(this.currentFigure.position());
+    const promoteIdx = this.chessService.pawnPromotionIndex();
+    this.chessService.handlePromotionChoose(
+      piece,
+      this.currentFigure,
+      promoteIdx,
+    );
+    if (
+      (this.chessService.gameType() === 'online' ||
+        this.chessService.gameType() === 'friend') &&
+      promoteIdx !== null
+    ) {
+      this.ws.send({
+        type: 'promote',
+        data: {
+          roomId: this.chessService.roomId,
+          figure: piece,
+          idx: prevIdx,
+          promoteIdx,
+        },
+      });
+    }
     this.currentFigure = null;
   }
 
@@ -148,7 +207,8 @@ export class Game {
       !piece.isPlayer ||
       !piece.figure ||
       this.chessService.pawnPromotionIndex() !== null ||
-      (piece.isPlayer &&
+      (this.chessService.gameType() !== 'irl' &&
+        piece.isPlayer &&
         this.chessService.moveTurn() !== this.chessService.player.color)
     )
       return;
@@ -186,5 +246,10 @@ export class Game {
     this.ws.send({ type: 'cancel_selection' });
     this.chessService.isWaiting.set(false);
     this.chessService.gameType.set(null);
+  }
+
+  public onInvitationCancel() {
+    this.ws.close(1000, this.chessService.invitation().link ?? '');
+    this.chessService.reset();
   }
 }

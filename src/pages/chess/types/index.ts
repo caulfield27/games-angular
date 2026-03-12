@@ -32,9 +32,13 @@ export interface History {
 
 export type Forbidden = MoveDirection[] | number[];
 
+export type PromoteOption = 'queen' | 'knight' | 'bishop' | 'rook';
+
 export enum MessageType {
   GAMESTART = 'gameFound',
   MOVE = 'move',
+  PROMOTE = 'promote',
+  OPPONENT_LEAVE = 'opponent-leave'
 }
 export interface IMessageData {
   type: MessageType;
@@ -46,6 +50,12 @@ export interface GameFound {
   name: string;
   opponent: string;
   color: 'black' | 'white';
+}
+
+export interface PromoteData {
+  figure: PromoteOption,
+  idx: number,
+  promoteIdx: number
 }
 
 export interface MoveData {
@@ -62,3 +72,8 @@ export type MoveDirection =
   | 'downright'
   | 'left'
   | 'right';
+
+export interface IInvitation{
+  isModalOpen: boolean;
+  link: string | null;
+}

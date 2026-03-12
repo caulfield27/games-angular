@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 export enum GameEndState {
   Draw = 'draw',
   PlayerWon = 'player-won',
-  OpponentWon = 'opponent-won'
+  OpponentWon = 'opponent-won',
 }
 
 export enum GameEndReason {
@@ -12,7 +12,8 @@ export enum GameEndReason {
   Resignation = 'resignation',
   Stalemate = 'stalemate',
   PositionRepeat = 'repeat',
-  Timeout = 'timeout'
+  Timeout = 'timeout',
+  OpponentLeave = 'opponentLeave',
 }
 
 export interface GameEndData {
@@ -28,46 +29,37 @@ export interface GameEndData {
     <div
       *ngIf="isOpen"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-opacity-animation"
-      (click)="onBackdropClick($event)">
-
-      <!-- Backdrop -->
+      (click)="onBackdropClick($event)"
+    >
       <div class="absolute inset-0 bg-black/80"></div>
 
-      <!-- Modal -->
       <div
         class="relative bg-neutral-900 rounded-2xl shadow-2xl max-w-md w-full border border-neutral-700 modal-scale-animation"
-        (click)="$event.stopPropagation()">
-
-        <!-- Content -->
+        (click)="$event.stopPropagation()"
+      >
         <div class="p-8 text-center">
-          <!-- Icon/Symbol -->
           <div class="mb-6">
-            <div [ngClass]="getIconClasses()" class="mx-auto w-20 h-20 rounded-full flex items-center justify-center">
+            <div
+              [ngClass]="getIconClasses()"
+              class="mx-auto w-20 h-20 rounded-full flex items-center justify-center"
+            >
               <span class="text-4xl text-white">{{ getIcon() }}</span>
             </div>
           </div>
 
-          <!-- Title -->
           <h2 [ngClass]="getTitleColorClass()" class="text-3xl font-bold mb-3">
             {{ getTitle() }}
           </h2>
 
-          <!-- Subtitle -->
           <p class="text-neutral-400 text-lg mb-8">
             {{ getSubtitle() }}
           </p>
 
-          <!-- Buttons -->
           <div class="flex flex-col gap-3">
             <button
-              (click)="onNewGame()"
-              class="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95">
-              Навая игра
-            </button>
-
-            <button
               (click)="onClose()"
-              class="w-full bg-neutral-700 hover:bg-neutral-600 text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-200">
+              class="w-full bg-neutral-700 hover:bg-neutral-600 text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-200"
+            >
               Закрыть
             </button>
           </div>
@@ -75,74 +67,75 @@ export interface GameEndData {
       </div>
     </div>
   `,
-  styles: [`
-    :host ::ng-deep {
-      .backdrop-opacity-animation {
-        animation: fadeInBackdrop 200ms ease-out forwards;
-      }
+  styles: [
+    `
+      :host ::ng-deep {
+        .backdrop-opacity-animation {
+          animation: fadeInBackdrop 200ms ease-out forwards;
+        }
 
-      .backdrop-opacity-animation.ng-leave {
-        animation: fadeOutBackdrop 150ms ease-in forwards;
-      }
+        .backdrop-opacity-animation.ng-leave {
+          animation: fadeOutBackdrop 150ms ease-in forwards;
+        }
 
-      .modal-scale-animation {
-        animation: scaleInModal 200ms ease-out forwards;
-      }
+        .modal-scale-animation {
+          animation: scaleInModal 200ms ease-out forwards;
+        }
 
-      .modal-scale-animation.ng-leave {
-        animation: scaleOutModal 150ms ease-in forwards;
-      }
+        .modal-scale-animation.ng-leave {
+          animation: scaleOutModal 150ms ease-in forwards;
+        }
 
-      @keyframes fadeInBackdrop {
-        from {
-          opacity: 0;
+        @keyframes fadeInBackdrop {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
-        to {
-          opacity: 1;
-        }
-      }
 
-      @keyframes fadeOutBackdrop {
-        from {
-          opacity: 1;
+        @keyframes fadeOutBackdrop {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
         }
-        to {
-          opacity: 0;
-        }
-      }
 
-      @keyframes scaleInModal {
-        from {
-          transform: scale(0.9);
-          opacity: 0;
+        @keyframes scaleInModal {
+          from {
+            transform: scale(0.9);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
         }
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
 
-      @keyframes scaleOutModal {
-        from {
-          transform: scale(1);
-          opacity: 1;
-        }
-        to {
-          transform: scale(0.9);
-          opacity: 0;
+        @keyframes scaleOutModal {
+          from {
+            transform: scale(1);
+            opacity: 1;
+          }
+          to {
+            transform: scale(0.9);
+            opacity: 0;
+          }
         }
       }
-    }
-  `]
+    `,
+  ],
 })
 export class GameEndModalComponent {
   @Input() isOpen = false;
   @Input() data: GameEndData = {
     state: GameEndState.Draw,
-    reason: GameEndReason.Stalemate
+    reason: GameEndReason.Stalemate,
   };
 
-  @Output() newGame = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
   getTitle(): string {
@@ -162,12 +155,14 @@ export class GameEndModalComponent {
     const isResignation = this.data.reason === GameEndReason.Resignation;
     const isCheckmate = this.data.reason === GameEndReason.Checkmate;
     const isTimeout = this.data.reason === GameEndReason.Timeout;
+    const isOpponentLeave = this.data.reason === GameEndReason.OpponentLeave;
 
     switch (this.data.state) {
       case GameEndState.PlayerWon:
         if (isResignation) return 'Соперник сдался';
         if (isCheckmate) return 'Вы объявили мат';
         if (isTimeout) return 'У соперника закончилась время';
+        if (isOpponentLeave) return 'Противник покинул игру';
         return 'Победа!';
 
       case GameEndState.OpponentWon:
@@ -178,7 +173,8 @@ export class GameEndModalComponent {
 
       case GameEndState.Draw:
         if (this.data.reason === GameEndReason.Stalemate) return 'Пат';
-        if(this.data.reason === GameEndReason.PositionRepeat) return 'Троектратное повторение позиции'
+        if (this.data.reason === GameEndReason.PositionRepeat)
+          return 'Троектратное повторение позиции';
         return 'Ничья!';
 
       default:
@@ -224,10 +220,6 @@ export class GameEndModalComponent {
       default:
         return 'text-white';
     }
-  }
-
-  onNewGame(): void {
-    this.newGame.emit();
   }
 
   onClose(): void {

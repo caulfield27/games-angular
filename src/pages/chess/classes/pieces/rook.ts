@@ -65,7 +65,7 @@ export class Rook extends Figure {
     const lastFigure = board[get1Dposition([startY, startX]) ?? -1]?.figure;
     if (lastFigure instanceof Figure) {
       if (
-        (!this.isPlayer && lastFigure.color === color) ||
+        (kingCheck && lastFigure.color === color) ||
         lastFigure.color !== color
       ) {
         arr.push(get1Dposition([startY, startX])!);
