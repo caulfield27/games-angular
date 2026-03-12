@@ -39,8 +39,8 @@ export class ChessService {
   public history = signal<History[]>([]);
   public gameType = signal<GameType | null>(null);
   public board;
-  public player: Player = new Player('white', 'no Alisher');
-  public opponent: Player = new Player('black', 'Alisher');
+  public player: Player = new Player('white', '');
+  public opponent: Player = new Player('black', '');
   public checkIndex = signal<null | number>(null);
   private checkedFigureIndex: number | null = null;
   public mateIndex = signal<null | number>(null);

@@ -106,11 +106,7 @@ export class Figure {
         x += dir;
       }
       let index = get1Dposition([y, x]) ?? 99;
-      while (
-        direction === 'down' || direction === 'left'
-          ? index > kingPosition
-          : index < kingPosition
-      ) {
+      while (index !== kingPosition) {
         if (board[index]?.figure instanceof Figure && index !== guardPosition) {
           return true;
         }
@@ -128,9 +124,7 @@ export class Figure {
       x += dir;
 
       let index = get1Dposition([y, x]) ?? 99;
-      while (
-        direction === 'upleft' ? index > kingPosition : index < kingPosition
-      ) {
+      while (index !== kingPosition) {
         if (board[index]?.figure instanceof Figure && index !== guardPosition) {
           return true;
         }
@@ -147,9 +141,7 @@ export class Figure {
         x++;
       }
       let index = get1Dposition([y, x]) ?? 99;
-      while (
-        direction === 'downleft' ? index > kingPosition : index < kingPosition
-      ) {
+      while (index !== kingPosition) {
         if (board[index]?.figure instanceof Figure && index !== guardPosition) {
           return true;
         }
