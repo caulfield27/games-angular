@@ -46,7 +46,13 @@
       </div>
     </div>
   } @else if (chessService.gameType() === "bot") {
-    <h1>В процессе разработки</h1>
+    <button
+      (click)="onGoback()"
+      class="border-0 bg-none outline-none absolute left-[20px] top-[20px]"
+    >
+      <lucide-icon [img]="ArrowIcon" color="#fff" size="30"></lucide-icon>
+    </button>
+    <h1 class="text-white">В процессе разработки</h1>
   } @else {
     <button
       (click)="onGoback()"
