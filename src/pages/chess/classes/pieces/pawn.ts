@@ -27,6 +27,7 @@ export class Pawn extends Figure {
     forbidden: MoveDirection[],
     board: Square[],
     history?: History[],
+    kingCheck: boolean = false
   ) {
     const position = this.position();
     const [y, x] = position;
@@ -64,6 +65,7 @@ export class Pawn extends Figure {
     }
 
     if (!forbidden.includes('upleft')) {
+      
       const up3 = get1Dposition([y + directions[0], x + directions[0]]) ?? -1;
       const up3Figure = board[up3]?.figure;
       if (up3Figure instanceof Figure && up3Figure.color !== this.color) {
@@ -74,7 +76,7 @@ export class Pawn extends Figure {
         (up3Figure instanceof Figure &&
           up3Figure.color === this.color &&
           !this.isPlayer) ||
-        (up3Figure === null && !this.isPlayer)
+        (up3Figure === null && kingCheck)
       ) {
         hash['upleft'].push(up3);
       }
@@ -101,6 +103,7 @@ export class Pawn extends Figure {
     }
 
     if (!forbidden.includes('upright')) {
+      
       const up4 = get1Dposition([y + directions[0], x + directions[2]]) ?? -1;
       const up4Figure = board[up4]?.figure;
       if (up4Figure instanceof Figure && up4Figure.color !== this.color) {
@@ -111,7 +114,7 @@ export class Pawn extends Figure {
         (up4Figure instanceof Figure &&
           up4Figure.color === this.color &&
           !this.isPlayer) ||
-        (up4Figure === null && !this.isPlayer)
+        (up4Figure === null && kingCheck)
       ) {
         hash['upright'].push(up4);
       }
@@ -131,6 +134,7 @@ export class Pawn extends Figure {
             lastMovedFigure.color !== this.color &&
             curY + dif === prevY
           ) {
+            console.log('case 6');
             hash['upright'].push(up4);
           }
         }

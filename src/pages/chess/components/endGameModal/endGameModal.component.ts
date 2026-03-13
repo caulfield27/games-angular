@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChessButton } from '../button/button.component';
 
 export enum GameEndState {
   Draw = 'draw',
@@ -24,7 +25,7 @@ export interface GameEndData {
 @Component({
   selector: 'game-end-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ChessButton],
   template: `
     <div
       *ngIf="isOpen"
@@ -56,12 +57,7 @@ export interface GameEndData {
           </p>
 
           <div class="flex flex-col gap-3">
-            <button
-              (click)="onClose()"
-              class="w-full bg-neutral-700 hover:bg-neutral-600 text-white font-semibold py-3.5 px-6 rounded-lg transition-all duration-200"
-            >
-              Закрыть
-            </button>
+            <chess-button label="Закрыть" (handleClick)="onClose()" />
           </div>
         </div>
       </div>

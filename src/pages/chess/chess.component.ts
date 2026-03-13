@@ -1,6 +1,6 @@
 import { Component, effect, OnInit } from '@angular/core';
 import { ChessService } from './service/chess.service';
-import { Game, GameEndModalComponent } from './components';
+import { ChessButton, Game, GameEndModalComponent, ThemeSettingsComponent } from './components';
 import {
   LucideAngularModule,
   Bot,
@@ -8,6 +8,7 @@ import {
   Globe,
   Users,
   ArrowLeft,
+  Paintbrush
 } from 'lucide-angular';
 import { GameType } from './types';
 import { WebsocketService } from './service/ws.service';
@@ -16,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Component({
   selector: 'chess',
   templateUrl: './chess.component.html',
-  imports: [GameEndModalComponent, Game, LucideAngularModule],
+  imports: [GameEndModalComponent, Game, LucideAngularModule, ThemeSettingsComponent, ChessButton],
 })
 export class Chess implements OnInit {
   // icons
@@ -25,6 +26,10 @@ export class Chess implements OnInit {
   readonly GlobeIcon = Globe;
   readonly UsersIcon = Users;
   readonly ArrowIcon = ArrowLeft;
+  readonly PaintBrushIcon = Paintbrush;
+
+  isThemeModalOpen: boolean = false;
+
   constructor(
     public chessService: ChessService,
     public ws: WebsocketService,

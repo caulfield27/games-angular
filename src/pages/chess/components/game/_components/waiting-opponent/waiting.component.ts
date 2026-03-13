@@ -1,8 +1,10 @@
 import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChessButton } from '../../../button/button.component';
 
 @Component({
   selector: 'waiting-opponent',
-  templateUrl: './waiting.component.html'
+  templateUrl: './waiting.component.html',
+  imports: [ChessButton]
 })
 export class WaitingOpponent implements OnInit, OnDestroy {
 

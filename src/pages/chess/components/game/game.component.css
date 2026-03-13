@@ -26,22 +26,20 @@
 
 @keyframes dangerPulse {
   0% {
-    box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+    filter: drop-shadow(0 0 6px rgba(255, 0, 0, 0.6));
   }
   50% {
-    box-shadow:
-      0 0 16px rgba(255, 0, 0, 1),
-      0 0 32px rgba(255, 0, 0, 0.6);
+    filter: drop-shadow(0 0 16px rgba(255, 0, 0, 1))
+      drop-shadow(0 0 32px rgba(255, 0, 0, 0.6));
   }
   100% {
-    box-shadow: 0 0 6px rgba(255, 0, 0, 0.6);
+    filter: drop-shadow(0 0 6px rgba(255, 0, 0, 0.6));
   }
 }
 
 .check {
   animation: dangerPulse 1s infinite ease-in-out;
 }
-
 .mate {
   background-color: #ef4444;
 }

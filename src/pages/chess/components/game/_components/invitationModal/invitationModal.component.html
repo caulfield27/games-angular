@@ -12,17 +12,12 @@
     >
       <span>{{ link }}</span>
     </div>
-    <button
-      (click)="onCopy()"
-      class="w-full bg-neutral-800 hover:bg-neutral-900 transition rounded-lg py-2 font-medium flex flex-row justify-center items-center gap-2"
-    >
-      Скопировать <lucide-icon [img]="CopyIcon" />
-    </button>
-    <button
-      (click)="onCancel()"
-      class="w-full bg-sky-500 hover:bg-sky-600 transition rounded-lg py-2 font-medium"
-    >
-      Отмена
-    </button>
+    <chess-button
+      label="Скопировать"
+      [icon]="CopyIcon"
+      variant="dark"
+      (handleClick)="onCopy()"
+    />
+    <chess-button label="Отмена" (handleClick)="onCancel()" />
   </div>
 </div>

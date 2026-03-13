@@ -50,7 +50,7 @@ export class King extends Figure {
             forbidden.push(...figure.getAvailableFields(board));
             break;
           case figure instanceof Pawn:
-            const pawn = figure.getAvailableFields([], board);
+            const pawn = figure.getAvailableFields([], board, [],true);
             forbidden.push(...pawn.upleft, ...pawn.upright);
             break;
           case figure instanceof Queen:

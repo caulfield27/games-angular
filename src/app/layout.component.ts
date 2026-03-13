@@ -7,6 +7,7 @@ import { SeoService } from '../shared/services/seo.service';
 import { AuthModal } from '@/shared/components/authModal/authModal.component';
 import { AuthService } from '@/shared/services/auth.service';
 import { User } from '@/shared/types/types';
+import { AxiosError } from 'axios';
 
 @Component({
   selector: 'layout',
@@ -48,17 +49,22 @@ export class Layout {
   isHome: boolean = true;
   readonly house = House;
 
-  // ngOnInit(): void {
-  //   this.authService
-  //     .getMe()
-  //     .then((res) => {
-  //       const user = res.data?.data as User | undefined;
-  //       if (user) {
-  //         this.authService.user.set(user);
-  //       }
-  //     })
-  //     .catch(console.error);
-  // }
+  ngOnInit(): void {
+    this.authService
+      .getMe()
+      .then((res) => {
+        const user = res.data?.data as User | undefined;
+        if (user) {
+          this.authService.user.set(user);
+        }
+      })
+      .catch((err: AxiosError<any>) => {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          this.authService.user.set(null);
+        }
+      });
+  }
 
   goHome() {
     this.router.navigate(['/']);

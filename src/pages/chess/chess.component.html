@@ -7,34 +7,40 @@
         class="bg-neutral-900 min-w-[500px] max-sm:min-w-[95%] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
       >
         <div class="w-full flex flex-col gap-5">
-          <button
-            (click)="onGameTypeChoose('online')"
-            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-          >
-            <lucide-angular class="text-blue-500" [img]="GlobeIcon" />
-            Играть онлайн
-          </button>
-          <button
-            (click)="onGameTypeChoose('friend')"
-            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-          >
-            <lucide-angular class="text-amber-500" [img]="HandshakeIcon" />
-            Играть c другом
-          </button>
-          <button
-            (click)="onGameTypeChoose('bot')"
-            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-          >
-            <lucide-angular class="text-blue-300" [img]="BotIcon" />
-            Играть с ботами
-          </button>
-          <button
-            (click)="onGameTypeChoose('irl')"
-            class="p-3 w-full flex flex-row gap-4 justify-center items-center rounded-2xl border border-sky-500 bg-neutral-800 hover:scale-[1.02] cursor-pointer font-bold text-white text-2xl max-sm:text-xl"
-          >
-            <lucide-angular class="text-green-500" [img]="UsersIcon" />
-            Играть вживую
-          </button>
+          <chess-button
+            label="Играть онлайн"
+            [icon]="GlobeIcon"
+            iconColor="#fff"
+            variant="primary"
+            (handleClick)="onGameTypeChoose('online')"
+          />
+          <chess-button
+            label="Играть с ботами"
+            [icon]="BotIcon"
+            iconColor="#fff"
+            variant="primary"
+            (handleClick)="onGameTypeChoose('online')"
+          />
+          <chess-button
+            label="Играть c другом"
+            [icon]="HandshakeIcon"
+            iconColor="#fff"
+            variant="primary"
+            (handleClick)="onGameTypeChoose('bot')"
+          />
+          <chess-button
+            label="Играть вживую"
+            [icon]="UsersIcon"
+            iconColor="#fff"
+            variant="primary"
+            (handleClick)="onGameTypeChoose('irl')"
+          />
+          <chess-button
+            label="Тема"
+            [icon]="PaintBrushIcon"
+            iconColor="#fff"
+            variant="primary"
+          />
         </div>
       </div>
     </div>
@@ -48,6 +54,10 @@
     <game></game>
   }
 </div>
+
+@if (isThemeModalOpen) {
+  <theme-modal [isOpen]="isThemeModalOpen" />
+}
 
 @if (chessService.isGameEndModalOpen()) {
   <game-end-modal

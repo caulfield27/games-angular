@@ -1,0 +1,42 @@
+<div
+  class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in max-sm:h-[100svh] overflow-y-auto"
+>
+  <div
+    class="bg-neutral-900 text-white rounded-2xl max-sm:rounded-none p-10 shadow-2xl text-center min-w-[500px] max-w-[500px] max-sm:min-w-full flex flex-col gap-4 max-sm:h-[100svh] overflow-y-auto"
+  >
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-semibold">Тема</h2>
+
+      <button (click)="close()" class="rounded-lg hover:bg-neutral-700">
+        ✕
+      </button>
+    </div>
+
+    <div class="mt-6 grid grid-cols-2 gap-6 max-sm:flex flex-col">
+      @for (theme of themes; track theme.name) {
+        <div
+          (click)="selectTheme(theme)"
+          class="cursor-pointer rounded-xl p-3 transition hover:bg-neutral-800"
+          [class.ring-2]="theme === selectedTheme"
+          [class.ring-blue-500]="theme === selectedTheme"
+        >
+          <div
+            class="mx-auto grid w-[120px] grid-cols-8 overflow-hidden rounded-md"
+          >
+            @for (sq of preview; track $index) {
+              <div
+                class="aspect-square"
+                [style.background]="getColor($index, theme)"
+              ></div>
+            }
+          </div>
+
+          <p class="mt-3 text-center text-sm font-medium">
+            {{ theme.name }}
+          </p>
+        </div>
+      }
+    </div>
+    <div></div>
+  </div>
+</div>
