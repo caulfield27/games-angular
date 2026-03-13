@@ -35,12 +35,12 @@ export class ChessService {
     link: null,
   });
   public roomId: string | null = null;
-  public isWaiting = signal<boolean>(true);
+  public isWaiting = signal<boolean>(false);
   public history = signal<History[]>([]);
   public gameType = signal<GameType | null>(null);
   public board;
-  public player: Player = new Player('black', '');
-  public opponent: Player = new Player('white', '');
+  public player: Player = new Player('white', '');
+  public opponent: Player = new Player('black', '');
   public checkIndex = signal<null | number>(null);
   private checkedFigureIndex: number | null = null;
   public mateIndex = signal<null | number>(null);
@@ -50,7 +50,7 @@ export class ChessService {
     reason: GameEndReason.Stalemate,
   });
   public pawnPromotionIndex = signal<number | null>(null);
-  public moveTurn = signal(Color.BLACK);
+  public moveTurn = signal(Color.WHITE);
   private historyHash: Record<string, number> = {};
   constructor(
     private auth: AuthService,
@@ -218,64 +218,32 @@ export class ChessService {
     return isChek;
   }
 
-  // public generateBoard(): Square[] {
-  //   return new Array(64).fill(null).map((square, idx) => {
-  //     square = {
-  //       figure: null,
-  //       isPlayer: false,
-  //       canMove: false,
-  //     };
-  //     if (idx > 47) {
-  //       square.isPlayer = true;
-  //       const piece = idx < 56 ? Piece.PAWN : (PLAYER_PIECE[idx] ?? Piece.PAWN);
-  //       square.figure = this.getFigure(
-  //         piece,
-  //         this.player.color as Color,
-  //         get2Dposition(idx)!,
-  //       );
-  //     } else if (idx < 16) {
-  //       const piece =
-  //         idx > 7 ? Piece.PAWN : (OPPONENT_PIECE[idx] ?? Piece.PAWN);
-  //       square.figure = this.getFigure(
-  //         piece,
-  //         this.opponent.color as Color,
-  //         get2Dposition(idx)!,
-  //       );
-  //     }
-  //     return square;
-  //   });
-  // }
-
   public generateBoard(): Square[] {
-    const board: Square[] = new Array(64).fill(null).map(() => ({
-      figure: null,
-      isPlayer: false,
-      canMove: false,
-    }));
-
-    const setPiece = (idx: number, piece: Piece, color: Color) => {
-      board[idx].figure = this.getFigure(piece, color, get2Dposition(idx)!);
-      board[idx].isPlayer = color === this.player.color;
-    };
-
-    // WHITE
-    setPiece(23, Piece.KING, Color.WHITE); // h6
-    setPiece(48, Piece.QUEEN, Color.WHITE); // a2
-    setPiece(16, Piece.PAWN, Color.WHITE); // a6
-    setPiece(33, Piece.PAWN, Color.WHITE); // b4
-    setPiece(22, Piece.PAWN, Color.WHITE); // g6
-    setPiece(15, Piece.PAWN, Color.WHITE); // h7
-
-    // BLACK
-    setPiece(54, Piece.KING, Color.BLACK); // g2
-    setPiece(38, Piece.QUEEN, Color.BLACK); // h4
-    setPiece(12, Piece.ROOK, Color.BLACK); // e7
-    setPiece(27, Piece.BISHOP, Color.BLACK); // d5
-    setPiece(29, Piece.PAWN, Color.BLACK); // f5
-    setPiece(53, Piece.PAWN, Color.BLACK); // f2
-    setPiece(55, Piece.PAWN, Color.BLACK); // h2
-
-    return board;
+    return new Array(64).fill(null).map((square, idx) => {
+      square = {
+        figure: null,
+        isPlayer: false,
+        canMove: false,
+      };
+      if (idx > 47) {
+        square.isPlayer = true;
+        const piece = idx < 56 ? Piece.PAWN : (PLAYER_PIECE[idx] ?? Piece.PAWN);
+        square.figure = this.getFigure(
+          piece,
+          this.player.color as Color,
+          get2Dposition(idx)!,
+        );
+      } else if (idx < 16) {
+        const piece =
+          idx > 7 ? Piece.PAWN : (OPPONENT_PIECE[idx] ?? Piece.PAWN);
+        square.figure = this.getFigure(
+          piece,
+          this.opponent.color as Color,
+          get2Dposition(idx)!,
+        );
+      }
+      return square;
+    });
   }
 
   public updateSquares(squares: number[]) {

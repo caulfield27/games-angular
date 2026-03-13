@@ -40,6 +40,7 @@
             [icon]="PaintBrushIcon"
             iconColor="#fff"
             variant="primary"
+            (handleClick)="openThemeSettings()"
           />
         </div>
       </div>
@@ -56,7 +57,7 @@
 </div>
 
 @if (isThemeModalOpen) {
-  <theme-modal [isOpen]="isThemeModalOpen" />
+  <theme-modal [isOpen]="isThemeModalOpen" (onClose)="closeThemeSettings()" />
 }
 
 @if (chessService.isGameEndModalOpen()) {

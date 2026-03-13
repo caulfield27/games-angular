@@ -102,4 +102,12 @@ export class Chess implements OnInit {
     this.ws.close(3000, this.chessService.roomId ?? '');
     this.chessService.reset();
   }
+
+  public openThemeSettings(){
+    this.isThemeModalOpen = true;
+  }
+
+  public closeThemeSettings(){
+    this.isThemeModalOpen = false;
+  }
 }
