@@ -37,13 +37,14 @@
         </div>
       }
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="w-full flex flex-col gap-2.5 sticky bottom-0">
       <chess-button
+        class="w-full"
         variant="primary"
         label="Сохранить"
         (handleClick)="handleSave()"
       />
-      <chess-button variant="dark" label="Отмена" (handleClick)="close()" />
+      <chess-button class="w-full" variant="dark" label="Отмена" (handleClick)="close()" />
     </div>
   </div>
 </div>

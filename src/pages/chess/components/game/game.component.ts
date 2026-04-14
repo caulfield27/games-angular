@@ -119,7 +119,7 @@ export class Game implements OnDestroy, OnInit {
 
   public onDragEnd(event: CdkDragEnd<Square>) {
     event.source.reset();
-    if (!this.currentFigure) return;
+    if (!this.currentFigure || this.chessService.isGameFinished()) return;
     const { x, y } = getCoordinates(
       this.board.nativeElement,
       event.dropPoint,
@@ -204,6 +204,7 @@ export class Game implements OnDestroy, OnInit {
 
   public onPieceChoose(piece: Square) {
     if (
+      this.chessService.isGameFinished() ||
       !piece.isPlayer ||
       !piece.figure ||
       this.chessService.pawnPromotionIndex() !== null ||
@@ -229,6 +230,7 @@ export class Game implements OnDestroy, OnInit {
 
   public onMove(piece: Square, index: number) {
     if (
+      this.chessService.isGameFinished() ||
       !piece.canMove ||
       !this.currentFigure ||
       this.chessService.pawnPromotionIndex() !== null
@@ -238,6 +240,7 @@ export class Game implements OnDestroy, OnInit {
   }
 
   public isDragDisabled(figure: Figure) {
+    if (this.chessService.isGameFinished()) return true;
     if (this.chessService.gameType() === 'irl') return false;
     return !figure.isPlayer;
   }

@@ -45,6 +45,7 @@ export class ChessService {
   private checkedFigureIndex: number | null = null;
   public mateIndex = signal<null | number>(null);
   public isGameEndModalOpen = signal<boolean>(false);
+  public isGameFinished = signal<boolean>(false);
   public gameEndData = signal<GameEndData>({
     state: GameEndState.Draw,
     reason: GameEndReason.Stalemate,
@@ -113,12 +114,15 @@ export class ChessService {
         break;
       }
       case MessageType.OPPONENT_LEAVE:
-        this.isGameEndModalOpen.set(true);
-        this.gameEndData.set({
+        this.finishGame({
           state: GameEndState.PlayerWon,
           reason: GameEndReason.OpponentLeave,
         });
     }
+  }
+
+  public dismissGameEndModal() {
+    this.isGameEndModalOpen.set(false);
   }
 
   private getFigure(piece: Piece, color: Color, position: [number, number]) {
@@ -200,8 +204,7 @@ export class ChessService {
             this.mateIndex.set(kingIdx);
             setTimeout(() => {
               this.audio.play(SoundType.GAMEOVER);
-              this.isGameEndModalOpen.set(true);
-              this.gameEndData.set({
+              this.finishGame({
                 state: isWin
                   ? GameEndState.PlayerWon
                   : GameEndState.OpponentWon,
@@ -438,14 +441,16 @@ export class ChessService {
 
   public checkDraw() {
     const board = this.board();
+    const history = this.history();
     const currentFigures = board.filter(
       (s) => s.figure instanceof Figure && s.figure.color === this.moveTurn(),
     );
     if (
-      !currentFigures.some((f) => f.figure!.getAllowedSquares(board).length)
+      !currentFigures.some((f) =>
+        f.figure!.getAllowedSquares(board, history).length,
+      )
     ) {
-      this.isGameEndModalOpen.set(true);
-      this.gameEndData.set({
+      this.finishGame({
         state: GameEndState.Draw,
         reason: GameEndReason.Stalemate,
       });
@@ -454,8 +459,7 @@ export class ChessService {
 
     for (const key in this.historyHash) {
       if (this.historyHash[key] === 3) {
-        this.isGameEndModalOpen.set(true);
-        this.gameEndData.set({
+        this.finishGame({
           state: GameEndState.Draw,
           reason: GameEndReason.PositionRepeat,
         });
@@ -513,6 +517,13 @@ export class ChessService {
     board[index + dif] = rook;
   }
 
+  private finishGame(data: GameEndData) {
+    this.gameEndData.set(data);
+    this.isGameFinished.set(true);
+    this.isGameEndModalOpen.set(true);
+    this.updateSquares([]);
+  }
+
   private updateTurn(updatedBoard: Square[]) {
     this.moveTurn.update((prev) =>
       prev === Color.WHITE ? Color.BLACK : Color.WHITE,
@@ -535,6 +546,7 @@ export class ChessService {
   public reset() {
     this.board.set(this.generateBoard());
     this.isGameEndModalOpen.set(false);
+    this.isGameFinished.set(false);
     this.mateIndex.set(null);
     this.history.set([]);
     this.historyHash = {};

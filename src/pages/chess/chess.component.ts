@@ -98,6 +98,10 @@ export class Chess implements OnInit {
     this.chessService.reset();
   }
 
+  public dismissGameEndModal() {
+    this.chessService.dismissGameEndModal();
+  }
+
   public onGoback() {
     this.ws.close(3000, this.chessService.roomId ?? '');
     this.chessService.reset();

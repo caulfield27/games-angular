@@ -162,8 +162,8 @@ export class King extends Figure {
             break;
           case guardFigure instanceof Pawn:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields([], board).upleft,
-              ...guardFigure.getAvailableFields([], board).upright,
+              ...guardFigure.getAvailableFields([], board,[],true).upleft,
+              ...guardFigure.getAvailableFields([], board,[],true).upright,
             );
             break;
           case guardFigure instanceof Queen:

@@ -85,6 +85,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    Swal.close();
     this.reset();
   }
 

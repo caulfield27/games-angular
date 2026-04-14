@@ -64,6 +64,7 @@
   <game-end-modal
     [data]="chessService.gameEndData()"
     [isOpen]="chessService.isGameEndModalOpen()"
-    (close)="reset()"
+    (close)="dismissGameEndModal()"
+    (exit)="reset()"
   />
 }
