@@ -19,14 +19,14 @@
             [icon]="BotIcon"
             iconColor="#fff"
             variant="primary"
-            (handleClick)="onGameTypeChoose('online')"
+            (handleClick)="onGameTypeChoose('bot')"
           />
           <chess-button
             label="Играть c другом"
             [icon]="HandshakeIcon"
             iconColor="#fff"
             variant="primary"
-            (handleClick)="onGameTypeChoose('bot')"
+            (handleClick)="onGameTypeChoose('friend')"
           />
           <chess-button
             label="Играть вживую"
@@ -45,6 +45,14 @@
         </div>
       </div>
     </div>
+  } @else if (chessService.gameType() === "bot") {
+    <button
+      (click)="onGoback()"
+      class="border-0 bg-none outline-none absolute left-[20px] top-[20px]"
+    >
+      <lucide-icon [img]="ArrowIcon" color="#fff" size="30"></lucide-icon>
+    </button>
+    <h1 class="text-white">В процессе разработки</h1>
   } @else {
     <button
       (click)="onGoback()"
