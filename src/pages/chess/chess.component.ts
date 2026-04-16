@@ -1,6 +1,10 @@
 import { Component, effect, OnInit } from '@angular/core';
 import { ChessService } from './service/chess.service';
-import { ChessButton, Game, GameEndModalComponent, ThemeSettingsComponent } from './components';
+import {
+  Game,
+  GameEndModalComponent,
+  ThemeSettingsComponent,
+} from './components';
 import {
   LucideAngularModule,
   Bot,
@@ -8,16 +12,22 @@ import {
   Globe,
   Users,
   ArrowLeft,
-  Paintbrush
+  Paintbrush,
 } from 'lucide-angular';
-import { GameType } from './types';
+import { GameType, MenuOption } from './types';
 import { WebsocketService } from './service/ws.service';
 import { v4 as uuidv4 } from 'uuid';
+import { setupTheme } from './utils';
 
 @Component({
   selector: 'chess',
   templateUrl: './chess.component.html',
-  imports: [GameEndModalComponent, Game, LucideAngularModule, ThemeSettingsComponent, ChessButton],
+  imports: [
+    GameEndModalComponent,
+    Game,
+    LucideAngularModule,
+    ThemeSettingsComponent,
+  ],
 })
 export class Chess implements OnInit {
   // icons
@@ -29,6 +39,40 @@ export class Chess implements OnInit {
   readonly PaintBrushIcon = Paintbrush;
 
   isThemeModalOpen: boolean = false;
+  readonly menuOptions: MenuOption[] = [
+    {
+      type: 'online',
+      icon: this.GlobeIcon,
+      title: 'Играть Онлайн',
+      description: 'Соревнуйтесь с игроками по со всего мира',
+      iconColor: '#60a5fa',
+      iconBg: '#dbeafe',
+    },
+    {
+      type: 'bot',
+      icon: this.BotIcon,
+      title: 'Играть против Бота',
+      description: 'Бросьте вызов ИИ противникам',
+      iconColor: '#c084fc',
+      iconBg: '#f3e8ff',
+    },
+    {
+      type: 'friend',
+      icon: this.UsersIcon,
+      title: 'Играть c Другом',
+      description: 'Пригласить кого-нибудь поиграть',
+      iconColor: '#4ade80',
+      iconBg: '#dcfce7',
+    },
+    {
+      type: 'irl',
+      icon: this.HandshakeIcon,
+      title: 'Игра за доской',
+      description: 'Режим игры вдвоём.',
+      iconColor: '#f59e0b',
+      iconBg: '#fef3c7',
+    },
+  ];
 
   constructor(
     public chessService: ChessService,
@@ -81,6 +125,7 @@ export class Chess implements OnInit {
         data: room,
       });
     }
+    setupTheme();
   }
 
   private connectWs(data: unknown) {
@@ -107,11 +152,11 @@ export class Chess implements OnInit {
     this.chessService.reset();
   }
 
-  public openThemeSettings(){
+  public openThemeSettings() {
     this.isThemeModalOpen = true;
   }
 
-  public closeThemeSettings(){
+  public closeThemeSettings() {
     this.isThemeModalOpen = false;
   }
 }

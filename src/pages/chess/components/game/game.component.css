@@ -50,7 +50,7 @@
   z-index: 1;
   width: var(--chess-cell);
   height: var(--chess-cell);
-  background: #cbd5e1;
+  background: var(--board-history);
   opacity: 0.8;
 }
 
@@ -60,4 +60,44 @@
 
 .cdk-drag-dragging {
   z-index: 1000 !important;
+}
+
+.match-sidebar {
+  position: relative;
+  overflow: hidden;
+}
+
+.match-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  pointer-events: none;
+}
+
+.moves-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(163, 163, 163, 0.45) transparent;
+}
+
+.moves-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.moves-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(163, 163, 163, 0.45);
+}
+
+.moves-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (max-width: 1279px) {
+  .match-sidebar {
+    max-width: 44rem;
+    margin: 0 auto;
+  }
 }

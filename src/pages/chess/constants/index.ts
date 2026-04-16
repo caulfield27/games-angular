@@ -47,3 +47,14 @@ export const OPPONENT_PIECE: Record<string, Piece> = {
   6: Piece.KNIGHT,
   7: Piece.ROOK,
 };
+
+export const lettersHash: Record<string, string> = {
+  0: 'a',
+  1: 'b',
+  2: 'c',
+  3: 'd',
+  4: 'e',
+  5: 'f',
+  6: 'g',
+  7: 'h',
+};

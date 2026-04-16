@@ -50,20 +50,20 @@ export class Layout {
   readonly house = House;
 
   ngOnInit(): void {
-    this.authService
-      .getMe()
-      .then((res) => {
-        const user = res.data?.data as User | undefined;
-        if (user) {
-          this.authService.user.set(user);
-        }
-      })
-      .catch((err: AxiosError<any>) => {
-        if (err.response?.status === 401) {
-          localStorage.removeItem('token');
-          this.authService.user.set(null);
-        }
-      });
+    // this.authService
+    //   .getMe()
+    //   .then((res) => {
+    //     const user = res.data?.data as User | undefined;
+    //     if (user) {
+    //       this.authService.user.set(user);
+    //     }
+    //   })
+    //   .catch((err: AxiosError<any>) => {
+    //     if (err.response?.status === 401) {
+    //       localStorage.removeItem('token');
+    //       this.authService.user.set(null);
+    //     }
+    //   });
   }
 
   goHome() {

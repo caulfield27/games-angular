@@ -1,17 +1,38 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { ChessButton } from '../button/button.component';
 
 export interface BoardTheme {
   name: string;
   white: string;
   black: string;
+  historyColor: string;
 }
 
 export const BOARD_THEMES: BoardTheme[] = [
-  { name: 'Классический', white: '#eeeed2', black: '#769656' },
-  { name: 'Дерево', white: '#f0d9b5', black: '#b58863' },
-  { name: 'Темный', white: '#cfcfcf', black: '#3b3b3b' },
-  { name: 'Минимализм', white: '#dee3e6', black: '#8ca2ad' },
+  {
+    name: 'Классический',
+    white: '#eeeed2',
+    black: '#769656',
+    historyColor: '#fde68a',
+  },
+  {
+    name: 'Дерево',
+    white: '#f0d9b5',
+    black: '#b58863',
+    historyColor: '#d6d3d1',
+  },
+  {
+    name: 'Темный',
+    white: '#f5f5f5',
+    black: '#3b3b3b',
+    historyColor: '#cbd5e1',
+  },
+  {
+    name: 'Минимализм',
+    white: '#dee3e6',
+    black: '#8ca2ad',
+    historyColor: '#fca5a5',
+  },
 ];
 
 @Component({
@@ -20,7 +41,7 @@ export const BOARD_THEMES: BoardTheme[] = [
   styleUrl: './theme.component.css',
   imports: [ChessButton],
 })
-export class ThemeSettingsComponent {
+export class ThemeSettingsComponent implements OnDestroy {
   [x: string]: any;
 
   @Input() isOpen: boolean = false;
@@ -34,6 +55,7 @@ export class ThemeSettingsComponent {
   selectedTheme = this.themes[1];
 
   ngOnInit() {
+    document.body.style.overflowY = 'hidden';
     const saved = localStorage.getItem('boardTheme');
     if (saved) {
       const parsedSaved = JSON.parse(saved) as BoardTheme;
@@ -44,13 +66,21 @@ export class ThemeSettingsComponent {
     }
   }
 
+  ngOnDestroy(){
+    document.body.style.overflowY = 'auto';
+  }
+
   selectTheme(theme: BoardTheme) {
     this.selectedTheme = theme;
   }
 
   handleSave() {
     localStorage.setItem('boardTheme', JSON.stringify(this.selectedTheme));
+    this.setupVariables();
+    this.close();
+  }
 
+  setupVariables() {
     document.documentElement.style.setProperty(
       '--board-white',
       this.selectedTheme.white,
@@ -59,7 +89,10 @@ export class ThemeSettingsComponent {
       '--board-black',
       this.selectedTheme.black,
     );
-    this.close();
+    document.documentElement.style.setProperty(
+      '--board-history',
+      this.selectedTheme.historyColor,
+    );
   }
 
   getColor(index: number, theme: BoardTheme) {

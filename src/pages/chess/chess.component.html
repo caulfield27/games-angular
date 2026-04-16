@@ -1,47 +1,57 @@
 <div
-  class="h-[100svh] w-full bg-neutral-800 flex justify-center items-center relative"
+  class="min-h-[100dvh] w-full bg-neutral-900 flex justify-center items-center relative"
 >
   @if (chessService.gameType() === null) {
-    <div class="w-full h-full flex flex-col gap-8 justify-center items-center">
-      <div
-        class="bg-neutral-900 min-w-[500px] max-sm:min-w-[95%] max-w-[500px] p-10 max-sm:p-5 rounded-3xl"
-      >
-        <div class="w-full flex flex-col gap-5">
-          <chess-button
-            label="Играть онлайн"
-            [icon]="GlobeIcon"
-            iconColor="#fff"
-            variant="primary"
-            (handleClick)="onGameTypeChoose('online')"
-          />
-          <chess-button
-            label="Играть с ботами"
-            [icon]="BotIcon"
-            iconColor="#fff"
-            variant="primary"
-            (handleClick)="onGameTypeChoose('bot')"
-          />
-          <chess-button
-            label="Играть c другом"
-            [icon]="HandshakeIcon"
-            iconColor="#fff"
-            variant="primary"
-            (handleClick)="onGameTypeChoose('friend')"
-          />
-          <chess-button
-            label="Играть вживую"
-            [icon]="UsersIcon"
-            iconColor="#fff"
-            variant="primary"
-            (handleClick)="onGameTypeChoose('irl')"
-          />
-          <chess-button
-            label="Тема"
-            [icon]="PaintBrushIcon"
-            iconColor="#fff"
-            variant="primary"
-            (handleClick)="openThemeSettings()"
-          />
+    <div class="max-w-4xl mx-auto p-8 max-sm:p-4">
+      <h1 class="text-white text-2xl mt-2 mb-2 font-semibold">Играть</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        @for (item of menuOptions; track item.type) {
+          <div
+            role="button"
+            (click)="onGameTypeChoose(item.type)"
+            class="bg-neutral-800 flex flex-col gap-6 rounded-xl group cursor-pointer transition-all hover:shadow-xl hover:scale-105"
+          >
+            <div class="px-6 [&:last-child]:pb-6 p-8 max-sm:p-4">
+              <div
+                [style.background]="item.iconBg"
+                class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+              >
+                <lucide-icon
+                  size="28"
+                  [img]="item.icon"
+                  [color]="item.iconColor"
+                />
+              </div>
+              <h3 class="text-2xl font-semibold mb-2 text-white">
+                {{ item.title }}
+              </h3>
+              <p class="text-neutral-400">
+                {{ item.description }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+      <h1 class="text-white text-2xl mt-2 mb-2 font-semibold">Настройки</h1>
+      <div class="grid grid-cols-1 gap-4">
+        <div
+          role="button"
+          (click)="openThemeSettings()"
+          class="bg-neutral-800 flex flex-col gap-6 rounded-xl group cursor-pointer transition-all hover:shadow-xl hover:scale-105 border-2 border-transparent"
+        >
+          <div class="px-6 [&:last-child]:pb-6 p-8 max-sm:p-4">
+            <div
+              class="bg-[#fae8ff] w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+            >
+              <lucide-icon size="28" [img]="PaintBrushIcon" color="#d946ef" />
+            </div>
+            <h3 class="text-2xl font-semibold mb-2 text-white">
+              Темы и внешний вид
+            </h3>
+            <p class="text-neutral-400">
+              Настройте свой игровой процесс в шахматы под себя
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import {
   ElementRef,
   OnDestroy,
   OnInit,
+  signal,
   ViewChild,
 } from '@angular/core';
 import {
@@ -14,6 +15,11 @@ import {
   ChessQueen,
   ChessKnight,
   ChessRook,
+  Timer,
+  Handshake,
+  LogOut,
+  ChevronRight,
+  ChevronLeft,
 } from 'lucide-angular';
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from '../../service/chess.service';
@@ -31,6 +37,7 @@ import {
 import { WebsocketService } from '../../service/ws.service';
 import { PIECE_IMAGE_PATH } from '../../constants';
 
+
 @Component({
   selector: 'game',
   templateUrl: './game.component.html',
@@ -41,12 +48,13 @@ import { PIECE_IMAGE_PATH } from '../../constants';
     CommonModule,
     WaitingOpponent,
     PromotionDialog,
-    InvitationModal,
+    InvitationModal
   ],
 })
 export class Game implements OnDestroy, OnInit {
   // icons
   readonly FlagIcon = Flag;
+  readonly DrawIcon = Handshake;
   readonly UserIcon = User;
   readonly PawnIcon = ChessPawn;
   readonly KnightIcon = ChessKnight;
@@ -54,6 +62,10 @@ export class Game implements OnDestroy, OnInit {
   readonly QueenIcon = ChessQueen;
   readonly RookIcon = ChessRook;
   readonly PIECE_PATH = PIECE_IMAGE_PATH;
+  readonly TimerIcon = Timer;
+  readonly ExitIcon = LogOut;
+  readonly LeftIcon = ChevronLeft;
+  readonly RightIcon = ChevronRight
 
   // dom
   @ViewChild('board') board!: ElementRef<HTMLDivElement>;
@@ -62,7 +74,8 @@ export class Game implements OnDestroy, OnInit {
   promotionContainer!: ElementRef<HTMLDivElement>;
 
   // states
-  cellSize: number = 60;
+  cellSize = signal<number>(60);
+  boardH = signal<number>(50);
   currentFigure: Figure | null = null;
   beforeUnloadListener: (() => void) | null = null;
 
@@ -73,10 +86,12 @@ export class Game implements OnDestroy, OnInit {
 
   ngAfterViewInit(): void {
     const width = this.cell.nativeElement.clientWidth;
+    const boardHeight = this.board.nativeElement.clientHeight;
     if (width) {
       const root = document.documentElement;
       root.style.setProperty('--chess-cell', width + 'px');
-      this.cellSize = width;
+      this.boardH.update(prev => prev+boardHeight);
+      this.cellSize.set(width);
     }
   }
 
@@ -117,13 +132,15 @@ export class Game implements OnDestroy, OnInit {
     return data instanceof Figure;
   }
 
+  
+
   public onDragEnd(event: CdkDragEnd<Square>) {
     event.source.reset();
     if (!this.currentFigure || this.chessService.isGameFinished()) return;
     const { x, y } = getCoordinates(
       this.board.nativeElement,
       event.dropPoint,
-      this.cellSize,
+      this.cellSize(),
       8,
     );
     const newIndex = get1Dposition([y, x]) ?? -1;

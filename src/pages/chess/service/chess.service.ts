@@ -16,7 +16,7 @@ import {
 import { Figure, Square } from '../classes/figure';
 import { Player } from '../classes/player';
 import { AuthService } from '@/shared/services/auth.service';
-import { OPPONENT_PIECE, PLAYER_PIECE } from '../constants';
+import { lettersHash, OPPONENT_PIECE, PLAYER_PIECE } from '../constants';
 import { get1Dposition, get2Dposition } from '../utils';
 import { King, Bishop, Queen, Knight, Pawn, Rook } from '../classes/pieces';
 import {
@@ -34,6 +34,9 @@ export class ChessService {
     isModalOpen: false,
     link: null,
   });
+  public movesHash: Record<string, Square[]> = {};
+  public currentMoveIdx = signal<number>(0);
+  public moves = signal<string[][]>([]);
   public roomId: string | null = null;
   public isWaiting = signal<boolean>(false);
   public history = signal<History[]>([]);
@@ -91,7 +94,7 @@ export class ChessService {
         const from = get1Dposition([7 - fromC[0], fromC[1]])!;
         const to = get1Dposition([7 - toC[0], toC[1]])!;
         const figure = this.board()[from].figure;
-        
+
         const sound = this.moveFigure(figure!, to, false);
         if (!sound) return;
         const isCheck = this.check();
@@ -198,7 +201,7 @@ export class ChessService {
         const squares = f.figure!.getAllowedSquares(board);
         if (squares.includes(kingIdx)) {
           const path = f.figure!.getPath(kingIdx, board);
-          
+
           if (!kingEscapeSquares.length && f.figure!.isSave(board, path)) {
             const isWin = this.player.color !== color;
             this.mateIndex.set(kingIdx);
@@ -305,26 +308,34 @@ export class ChessService {
 
     figure.move(index);
 
-    if (figure instanceof Pawn)
+    if (figure instanceof Pawn) {
       this.handleOnPasson(index, prevIndex, updatedBoard);
+    }
 
     const prevSquare = updatedBoard[prevIndex];
-    updatedBoard[prevIndex] = {
-      figure: null,
-      isPlayer: false,
-      canMove: false,
-    };
-
     if (updatedBoard[index].figure instanceof Figure) {
       this.saveTakenPiece(updatedBoard[index].figure, isPlayer);
       sound = SoundType.CAPTURE;
     }
 
+    this.saveMoveNotation(
+      updatedBoard[prevIndex].figure,
+      prevIndex,
+      index,
+      sound === SoundType.CAPTURE,
+      isCastle,
+    );
+    updatedBoard[prevIndex] = {
+      figure: null,
+      isPlayer: false,
+      canMove: false,
+    };
     updatedBoard[index] = prevSquare;
     this.history.update((prev) => [
       ...prev,
       { move: [prevPosition, figure.position()] },
     ]);
+
     const stringifiedBoard = JSON.stringify(
       updatedBoard
         .filter((s) => s.figure instanceof Figure)
@@ -344,6 +355,59 @@ export class ChessService {
     }
   }
 
+  private saveMoveNotation(
+    figure: Figure | null,
+    from: number,
+    to: number,
+    isCapture: boolean,
+    isCastle: boolean,
+  ): void {
+    if (!figure) return;
+
+    const piece = figure.piece;
+    const file = (i: number) => lettersHash[i % 8];
+    const rank = (i: number) => 8 - Math.floor(i / 8);
+
+    const toNotation = `${file(to)}${rank(to)}`;
+    let move = '';
+
+    if (isCastle) {
+      move = to > from ? 'O-O' : 'O-O-O';
+    } else if (piece === Piece.PAWN) {
+      if (isCapture) {
+        move = `${file(from)}x${toNotation}`;
+      } else {
+        move = toNotation;
+      }
+    } else {
+      const pieceLetterMap: Record<string, string> = {
+        [Piece.KING]: 'K',
+        [Piece.QUEEN]: 'Q',
+        [Piece.ROOK]: 'R',
+        [Piece.BISHOP]: 'B',
+        [Piece.KNIGHT]: 'N',
+      };
+
+      const pieceLetter = pieceLetterMap[piece];
+
+      move = isCapture
+        ? `${pieceLetter}x${toNotation}`
+        : `${pieceLetter}${toNotation}`;
+    }
+
+    const prevMoves = this.moves();
+    if (figure.color === Color.WHITE) {
+      prevMoves.push([prevMoves.length + 1 + '', move]);
+    } else {
+      prevMoves[prevMoves.length - 1] = [
+        prevMoves[prevMoves.length - 1][0],
+        prevMoves[prevMoves.length - 1][1],
+        move,
+      ];
+    }
+    this.moves.set(prevMoves);
+  }
+
   public handlePromotionChoose(
     newPiece: PromoteOption,
     figure: Figure,
@@ -354,6 +418,7 @@ export class ChessService {
     const updatedBoard = this.board();
     const prevIndex = get1Dposition(figure.position())!;
     const prevPosition = figure.position()!;
+    let isCapture = false;
     let newFigure: Queen | Rook | Bishop | Knight;
     switch (newPiece) {
       case 'queen':
@@ -400,20 +465,28 @@ export class ChessService {
     figure.move(index);
 
     const prevSquare = updatedBoard[prevIndex];
-    updatedBoard[prevIndex] = {
-      figure: null,
-      isPlayer: false,
-      canMove: false,
-    };
 
     if (updatedBoard[index].figure instanceof Figure) {
       this.saveTakenPiece(
         updatedBoard[index].figure,
         this.moveTurn() === this.player.color,
       );
+      isCapture = true;
       this.audio.play(SoundType.CAPTURE);
     }
 
+    this.saveMoveNotation(
+      updatedBoard[prevIndex].figure,
+      prevIndex,
+      index,
+      isCapture,
+      false,
+    );
+    updatedBoard[prevIndex] = {
+      figure: null,
+      isPlayer: false,
+      canMove: false,
+    };
     updatedBoard[index] = { ...prevSquare, figure: newFigure };
     this.history.update((prev) => [
       ...prev,
@@ -446,8 +519,8 @@ export class ChessService {
       (s) => s.figure instanceof Figure && s.figure.color === this.moveTurn(),
     );
     if (
-      !currentFigures.some((f) =>
-        f.figure!.getAllowedSquares(board, history).length,
+      !currentFigures.some(
+        (f) => f.figure!.getAllowedSquares(board, history).length,
       )
     ) {
       this.finishGame({

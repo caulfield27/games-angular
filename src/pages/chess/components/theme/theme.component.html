@@ -1,8 +1,8 @@
 <div
-  class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in max-sm:h-[100svh] overflow-y-auto"
+  class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in max-sm:h-[100svh] overflow-y-auto"
 >
   <div
-    class="bg-neutral-900 text-white rounded-2xl max-sm:rounded-none p-10 shadow-2xl text-center min-w-[500px] max-w-[500px] max-sm:min-w-full flex flex-col gap-4 max-sm:h-[100svh] overflow-y-auto"
+    class="bg-neutral-900 text-white rounded-2xl max-sm:rounded-none px-10 py-5 shadow-2xl text-center min-w-[500px] max-w-[500px] max-sm:min-w-full flex flex-col gap-4 max-sm:h-[100svh] overflow-y-auto"
   >
     <div class="flex items-center justify-between">
       <h2 class="text-xl font-semibold">Выберите тему</h2>
@@ -44,7 +44,6 @@
         label="Сохранить"
         (handleClick)="handleSave()"
       />
-      <chess-button class="w-full" variant="dark" label="Отмена" (handleClick)="close()" />
     </div>
   </div>
 </div>

@@ -1,3 +1,5 @@
+import { LucideIconData } from "lucide-angular";
+
 export type GameType = 'bot' | 'online' | 'friend' | 'irl';
 export enum Piece {
   KING = 'king',
@@ -21,36 +23,6 @@ export enum SoundType {
   PROMOTE = 'promote',
 }
 
-
-// green
-// export enum SquareColor {
-//   BLACK = '#769656',
-//   WHITE = '#eeeed2',
-// }
-
-// wood 1
-export enum SquareColor {
-  BLACK = '#b58863',
-  WHITE = '#f0d9b5',
-}
-
-// wood 2
-// export enum SquareColor {
-//   BLACK = '#6b4f3a',
-//   WHITE = '#f5deb3',
-// }
-
-// dark
-// export enum SquareColor {
-//   BLACK = '#3b3b3b',
-//   WHITE = '#cfcfcf',
-// }
-
-// blue
-// export enum SquareColor {
-//   BLACK = '#8ca2ad',
-//   WHITE = '#dee3e6',
-// }
 
 export interface History {
   move: [[number, number], [number, number]];
@@ -102,4 +74,13 @@ export type MoveDirection =
 export interface IInvitation{
   isModalOpen: boolean;
   link: string | null;
+}
+
+export interface MenuOption{
+  icon: LucideIconData;
+  title: string;
+  description: string;
+  iconColor: string;
+  iconBg: string;
+  type: GameType;
 }
