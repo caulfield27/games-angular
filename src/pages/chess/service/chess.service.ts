@@ -409,10 +409,6 @@ export class ChessService {
     }
 
     const lastIdx = prevMoves.length - 1;
-    this.movesHash[prevMoves[lastIdx][0] + move] = () => {
-      const curPosition: [number, number] = [...figure.position()];
-      figure.position.set(curPosition);
-    };
     this.currentMove.set([lastIdx, prevMoves[lastIdx].length - 1]);
     this.moves.set(prevMoves);
   }

@@ -306,22 +306,11 @@ export class Game implements OnDestroy, OnInit {
     } else {
       nextMove = [currentMove[0], 2];
     }
-  
+
     this.updateBoard(nextMove);
   }
 
   private updateBoard(move: [number, number]) {
-    const currentMove = this.chessService.currentMove();
-    const moveNotation = this.chessService.moves()[currentMove[0]][currentMove[1]];
-    const key = currentMove[0] + 1 + moveNotation;
-    const callback = this.chessService.movesHash[key];
-    if (!callback) {
-      
-    } else {
-      console.log(key, callback);
-      
-      this.chessService.currentMove.set(move);
-      callback();
-    }
+    this.chessService.currentMove.set(move);
   }
 }
