@@ -150,16 +150,35 @@
       class="max-sm:hidden flex flex-col justify-between items-start h-full min-w-72 max-w-72 border-l-0 border border-white/10 bg-neutral-900/80 p-4 shadow-2xl shadow-black/30 backdrop-blur rounded-tr-2xl rounded-br-2xl"
     >
       <main
-        [style.height]="boardH()+'px'"
+        [style.height]="boardH() + 'px'"
         class="w-full overflow-y-auto flex flex-col gap-1"
       >
         @for (move of chessService.moves(); track $index) {
-          <div
-            class="w-full flex items-center justify-between text-white p-1 rounded-md"
-          >
+          <div class="w-full flex items-center justify-between text-white">
             <span class="w-[33%]">{{ move[0] || "" }}.</span>
-            <span class="w-[33%]">{{ move[1] || "" }}</span>
-            <span class="w-[33%]">{{ move[2] || "" }}</span>
+            <span
+              [class]="
+                $index === chessService.currentMove()[0] &&
+                move[1] ===
+                  chessService.moves()[$index][chessService.currentMove()[1]]
+                  ? 'bg-neutral-800'
+                  : ''
+              "
+              class="w-[33%] p-1 rounded-md flex justify-center items-center"
+              >{{ move[1] || "" }}</span
+            >
+            <span
+              [class]="
+                $index === chessService.currentMove()[0] &&
+                move[2] ===
+                  chessService.moves()[$index][chessService.currentMove()[1]]
+                  ? 'bg-neutral-800'
+                  : ''
+              "
+              [class]
+              class="w-[33%] p-1 rounded-md flex justify-center items-center"
+              >{{ move[2] || "" }}</span
+            >
           </div>
         }
       </main>
@@ -176,11 +195,21 @@
           </button>
         </div>
         <div class="flex flex-row gap-3">
-          <button>
-            <lucide-icon [img]="LeftIcon" size="30" color="white" />
+          <button [disabled]="isPrevDisabled" (click)="prevMove()">
+            <lucide-icon
+              [img]="LeftIcon"
+              size="30"
+              color="white"
+              [class]="isPrevDisabled ? 'opacity-60' : ''"
+            />
           </button>
-          <button>
-            <lucide-icon [img]="RightIcon" size="30" color="white" />
+          <button [disabled]="isNextDisabled" (click)="nextMove()">
+            <lucide-icon
+              [img]="RightIcon"
+              size="30"
+              color="white"
+              [class]="isNextDisabled ? 'opacity-60' : ''"
+            />
           </button>
         </div>
       </footer>

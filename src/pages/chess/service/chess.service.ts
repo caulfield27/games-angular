@@ -34,7 +34,8 @@ export class ChessService {
     isModalOpen: false,
     link: null,
   });
-  public movesHash: Record<string, Square[]> = {};
+  public currentMove = signal<[number, number]>([0, 0]);
+  public movesHash: Record<string, () => void> = {};
   public currentMoveIdx = signal<number>(0);
   public moves = signal<string[][]>([]);
   public roomId: string | null = null;
@@ -42,6 +43,7 @@ export class ChessService {
   public history = signal<History[]>([]);
   public gameType = signal<GameType | null>(null);
   public board;
+  public initialBoard: Square[] = [];
   public player: Player = new Player('white', '');
   public opponent: Player = new Player('black', '');
   public checkIndex = signal<null | number>(null);
@@ -82,7 +84,8 @@ export class ChessService {
           this.roomId = data.roomId;
           this.opponent.color = data.color === 'white' ? 'black' : 'white';
           this.opponent.name.set(data.opponent);
-          this.board.set(this.generateBoard());
+          this.initialBoard = this.generateBoard();
+          this.board.set(this.initialBoard);
           this.isWaiting.set(false);
           this.invitation.set({ isModalOpen: false, link: null });
         }
@@ -363,7 +366,6 @@ export class ChessService {
     isCastle: boolean,
   ): void {
     if (!figure) return;
-
     const piece = figure.piece;
     const file = (i: number) => lettersHash[i % 8];
     const rank = (i: number) => 8 - Math.floor(i / 8);
@@ -405,6 +407,13 @@ export class ChessService {
         move,
       ];
     }
+
+    const lastIdx = prevMoves.length - 1;
+    this.movesHash[prevMoves[lastIdx][0] + move] = () => {
+      const curPosition: [number, number] = [...figure.position()];
+      figure.position.set(curPosition);
+    };
+    this.currentMove.set([lastIdx, prevMoves[lastIdx].length - 1]);
     this.moves.set(prevMoves);
   }
 
@@ -617,7 +626,7 @@ export class ChessService {
   }
 
   public reset() {
-    this.board.set(this.generateBoard());
+    this.board.set(this.initialBoard);
     this.isGameEndModalOpen.set(false);
     this.isGameFinished.set(false);
     this.mateIndex.set(null);

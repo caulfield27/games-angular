@@ -109,7 +109,8 @@ export class Chess implements OnInit {
       }
 
       if (chessService.gameType() !== null) {
-        chessService.board.set(chessService.generateBoard());
+        chessService.initialBoard = chessService.generateBoard();
+        chessService.board.set(chessService.initialBoard);
       }
     });
   }

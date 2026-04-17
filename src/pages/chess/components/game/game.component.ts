@@ -37,7 +37,6 @@ import {
 import { WebsocketService } from '../../service/ws.service';
 import { PIECE_IMAGE_PATH } from '../../constants';
 
-
 @Component({
   selector: 'game',
   templateUrl: './game.component.html',
@@ -48,7 +47,7 @@ import { PIECE_IMAGE_PATH } from '../../constants';
     CommonModule,
     WaitingOpponent,
     PromotionDialog,
-    InvitationModal
+    InvitationModal,
   ],
 })
 export class Game implements OnDestroy, OnInit {
@@ -65,7 +64,7 @@ export class Game implements OnDestroy, OnInit {
   readonly TimerIcon = Timer;
   readonly ExitIcon = LogOut;
   readonly LeftIcon = ChevronLeft;
-  readonly RightIcon = ChevronRight
+  readonly RightIcon = ChevronRight;
 
   // dom
   @ViewChild('board') board!: ElementRef<HTMLDivElement>;
@@ -90,7 +89,7 @@ export class Game implements OnDestroy, OnInit {
     if (width) {
       const root = document.documentElement;
       root.style.setProperty('--chess-cell', width + 'px');
-      this.boardH.update(prev => prev+boardHeight);
+      this.boardH.update((prev) => prev + boardHeight);
       this.cellSize.set(width);
     }
   }
@@ -131,8 +130,6 @@ export class Game implements OnDestroy, OnInit {
   public isFigure(data: Figure | null) {
     return data instanceof Figure;
   }
-
-  
 
   public onDragEnd(event: CdkDragEnd<Square>) {
     event.source.reset();
@@ -271,5 +268,60 @@ export class Game implements OnDestroy, OnInit {
   public onInvitationCancel() {
     this.ws.close(1000, this.chessService.invitation().link ?? '');
     this.chessService.reset();
+  }
+
+  get isPrevDisabled() {
+    if (!this.chessService.moves().length) return true;
+    const currentMove = this.chessService.currentMove();
+    return currentMove[0] === 0 && currentMove[1] < 1;
+  }
+
+  get isNextDisabled() {
+    const moves = this.chessService.moves();
+    const currentMove = this.chessService.currentMove();
+    if (!moves.length) return true;
+    return (
+      currentMove[0] === moves.length - 1 &&
+      currentMove[1] === moves[moves.length - 1].length - 1
+    );
+  }
+
+  public prevMove() {
+    const currentMove = this.chessService.currentMove();
+    let prevMove: [number, number] = [0, 0];
+    if (currentMove[1] === 2) {
+      prevMove = [currentMove[0], 1];
+    } else if (currentMove[1] === 1 && currentMove[0] > 0) {
+      prevMove = [currentMove[0] - 1, 2];
+    }
+    this.updateBoard(prevMove);
+  }
+
+  public nextMove() {
+    const currentMove = this.chessService.currentMove();
+    let nextMove: [number, number] = [0, 0];
+
+    if (currentMove[1] === 2) {
+      nextMove = [currentMove[0] + 1, 1];
+    } else {
+      nextMove = [currentMove[0], 2];
+    }
+  
+    this.updateBoard(nextMove);
+  }
+
+  private updateBoard(move: [number, number]) {
+    const currentMove = this.chessService.currentMove();
+    const moveNotation = this.chessService.moves()[currentMove[0]][currentMove[1]];
+    const key = currentMove[0] + 1 + moveNotation;
+    const callback = this.chessService.movesHash[key];
+    if (!callback) {
+      
+    } else {
+      console.log(key, callback);
+      
+      this.chessService.currentMove.set(move);
+      callback();
+    }
   }
 }
