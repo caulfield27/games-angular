@@ -1,4 +1,5 @@
-import { LucideIconData } from "lucide-angular";
+import { LucideIconData } from 'lucide-angular';
+import { Square } from '../classes/figure';
 
 export type GameType = 'bot' | 'online' | 'friend' | 'irl';
 export enum Piece {
@@ -23,7 +24,6 @@ export enum SoundType {
   PROMOTE = 'promote',
 }
 
-
 export interface History {
   move: [[number, number], [number, number]];
 }
@@ -36,7 +36,7 @@ export enum MessageType {
   GAMESTART = 'gameFound',
   MOVE = 'move',
   PROMOTE = 'promote',
-  OPPONENT_LEAVE = 'opponent-leave'
+  OPPONENT_LEAVE = 'opponent-leave',
 }
 export interface IMessageData {
   type: MessageType;
@@ -51,9 +51,9 @@ export interface GameFound {
 }
 
 export interface PromoteData {
-  figure: PromoteOption,
-  idx: number,
-  promoteIdx: number
+  figure: PromoteOption;
+  idx: number;
+  promoteIdx: number;
 }
 
 export interface MoveData {
@@ -71,12 +71,12 @@ export type MoveDirection =
   | 'left'
   | 'right';
 
-export interface IInvitation{
+export interface IInvitation {
   isModalOpen: boolean;
   link: string | null;
 }
 
-export interface MenuOption{
+export interface MenuOption {
   icon: LucideIconData;
   title: string;
   description: string;
@@ -84,3 +84,6 @@ export interface MenuOption{
   iconBg: string;
   type: GameType;
 }
+
+export type HashSquare = (Square & { position?: [number, number] })[];
+export type MovesHash = Record<string, HashSquare>;

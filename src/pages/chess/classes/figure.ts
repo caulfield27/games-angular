@@ -13,7 +13,7 @@ import { get1Dposition, get2Dposition } from '../utils';
 export interface Square {
   figure: Figure | null;
   canMove: boolean;
-  isPlayer: boolean;
+  isPlayer: boolean
 }
 
 export class Figure {

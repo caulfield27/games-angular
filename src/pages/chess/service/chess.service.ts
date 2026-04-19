@@ -3,11 +3,13 @@ import {
   Color,
   GameFound,
   GameType,
+  HashSquare,
   History,
   IInvitation,
   IMessageData,
   MessageType,
   MoveData,
+  MovesHash,
   Piece,
   PromoteData,
   PromoteOption,
@@ -35,7 +37,7 @@ export class ChessService {
     link: null,
   });
   public currentMove = signal<[number, number]>([0, 0]);
-  public movesHash: Record<string, () => void> = {};
+  public movesHash: MovesHash = {};
   public currentMoveIdx = signal<number>(0);
   public moves = signal<string[][]>([]);
   public roomId: string | null = null;
@@ -44,6 +46,7 @@ export class ChessService {
   public gameType = signal<GameType | null>(null);
   public board;
   public initialBoard: Square[] = [];
+  public initialBoardPositions: (number[] | null)[] = [];
   public player: Player = new Player('white', '');
   public opponent: Player = new Player('black', '');
   public checkIndex = signal<null | number>(null);
@@ -320,14 +323,6 @@ export class ChessService {
       this.saveTakenPiece(updatedBoard[index].figure, isPlayer);
       sound = SoundType.CAPTURE;
     }
-
-    this.saveMoveNotation(
-      updatedBoard[prevIndex].figure,
-      prevIndex,
-      index,
-      sound === SoundType.CAPTURE,
-      isCastle,
-    );
     updatedBoard[prevIndex] = {
       figure: null,
       isPlayer: false,
@@ -347,6 +342,13 @@ export class ChessService {
     this.historyHash[stringifiedBoard] =
       (this.historyHash[stringifiedBoard] || 0) + 1;
     this.updateTurn(updatedBoard);
+    this.saveMoveNotation(
+      prevSquare.figure,
+      prevIndex,
+      index,
+      sound === SoundType.CAPTURE,
+      isCastle,
+    );
     return sound;
   }
 
@@ -365,6 +367,8 @@ export class ChessService {
     isCapture: boolean,
     isCastle: boolean,
   ): void {
+    console.log('figure: ', figure);
+
     if (!figure) return;
     const piece = figure.piece;
     const file = (i: number) => lettersHash[i % 8];
@@ -409,6 +413,17 @@ export class ChessService {
     }
 
     const lastIdx = prevMoves.length - 1;
+    this.movesHash[prevMoves[lastIdx][0] + move] = this.board().map(
+      (square) => {
+        const saved: Square & { position?: [number, number] } = { ...square };
+
+        if (saved.figure instanceof Figure) {
+          saved.position = [...saved.figure.position()];
+        }
+        return saved;
+      },
+    );
+
     this.currentMove.set([lastIdx, prevMoves[lastIdx].length - 1]);
     this.moves.set(prevMoves);
   }
@@ -479,14 +494,6 @@ export class ChessService {
       isCapture = true;
       this.audio.play(SoundType.CAPTURE);
     }
-
-    this.saveMoveNotation(
-      updatedBoard[prevIndex].figure,
-      prevIndex,
-      index,
-      isCapture,
-      false,
-    );
     updatedBoard[prevIndex] = {
       figure: null,
       isPlayer: false,
@@ -509,6 +516,13 @@ export class ChessService {
     this.check();
     this.pawnPromotionIndex.set(null);
     this.checkDraw();
+    this.saveMoveNotation(
+      prevSquare.figure,
+      prevIndex,
+      index,
+      isCapture,
+      false,
+    );
   }
 
   public checkPawnPromotion(index: number) {

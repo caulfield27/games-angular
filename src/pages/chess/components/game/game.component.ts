@@ -217,6 +217,8 @@ export class Game implements OnDestroy, OnInit {
   }
 
   public onPieceChoose(piece: Square) {
+    console.log(piece);
+    
     if (
       this.chessService.isGameFinished() ||
       !piece.isPlayer ||
@@ -227,6 +229,8 @@ export class Game implements OnDestroy, OnInit {
         this.chessService.moveTurn() !== this.chessService.player.color)
     )
       return;
+      console.log('case 2');
+      
     this.currentFigure = piece.figure;
     const board = this.chessService.board();
     const allowedSquares = piece.figure.getAllowedSquares(
@@ -303,6 +307,8 @@ export class Game implements OnDestroy, OnInit {
 
     if (currentMove[1] === 2) {
       nextMove = [currentMove[0] + 1, 1];
+    } else if (!currentMove[0] && !currentMove[1]) {
+      nextMove = [0, 1];
     } else {
       nextMove = [currentMove[0], 2];
     }
@@ -312,5 +318,22 @@ export class Game implements OnDestroy, OnInit {
 
   private updateBoard(move: [number, number]) {
     this.chessService.currentMove.set(move);
+    const moves = this.chessService.moves();
+    const key = moves[move[0]][0] + moves[move[0]][move[1]];
+    const savedPositions = this.chessService.movesHash[key];
+    if (savedPositions) {
+      const updatedBoard: Square[] = [];
+      savedPositions.forEach((pos) => {
+        if (pos.figure instanceof Figure) {
+          pos.figure.position.set(pos.position!);
+        }
+        updatedBoard.push({
+          figure: pos.figure,
+          canMove: pos.canMove,
+          isPlayer: pos.isPlayer
+        });
+      });
+      this.chessService.board.set(updatedBoard);
+    }
   }
 }
