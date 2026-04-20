@@ -18,6 +18,7 @@ import { GameType, MenuOption } from './types';
 import { WebsocketService } from './service/ws.service';
 import { v4 as uuidv4 } from 'uuid';
 import { setupTheme } from './utils';
+import { BotService } from './service/bot.service';
 
 @Component({
   selector: 'chess',
@@ -77,6 +78,7 @@ export class Chess implements OnInit {
   constructor(
     public chessService: ChessService,
     public ws: WebsocketService,
+    public bot: BotService
   ) {
     effect(async () => {
       switch (chessService.gameType()) {
@@ -109,8 +111,7 @@ export class Chess implements OnInit {
       }
 
       if (chessService.gameType() !== null) {
-        chessService.initialBoard = chessService.generateBoard();
-        chessService.board.set(chessService.initialBoard);
+        chessService.board.set(chessService.generateBoard());
       }
     });
   }

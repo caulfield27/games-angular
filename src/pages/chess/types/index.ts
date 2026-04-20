@@ -85,5 +85,13 @@ export interface MenuOption {
   type: GameType;
 }
 
-export type HashSquare = (Square & { position?: [number, number] })[];
-export type MovesHash = Record<string, HashSquare>;
+export interface ReviewSquares {
+  position?: [number, number];
+}
+
+export type HashSquare = (Square & ReviewSquares)[];
+export type MovesHash = Record<string, {
+  board: HashSquare;
+  checkIndex: number | null;
+  mateIndex: number | null;
+}>;

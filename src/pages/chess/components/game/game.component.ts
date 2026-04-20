@@ -1,10 +1,13 @@
 import {
   Component,
+  effect,
   ElementRef,
   OnDestroy,
   OnInit,
+  QueryList,
   signal,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import {
   LucideAngularModule,
@@ -67,6 +70,8 @@ export class Game implements OnDestroy, OnInit {
   readonly RightIcon = ChevronRight;
 
   // dom
+  @ViewChildren('moveListMobile') moveListMobile!: QueryList<ElementRef>;
+  @ViewChildren('moveListDesktop') moveListDesktop!: QueryList<ElementRef>;
   @ViewChild('board') board!: ElementRef<HTMLDivElement>;
   @ViewChild('cell') cell!: ElementRef<HTMLDivElement>;
   @ViewChild('promotionContainer')
@@ -81,7 +86,28 @@ export class Game implements OnDestroy, OnInit {
   constructor(
     public chessService: ChessService,
     private ws: WebsocketService,
-  ) {}
+  ) {
+    effect(() => {
+      const currentMove = chessService.currentMove();
+      const elementsMobile = this.moveListMobile;
+      const elementsDesktop = this.moveListDesktop;
+      const elemMobile = elementsMobile?.get(currentMove[0])?.nativeElement as
+        | HTMLDivElement
+        | undefined;
+      const elemDesktop = elementsDesktop?.get(currentMove[0])
+        ?.nativeElement as HTMLDivElement | undefined;
+      elemMobile?.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      });
+      elemDesktop?.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      });
+    });
+  }
 
   ngAfterViewInit(): void {
     const width = this.cell.nativeElement.clientWidth;
@@ -161,16 +187,11 @@ export class Game implements OnDestroy, OnInit {
       newIndex,
       this.chessService.moveTurn() === this.chessService.player.color,
     );
-    this.chessService.updateSquares([]);
 
     if (!moveType) {
       this.currentFigure = null;
       return;
     }
-
-    const isCheck = this.chessService.check();
-    this.chessService.audio.play(isCheck ? SoundType.CHECK : moveType);
-    this.chessService.checkDraw();
 
     if (
       this.chessService.gameType() === 'friend' ||
@@ -217,8 +238,7 @@ export class Game implements OnDestroy, OnInit {
   }
 
   public onPieceChoose(piece: Square) {
-    console.log(piece);
-    
+    if (this.chessService.inReview()) return;
     if (
       this.chessService.isGameFinished() ||
       !piece.isPlayer ||
@@ -229,8 +249,6 @@ export class Game implements OnDestroy, OnInit {
         this.chessService.moveTurn() !== this.chessService.player.color)
     )
       return;
-      console.log('case 2');
-      
     this.currentFigure = piece.figure;
     const board = this.chessService.board();
     const allowedSquares = piece.figure.getAllowedSquares(
@@ -317,23 +335,37 @@ export class Game implements OnDestroy, OnInit {
   }
 
   private updateBoard(move: [number, number]) {
+    this.chessService.updateSquares([]);
     this.chessService.currentMove.set(move);
     const moves = this.chessService.moves();
     const key = moves[move[0]][0] + moves[move[0]][move[1]];
     const savedPositions = this.chessService.movesHash[key];
     if (savedPositions) {
+      const { board, checkIndex, mateIndex } = savedPositions;
       const updatedBoard: Square[] = [];
-      savedPositions.forEach((pos) => {
+      board.forEach((pos) => {
         if (pos.figure instanceof Figure) {
           pos.figure.position.set(pos.position!);
         }
         updatedBoard.push({
           figure: pos.figure,
           canMove: pos.canMove,
-          isPlayer: pos.isPlayer
+          isPlayer: pos.isPlayer,
         });
       });
+      this.chessService.checkIndex.set(checkIndex);
+      this.chessService.mateIndex.set(mateIndex);
+
       this.chessService.board.set(updatedBoard);
+    } else {
+      this.chessService.board.set(this.chessService.generateBoard());
+    }
+
+    const last = moves.length - 1;
+    if (moves[last][0] + moves[last][moves[last].length - 1] === key) {
+      this.chessService.inReview.set(false);
+    } else {
+      this.chessService.inReview.set(true);
     }
   }
 }

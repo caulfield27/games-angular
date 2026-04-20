@@ -1,9 +1,9 @@
-<div class="relative w-full px-3 py-16 sm:px-6 lg:px-8">
+<div class="relative w-full px-3 pt-16 sm:px-6 lg:px-8">
   <div
     class="flex max-w-7xl flex-col md:grid md:grid-cols-[minmax(0,1fr)_22rem] md:items-start"
   >
     <div
-      class="mx-auto flex max-w-[44rem] flex-col gap-2 rounded-tl-2xl rounded-bl-2xl border border-white/10 bg-neutral-900/80 p-2 shadow-2xl shadow-black/30 backdrop-blur"
+      class="mx-auto flex max-w-[44rem] flex-col gap-2 rounded-tl-2xl rounded-bl-2xl max-sm:rounded-tr-2xl max-sm:rounded-br-2xl border border-white/10 bg-neutral-900/80 p-2 shadow-2xl shadow-black/30 backdrop-blur"
     >
       <div
         class="flex w-full flex-row items-center justify-between rounded-2xl border border-white/5 bg-neutral-800/80 px-3 py-2 text-neutral-50 font-semibold max-[480px]:px-2"
@@ -65,7 +65,10 @@
             #cell
             [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
           >
-            @if ($index === lastMove[0] || $index === lastMove[1]) {
+            @if (
+              !chessService.inReview() &&
+              ($index === lastMove[0] || $index === lastMove[1])
+            ) {
               <div class="history"></div>
             }
 
@@ -154,7 +157,7 @@
         class="w-full overflow-y-auto flex flex-col gap-1"
       >
         @for (move of chessService.moves(); track $index) {
-          <div class="w-full flex items-center justify-between text-white">
+          <div #moveListDesktop class="w-full flex items-center justify-between text-white">
             <span class="w-[33%]">{{ move[0] || "" }}.</span>
             <span
               [class]="
@@ -214,6 +217,82 @@
         </div>
       </footer>
     </aside>
+    <div
+      class="sm:hidden mt-2 sticky bottom-0 left-0 w-full z-50 bg-neutral-900/95 border-t border-white/10 backdrop-blur"
+    >
+      @if (chessService.moves().length) {
+        <div class="w-full py-2 flex flex-row gap-3 justify-between">
+          <button [disabled]="isPrevDisabled" (click)="prevMove()">
+            <lucide-icon [img]="LeftIcon" size="26" color="white" />
+          </button>
+          <div class="w-[75vw] overflow-x-auto flex flex-row gap-3">
+            @for (move of chessService.moves(); track $index) {
+              <div #moveListMobile class="flex items-center gap-1 text-white text-sm shrink-0">
+                <span class="text-neutral-400">{{ move[0] || "" }}.</span>
+
+                <span
+                  class="px-2 py-1 rounded-md"
+                  [class]="
+                    $index === chessService.currentMove()[0] &&
+                    move[1] ===
+                      chessService.moves()[$index][
+                        chessService.currentMove()[1]
+                      ]
+                      ? 'bg-neutral-800'
+                      : ''
+                  "
+                >
+                  {{ move[1] || "" }}
+                </span>
+
+                <span
+                  class="px-2 py-1 rounded-md"
+                  [class]="
+                    $index === chessService.currentMove()[0] &&
+                    move[2] ===
+                      chessService.moves()[$index][
+                        chessService.currentMove()[1]
+                      ]
+                      ? 'bg-neutral-800'
+                      : ''
+                  "
+                >
+                  {{ move[2] || "" }}
+                </span>
+              </div>
+            }
+          </div>
+          <button [disabled]="isNextDisabled" (click)="nextMove()">
+            <lucide-icon [img]="RightIcon" size="26" color="white" />
+          </button>
+        </div>
+      }
+      <!-- Actions -->
+      <div
+        class="flex items-center justify-between px-3 py-2 border-t border-white/10"
+      >
+        <div class="flex gap-3">
+          <button class="p-2 rounded-md bg-neutral-800">
+            <lucide-icon [img]="FlagIcon" size="18" color="white" />
+          </button>
+          <button class="p-2 rounded-md bg-neutral-800">
+            <lucide-icon [img]="DrawIcon" size="18" color="white" />
+          </button>
+          <button class="p-2 rounded-md bg-neutral-800">
+            <lucide-icon [img]="ExitIcon" size="18" color="white" />
+          </button>
+        </div>
+
+        <!-- <div class="flex gap-3">
+          <button [disabled]="isPrevDisabled" (click)="prevMove()">
+            <lucide-icon [img]="LeftIcon" size="26" color="white" />
+          </button>
+          <button [disabled]="isNextDisabled" (click)="nextMove()">
+            <lucide-icon [img]="RightIcon" size="26" color="white" />
+          </button>
+        </div> -->
+      </div>
+    </div>
   </div>
 
   @if (chessService.isWaiting()) {
