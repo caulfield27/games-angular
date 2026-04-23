@@ -8,6 +8,7 @@ export const apiRoutes = {
     login: '/api/login',
     register: '/api/register',
     getMe: '/api/me',
+    stockfish: 'https://stockfish.online/api/s/v2.php',
     battleship: WS_CONNECTION_URL+'/ws/battleship',
     chess: WS_CONNECTION_URL+'/ws/chess'
 }

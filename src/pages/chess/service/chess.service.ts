@@ -18,7 +18,13 @@ import {
 import { Figure, Square } from '../classes/figure';
 import { Player } from '../classes/player';
 import { AuthService } from '@/shared/services/auth.service';
-import { lettersHash, OPPONENT_PIECE, PLAYER_PIECE } from '../constants';
+import {
+  initialBoard,
+  lettersHash,
+  numbersHash,
+  PIECE_NOTATION,
+  promotionHash,
+} from '../constants';
 import { get1Dposition, get2Dposition } from '../utils';
 import { King, Bishop, Queen, Knight, Pawn, Rook } from '../classes/pieces';
 import {
@@ -36,6 +42,7 @@ export class ChessService {
     isModalOpen: false,
     link: null,
   });
+  private onPassonSquare: string | null = null;
   public inReview = signal<boolean>(false);
   public currentMove = signal<[number, number]>([0, 0]);
   public movesHash: MovesHash = {};
@@ -229,31 +236,38 @@ export class ChessService {
   }
 
   public generateBoard(): Square[] {
-    return new Array(64).fill(null).map((square, idx) => {
-      square = {
-        figure: null,
-        isPlayer: false,
-        canMove: false,
-      };
-      if (idx > 47) {
-        square.isPlayer = true;
-        const piece = idx < 56 ? Piece.PAWN : (PLAYER_PIECE[idx] ?? Piece.PAWN);
-        square.figure = this.getFigure(
-          piece,
-          this.player.color as Color,
-          get2Dposition(idx)!,
-        );
-      } else if (idx < 16) {
-        const piece =
-          idx > 7 ? Piece.PAWN : (OPPONENT_PIECE[idx] ?? Piece.PAWN);
-        square.figure = this.getFigure(
-          piece,
-          this.opponent.color as Color,
-          get2Dposition(idx)!,
-        );
+    const board: Square[] = [];
+
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        const square: Square = {
+          figure: null,
+          isPlayer: false,
+          canMove: false,
+        };
+        const realY = this.player.color === 'white' ? y : 7 - y;
+        const realX = this.player.color === 'white' ? x : 7 - x;
+
+        const piece = initialBoard[realY][realX];
+        const index = get1Dposition([realY, x])!;
+
+        if (!piece) {
+          board[index] = square;
+          continue;
+        }
+
+        const isPlayer = realY >= 6;
+        const color = isPlayer ? this.player.color : this.opponent.color;
+
+        board[index] = {
+          isPlayer,
+          figure: this.getFigure(piece, color as Color, [realY, x]),
+          canMove: false,
+        };
       }
-      return square;
-    });
+    }
+
+    return board;
   }
 
   public updateSquares(squares: number[]) {
@@ -262,31 +276,33 @@ export class ChessService {
     );
   }
 
+  private handleCastle(index: number, board: Square[], figure: Figure) {
+    const [y] = figure.position();
+    const kingIndex = get1Dposition(figure.position())!;
+    const isLeft = index < kingIndex;
+    const dif = isLeft ? 1 : -1;
+    let rookIndex;
+    if (y === 0) {
+      rookIndex = isLeft ? 0 : 7;
+    } else {
+      rookIndex = isLeft ? 56 : 63;
+    }
+
+    const rook = board[rookIndex];
+    rook.figure?.move(index + dif);
+    board[rookIndex] = {
+      figure: null,
+      isPlayer: false,
+      canMove: false,
+    };
+    board[index + dif] = rook;
+  }
+
   private isCastle(figure: Figure, index: number) {
     if (!(figure instanceof King)) return false;
-    if (figure.isMoved) return false;
-
-    const board = this.board();
-    const y = figure.position()[0];
-
-    if (y === 7) {
-      if (index === 58) {
-        const leftRook = board[56].figure;
-        if (leftRook instanceof Rook && !leftRook.isMoved) return true;
-      } else if (index === 62) {
-        const rightRook = board[63].figure;
-        if (rightRook instanceof Rook && !rightRook.isMoved) return true;
-      }
-    } else if (y === 0) {
-      if (index === 2) {
-        const leftRook = board[0].figure;
-        if (leftRook instanceof Rook && !leftRook.isMoved) return true;
-      } else if (index === 6) {
-        const rightRook = board[7].figure;
-        if (rightRook instanceof Rook && !rightRook.isMoved) return true;
-      }
-    }
-    return false;
+    if (figure.isMoved || this.checkIndex() !== null) return false;
+    const x = figure.position()[1];
+    return Math.abs(x - index) > 1;
   }
 
   public moveFigure(
@@ -313,6 +329,12 @@ export class ChessService {
     figure.move(index);
 
     if (figure instanceof Pawn) {
+      const dif = index > prevIndex ? 16 : -16;
+      if (prevIndex + dif === index) {
+        this.onPassonSquare = this.toNotation(
+          index > prevIndex ? prevIndex + 8 : prevIndex - 8,
+        );
+      }
       this.handleOnPasson(index, prevIndex, updatedBoard);
     }
 
@@ -372,9 +394,7 @@ export class ChessService {
     if (!figure) return;
     const piece = figure.piece;
     const file = (i: number) => lettersHash[i % 8];
-    const rank = (i: number) => 8 - Math.floor(i / 8);
-
-    const toNotation = `${file(to)}${rank(to)}`;
+    const toNotation = this.toNotation(to);
     let move = '';
 
     if (isCastle) {
@@ -415,22 +435,53 @@ export class ChessService {
     const lastIdx = prevMoves.length - 1;
     const key = prevMoves[lastIdx][0] + move;
     this.movesHash[key] = {
-      board: [],
-      checkIndex: null,
-      mateIndex: null,
+      board: this.board().map((square) => {
+        const saved: Square & ReviewSquares = { ...square };
+        if (saved.figure instanceof Figure) {
+          saved.position = [...saved.figure.position()];
+        }
+        return saved;
+      }),
+      checkIndex: this.checkIndex(),
+      mateIndex: this.mateIndex(),
+      playerTakenPieces: [...this.player.takenPieces()],
+      playerAdvantage: this.player.advantage(),
+      opponentTakenPieces: [...this.opponent.takenPieces()],
+      opponentAdvantage: this.opponent.advantage(),
     };
-    this.movesHash[key].board = this.board().map((square) => {
-      const saved: Square & ReviewSquares = { ...square };
-      if (saved.figure instanceof Figure) {
-        saved.position = [...saved.figure.position()];
-      }
-      return saved;
-    });
-    this.movesHash[key].checkIndex = this.checkIndex();
-    this.movesHash[key].mateIndex = this.mateIndex();
 
     this.currentMove.set([lastIdx, prevMoves[lastIdx].length - 1]);
     this.moves.set(prevMoves);
+  }
+
+  private getIndex(label: string) {
+    const col = 7 - (Number(label[1]) - 1);
+    const row = numbersHash[label[0]];
+    return get1Dposition([col, row])!;
+  }
+
+  public handleBotMove(move: string) {
+    const len = move.length;
+    const [from, to] = [move.slice(0, 2), move.slice(2, 5)];
+    const [fromIndex, toIndex] = [this.getIndex(from), this.getIndex(to)];
+    const figure = this.board()[fromIndex].figure;
+    if (fromIndex === null || toIndex === null || !figure) return;
+    if (len === 5) {
+      const promotion = move[len - 1];
+      const piece = promotionHash[promotion];
+      if (piece) {
+        this.handlePromotionChoose(piece, figure, toIndex);
+      }
+    } else if (len === 4) {
+      this.moveFigure(figure, toIndex, this.moveTurn() === this.player.color);
+    }
+  }
+
+  private toNotation(idx: number) {
+    const file = (i: number) => lettersHash[i % 8];
+    const rank = (i: number) => 8 - Math.floor(i / 8);
+
+    return `${file(idx)}${rank(idx)}`;
   }
 
   public handlePromotionChoose(
@@ -592,28 +643,6 @@ export class ChessService {
     }
   }
 
-  private handleCastle(index: number, board: Square[], figure: Figure) {
-    const [y] = figure.position();
-    const kingIndex = get1Dposition(figure.position())!;
-    const isLeft = index < kingIndex;
-    const dif = isLeft ? 1 : -1;
-    let rookIndex;
-    if (y === 0) {
-      rookIndex = isLeft ? 0 : 7;
-    } else {
-      rookIndex = isLeft ? 56 : 63;
-    }
-
-    const rook = board[rookIndex];
-    rook.figure?.move(index + dif);
-    board[rookIndex] = {
-      figure: null,
-      isPlayer: false,
-      canMove: false,
-    };
-    board[index + dif] = rook;
-  }
-
   private finishGame(data: GameEndData) {
     this.gameEndData.set(data);
     this.isGameFinished.set(true);
@@ -640,6 +669,110 @@ export class ChessService {
     }
   }
 
+  public getFEN() {
+    const board = this.board();
+    const fen = [];
+    for (let col = 0; col < 8; col++) {
+      let empty = 0;
+      for (let row = 0; row < 8; row++) {
+        const square = board[get1Dposition([col, row])!];
+        const figure = square.figure;
+        if (!figure) {
+          empty++;
+        } else {
+          if (empty > 0) {
+            fen.push(empty);
+            empty = 0;
+          }
+          const letter = PIECE_NOTATION[figure.piece];
+          fen.push(
+            figure.color === Color.BLACK ? letter : letter.toUpperCase(),
+          );
+        }
+      }
+      if (empty > 0) {
+        fen.push(empty);
+      }
+      if (col < 7) {
+        fen.push('/');
+      }
+    }
+
+    fen.push(' ', this.moveTurn()[0]);
+    let leftWhiteRook,
+      rightWhiteRook,
+      leftBlackRook,
+      rightBlackRook,
+      blackKing,
+      whiteKing;
+    for (const square of board) {
+      const { figure } = square;
+      if (figure === null) continue;
+      const index = get1Dposition(figure.position()!)!;
+
+      if (figure instanceof Rook && figure.color === Color.WHITE) {
+        if (index === 0 || index === 56) {
+          leftWhiteRook = figure;
+        } else if (index === 7 || index === 63) {
+          rightWhiteRook = figure;
+        }
+      }
+
+      if (figure instanceof Rook && figure.color === Color.BLACK) {
+        if (index === 0 || index === 56) {
+          leftBlackRook = figure;
+        } else if (index === 7 || index === 64) {
+          rightBlackRook = figure;
+        }
+      }
+
+      if (figure instanceof King && figure.color === Color.WHITE) {
+        whiteKing = figure;
+      }
+      if (figure instanceof King && figure.color === Color.BLACK) {
+        blackKing = figure;
+      }
+    }
+
+    let castleNotation = '';
+    const isReversed = this.player.color === 'black';
+    if (
+      whiteKing?.isMoved === false &&
+      (isReversed
+        ? leftWhiteRook?.isMoved === false
+        : rightWhiteRook?.isMoved === false)
+    )
+      castleNotation += 'K';
+    if (
+      whiteKing?.isMoved === false &&
+      (isReversed
+        ? rightWhiteRook?.isMoved === false
+        : leftWhiteRook?.isMoved === false)
+    )
+      castleNotation += 'Q';
+    if (
+      blackKing?.isMoved === false &&
+      (isReversed
+        ? leftBlackRook?.isMoved === false
+        : rightBlackRook?.isMoved === false)
+    )
+      castleNotation += 'k';
+    if (
+      blackKing?.isMoved === false &&
+      (isReversed
+        ? rightBlackRook?.isMoved === false
+        : leftBlackRook?.isMoved === false)
+    )
+      castleNotation += 'q';
+
+    fen.push(' ', castleNotation || '-');
+    fen.push(' ', this.onPassonSquare || '-');
+    fen.push(' ', '0');
+    fen.push(' ', '1');
+
+    return fen.join('');
+  }
+
   public reset() {
     this.board.set(this.generateBoard());
     this.isGameEndModalOpen.set(false);
@@ -656,5 +789,11 @@ export class ChessService {
     this.opponent.takenPieces.set([]);
     this.opponent.advantage.set(0);
     this.invitation.set({ isModalOpen: false, link: null });
+    this.onPassonSquare = null;
+    this.inReview.set(false);
+    this.moves.set([]);
+    this.movesHash = {};
+    this.currentMove.set([0,0]);
+    this.currentMoveIdx.set(0)
   }
 }

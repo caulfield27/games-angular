@@ -27,8 +27,8 @@ import {
 import { CdkDrag, CdkDragEnd } from '@angular/cdk/drag-drop';
 import { ChessService } from '../../service/chess.service';
 import { Figure, Square } from '../../classes/figure';
-import { PromoteOption, SoundType } from '../../types';
-import { get1Dposition, get2Dposition, getSquareBg } from '../../utils';
+import { PromoteOption } from '../../types';
+import { get1Dposition, get2Dposition } from '../../utils';
 import { getCoordinates } from '@/shared/utils/getCoordinates';
 import { CommonModule } from '@angular/common';
 import { King, Pawn } from '../../classes/pieces';
@@ -38,7 +38,12 @@ import {
   InvitationModal,
 } from './_components';
 import { WebsocketService } from '../../service/ws.service';
-import { PIECE_IMAGE_PATH } from '../../constants';
+import {
+  normalLabels,
+  PIECE_IMAGE_PATH,
+  reversedLabels,
+} from '../../constants';
+import { StockfishService } from '../../service/stockfish.service';
 
 @Component({
   selector: 'game',
@@ -86,6 +91,7 @@ export class Game implements OnDestroy, OnInit {
   constructor(
     public chessService: ChessService,
     private ws: WebsocketService,
+    private stockfish: StockfishService,
   ) {
     effect(() => {
       const currentMove = chessService.currentMove();
@@ -140,8 +146,16 @@ export class Game implements OnDestroy, OnInit {
   }
 
   // methods
-  public getBg(idx: number) {
-    return getSquareBg(idx);
+  getSquareBg(i: number): string {
+    return (i + Math.floor(i / 8)) % 2
+      ? 'var(--board-black)'
+      : 'var(--board-white)';
+  }
+
+  getLabelColor(i: number) {
+    return (i + Math.floor(i / 8)) % 2
+      ? 'var(--board-white)'
+      : 'var(--board-black)';
   }
 
   public getGridArea(idx: number, position: [number, number] | null) {
@@ -179,7 +193,10 @@ export class Game implements OnDestroy, OnInit {
     if (!this.currentFigure) return;
     if (this.currentFigure instanceof Pawn)
       this.chessService.checkPawnPromotion(newIndex);
-    if (this.chessService.pawnPromotionIndex() !== null) return;
+    if (this.chessService.pawnPromotionIndex() !== null){
+      return;
+    } 
+      
 
     const prevIdx = get1Dposition(this.currentFigure.position());
     const moveType = this.chessService.moveFigure(
@@ -205,8 +222,17 @@ export class Game implements OnDestroy, OnInit {
           to: newIndex,
         },
       });
+    } else if (this.chessService.gameType() === 'bot') {
+      const fen = this.chessService.getFEN();
+      this.stockfish
+        .bestMove(fen)
+        .then((bestMove) => {
+          if (bestMove) {
+            this.chessService.handleBotMove(bestMove);
+          }
+        })
+        .catch(console.error);
     }
-
     this.currentFigure = null;
   }
 
@@ -319,6 +345,22 @@ export class Game implements OnDestroy, OnInit {
     this.updateBoard(prevMove);
   }
 
+  public getLabel(index: number): {
+    col: string | null;
+    row: string | null;
+  } {
+    const labels =
+      this.chessService.player.color === 'black'
+        ? reversedLabels
+        : normalLabels;
+    return (
+      labels[index] ?? {
+        col: null,
+        row: null,
+      }
+    );
+  }
+
   public nextMove() {
     const currentMove = this.chessService.currentMove();
     let nextMove: [number, number] = [0, 0];
@@ -341,7 +383,15 @@ export class Game implements OnDestroy, OnInit {
     const key = moves[move[0]][0] + moves[move[0]][move[1]];
     const savedPositions = this.chessService.movesHash[key];
     if (savedPositions) {
-      const { board, checkIndex, mateIndex } = savedPositions;
+      const {
+        board,
+        checkIndex,
+        mateIndex,
+        playerAdvantage,
+        playerTakenPieces,
+        opponentAdvantage,
+        opponentTakenPieces,
+      } = savedPositions;
       const updatedBoard: Square[] = [];
       board.forEach((pos) => {
         if (pos.figure instanceof Figure) {
@@ -355,10 +405,17 @@ export class Game implements OnDestroy, OnInit {
       });
       this.chessService.checkIndex.set(checkIndex);
       this.chessService.mateIndex.set(mateIndex);
-
+      this.chessService.player.advantage.set(playerAdvantage);
+      this.chessService.player.takenPieces.set(playerTakenPieces);
+      this.chessService.opponent.advantage.set(opponentAdvantage);
+      this.chessService.opponent.takenPieces.set(opponentTakenPieces);
       this.chessService.board.set(updatedBoard);
     } else {
       this.chessService.board.set(this.chessService.generateBoard());
+      this.chessService.player.advantage.set(0);
+      this.chessService.player.takenPieces.set([]);
+      this.chessService.opponent.advantage.set(0);
+      this.chessService.opponent.takenPieces.set([]);
     }
 
     const last = moves.length - 1;

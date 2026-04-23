@@ -1,7 +1,51 @@
-import { Piece, Color } from '../types';
+import { Piece, Color, PromoteOption } from '../types';
 
-export const COLLS = 8;
-export const ROWS = 8;
+export const initialBoard: (Piece | null)[][] = [
+  [
+    Piece.ROOK,
+    Piece.KNIGHT,
+    Piece.BISHOP,
+    Piece.QUEEN,
+    Piece.KING,
+    Piece.BISHOP,
+    Piece.KNIGHT,
+    Piece.ROOK,
+  ],
+  [
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+  ],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [null, null, null, null, null, null, null, null],
+  [
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+    Piece.PAWN,
+  ],
+  [
+    Piece.ROOK,
+    Piece.KNIGHT,
+    Piece.BISHOP,
+    Piece.QUEEN,
+    Piece.KING,
+    Piece.BISHOP,
+    Piece.KNIGHT,
+    Piece.ROOK,
+  ],
+];
 
 export const PIECE_VALUE: Record<string, number> = {
   [Piece.PAWN]: 1,
@@ -9,6 +53,15 @@ export const PIECE_VALUE: Record<string, number> = {
   [Piece.KNIGHT]: 3,
   [Piece.ROOK]: 5,
   [Piece.QUEEN]: 8,
+};
+
+export const PIECE_NOTATION: Record<string, string> = {
+  [Piece.PAWN]: 'p',
+  [Piece.BISHOP]: 'b',
+  [Piece.KNIGHT]: 'n',
+  [Piece.ROOK]: 'r',
+  [Piece.KING]: 'k',
+  [Piece.QUEEN]: 'q',
 };
 
 export const PIECE_IMAGE_PATH: Record<string, string> = {
@@ -26,28 +79,6 @@ export const PIECE_IMAGE_PATH: Record<string, string> = {
   [Piece.PAWN + Color.BLACK]: '/chess/bp.svg',
 };
 
-export const PLAYER_PIECE: Record<string, Piece> = {
-  63: Piece.ROOK,
-  62: Piece.KNIGHT,
-  61: Piece.BISHOP,
-  60: Piece.KING,
-  59: Piece.QUEEN,
-  58: Piece.BISHOP,
-  57: Piece.KNIGHT,
-  56: Piece.ROOK,
-};
-
-export const OPPONENT_PIECE: Record<string, Piece> = {
-  0: Piece.ROOK,
-  1: Piece.KNIGHT,
-  2: Piece.BISHOP,
-  3: Piece.QUEEN,
-  4: Piece.KING,
-  5: Piece.BISHOP,
-  6: Piece.KNIGHT,
-  7: Piece.ROOK,
-};
-
 export const lettersHash: Record<string, string> = {
   0: 'a',
   1: 'b',
@@ -57,4 +88,156 @@ export const lettersHash: Record<string, string> = {
   5: 'f',
   6: 'g',
   7: 'h',
+};
+
+export const numbersHash: Record<string, number> = {
+  a: 0,
+  b: 1,
+  c: 2,
+  d: 3,
+  e: 4,
+  f: 5,
+  g: 6,
+  h: 7,
+};
+
+export const promotionHash: Record<string, PromoteOption> = {
+  q: 'queen',
+  r: 'rook',
+  b: 'bishop',
+  n: 'knight',
+};
+
+type Labels = Record<
+  number,
+  {
+    col: string | null;
+    row: string | null;
+  }
+>;
+
+export const normalLabels: Labels = {
+  0: {
+    col: '8',
+    row: null,
+  },
+  8: {
+    col: '7',
+    row: null,
+  },
+  16: {
+    col: '6',
+    row: null,
+  },
+  24: {
+    col: '5',
+    row: null,
+  },
+  32: {
+    col: '4',
+    row: null,
+  },
+  40: {
+    col: '3',
+    row: null,
+  },
+  48: {
+    col: '2',
+    row: null,
+  },
+  56: {
+    col: '1',
+    row: 'a',
+  },
+  57: {
+    col: null,
+    row: 'b',
+  },
+  58: {
+    col: null,
+    row: 'c',
+  },
+  59: {
+    col: null,
+    row: 'd',
+  },
+  60: {
+    col: null,
+    row: 'e',
+  },
+  61: {
+    col: null,
+    row: 'f',
+  },
+  62: {
+    col: null,
+    row: 'g',
+  },
+  63: {
+    col: null,
+    row: 'h',
+  },
+};
+
+export const reversedLabels: Labels = {
+  0: {
+    col: '1',
+    row: null,
+  },
+  8: {
+    col: '2',
+    row: null,
+  },
+  16: {
+    col: '3',
+    row: null,
+  },
+  24: {
+    col: '4',
+    row: null,
+  },
+  32: {
+    col: '5',
+    row: null,
+  },
+  40: {
+    col: '6',
+    row: null,
+  },
+  48: {
+    col: '7',
+    row: null,
+  },
+  56: {
+    col: '8',
+    row: 'h',
+  },
+  57: {
+    col: null,
+    row: 'g',
+  },
+  58: {
+    col: null,
+    row: 'f',
+  },
+  59: {
+    col: null,
+    row: 'e',
+  },
+  60: {
+    col: null,
+    row: 'd',
+  },
+  61: {
+    col: null,
+    row: 'c',
+  },
+  62: {
+    col: null,
+    row: 'b',
+  },
+  63: {
+    col: null,
+    row: 'a',
+  },
 };

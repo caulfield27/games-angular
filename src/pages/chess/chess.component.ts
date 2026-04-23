@@ -18,7 +18,6 @@ import { GameType, MenuOption } from './types';
 import { WebsocketService } from './service/ws.service';
 import { v4 as uuidv4 } from 'uuid';
 import { setupTheme } from './utils';
-import { BotService } from './service/bot.service';
 
 @Component({
   selector: 'chess',
@@ -78,12 +77,11 @@ export class Chess implements OnInit {
   constructor(
     public chessService: ChessService,
     public ws: WebsocketService,
-    public bot: BotService
   ) {
     effect(async () => {
       switch (chessService.gameType()) {
         case 'bot':
-          //todo
+          chessService.opponent.name.set('Stockfish');
           break;
         case 'friend':
           const params = new URLSearchParams(window.location.search);

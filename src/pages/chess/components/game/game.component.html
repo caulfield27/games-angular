@@ -36,7 +36,7 @@
             </div>
           </div>
         </div>
-        <div
+        <!-- <div
           class="flex flex-row items-center justify-center gap-1.5 rounded-md bg-neutral-900 px-2.5 py-1"
         >
           <lucide-icon [img]="TimerIcon" size="20" />
@@ -45,7 +45,7 @@
             <span>:</span>
             <span>59</span>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div
@@ -61,10 +61,27 @@
           <div
             class="relative"
             (click)="onMove(square, $index)"
-            [style.background]="getBg($index)"
+            [style.background]="getSquareBg($index)"
             #cell
             [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
           >
+            @let label = getLabel($index);
+            @let figure = isFigure(square.figure);
+            @if (label.col) {
+              <span
+                [style.color]="getLabelColor($index)"
+                class="absolute top-[1px] left-[1px] font-semibold"
+                >{{ label.col }}</span
+              >
+            }
+            @if (label.row) {
+              <span
+                [style.color]="getLabelColor($index)"
+                class="absolute bottom-0 right-0 font-semibold"
+                >{{ label.row }}</span
+              >
+            }
+
             @if (
               !chessService.inReview() &&
               ($index === lastMove[0] || $index === lastMove[1])
@@ -72,17 +89,17 @@
               <div class="history"></div>
             }
 
-            @if (square.canMove && isFigure(square.figure)) {
+            @if (square.canMove && figure) {
               <div class="take_square"></div>
             }
-            @if (square.canMove && !isFigure(square.figure)) {
+            @if (square.canMove && !figure) {
               <div class="available_square"></div>
             }
-            @if (isFigure(square.figure)) {
+            @if (figure) {
               <div
                 (pointerdown)="onPieceChoose(square)"
                 role="button"
-                [cdkDragDisabled]="isDragDisabled(square.figure)"
+                [cdkDragDisabled]="isDragDisabled(square.figure!)"
                 cdkDrag
                 cdkDragBoundary="#board"
                 class="relative z-[2] cursor-grab touch-none"
@@ -99,8 +116,8 @@
                   "
                   width="60"
                   height="60"
-                  [src]="square.figure.image"
-                  [alt]="square.figure.piece"
+                  [src]="square.figure!.image"
+                  [alt]="square.figure!.piece"
                 />
               </div>
             }
@@ -136,7 +153,7 @@
             </div>
           </div>
         </div>
-        <div
+        <!-- <div
           class="flex flex-row items-center justify-center gap-1.5 rounded-md bg-neutral-900 px-2.5 py-1"
         >
           <lucide-icon [img]="TimerIcon" size="20" />
@@ -145,7 +162,7 @@
             <span>:</span>
             <span>59</span>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -157,7 +174,10 @@
         class="w-full overflow-y-auto flex flex-col gap-1"
       >
         @for (move of chessService.moves(); track $index) {
-          <div #moveListDesktop class="w-full flex items-center justify-between text-white">
+          <div
+            #moveListDesktop
+            class="w-full flex items-center justify-between text-white"
+          >
             <span class="w-[33%]">{{ move[0] || "" }}.</span>
             <span
               [class]="
@@ -227,7 +247,10 @@
           </button>
           <div class="w-[75vw] overflow-x-auto flex flex-row gap-3">
             @for (move of chessService.moves(); track $index) {
-              <div #moveListMobile class="flex items-center gap-1 text-white text-sm shrink-0">
+              <div
+                #moveListMobile
+                class="flex items-center gap-1 text-white text-sm shrink-0"
+              >
                 <span class="text-neutral-400">{{ move[0] || "" }}.</span>
 
                 <span

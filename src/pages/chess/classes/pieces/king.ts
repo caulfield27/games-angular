@@ -50,7 +50,7 @@ export class King extends Figure {
             forbidden.push(...figure.getAvailableFields(board));
             break;
           case figure instanceof Pawn:
-            const pawn = figure.getAvailableFields([], board, [],true);
+            const pawn = figure.getAvailableFields([], board, [], true);
             forbidden.push(...pawn.upleft, ...pawn.upright);
             break;
           case figure instanceof Queen:
@@ -113,28 +113,63 @@ export class King extends Figure {
     const rookRight = board[leftRookIndex].figure;
     const rookLeft = board[rightRookIndex].figure;
 
-    if (rookLeft instanceof Figure && !rookLeft.isMoved) {
-      if (!(rookLeft instanceof Rook) || rookLeft.color !== this.color)
-        return allowed;
-      if (
-        board[kingIndex - 1].figure === null &&
-        board[kingIndex - 2].figure === null &&
-        board[kingIndex - 3].figure === null
-      ) {
-        allowed.push(kingIndex - 2);
+    if (
+      !(rookLeft instanceof Rook) ||
+      rookLeft.isMoved ||
+      rookLeft.color !== this.color
+    )
+      return allowed;
+    const leftPath = position[1] === 3 ? 2 : 3;
+    let leftPathClear = true;
+    for (let i = 1; i <= leftPath; i++) {
+      if (board[kingIndex - i].figure !== null) {
+        leftPathClear = false;
+        break;
       }
+    }
+    if (leftPathClear) {
+      allowed.push(kingIndex - 2);
     }
 
-    if (rookRight instanceof Figure && !rookRight.isMoved) {
-      if (!(rookRight instanceof Rook) || rookRight.color !== this.color)
-        return allowed;
-      if (
-        board[kingIndex + 1].figure === null &&
-        board[kingIndex + 2].figure === null
-      ) {
-        allowed.push(kingIndex + 2);
+    if (
+      !(rookRight instanceof Rook) ||
+      rookRight.isMoved ||
+      rookRight.color !== this.color
+    )
+      return allowed;
+    const rightPath = position[1] === 3 ? 3 : 2;
+    let rightPathClear = true;
+    for (let i = 1; i <= rightPath; i++) {
+      if (board[kingIndex + i].figure !== null) {
+        rightPathClear = false;
+        break;
       }
     }
+    if (rightPathClear) {
+      allowed.push(kingIndex + 2);
+    }
+    // if (rookLeft instanceof Figure && !rookLeft.isMoved) {
+    //   if (!(rookLeft instanceof Rook) || rookLeft.color !== this.color)
+    //     return allowed;
+    //   if (
+    //     board[kingIndex - 1].figure === null &&
+    //     board[kingIndex - 2].figure === null &&
+    //     board[kingIndex - 3].figure === null
+    //   ) {
+    //     allowed.push(kingIndex - 2);
+    //   }
+    // }
+
+    // if (rookRight instanceof Figure && !rookRight.isMoved) {
+    //   if (!(rookRight instanceof Rook) || rookRight.color !== this.color)
+    //     return allowed;
+    //   if (
+    //     board[kingIndex + 1].figure === null &&
+    //     board[kingIndex + 2].figure === null
+    //   ) {
+    //     allowed.push(kingIndex + 2);
+    //   }
+    // }
 
     return allowed;
   }
@@ -162,8 +197,8 @@ export class King extends Figure {
             break;
           case guardFigure instanceof Pawn:
             protectedSquares.push(
-              ...guardFigure.getAvailableFields([], board,[],true).upleft,
-              ...guardFigure.getAvailableFields([], board,[],true).upright,
+              ...guardFigure.getAvailableFields([], board, [], true).upleft,
+              ...guardFigure.getAvailableFields([], board, [], true).upright,
             );
             break;
           case guardFigure instanceof Queen:

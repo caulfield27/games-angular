@@ -94,4 +94,14 @@ export type MovesHash = Record<string, {
   board: HashSquare;
   checkIndex: number | null;
   mateIndex: number | null;
+  playerTakenPieces: Piece[];
+  playerAdvantage: number;
+  opponentTakenPieces: Piece[];
+  opponentAdvantage: number;
 }>;
+
+
+export type BoardHash = {
+  col: Record<number, string>;
+  row: Record<number, string>
+}
