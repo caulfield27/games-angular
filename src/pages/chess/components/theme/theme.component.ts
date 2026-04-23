@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import { ChessButton } from '../button/button.component';
 
 export interface BoardTheme {
@@ -13,25 +19,25 @@ export const BOARD_THEMES: BoardTheme[] = [
     name: 'Классический',
     white: '#eeeed2',
     black: '#769656',
-    historyColor: '#fde68a',
+    historyColor: '#f6f669',
   },
   {
     name: 'Дерево',
     white: '#f0d9b5',
     black: '#b58863',
-    historyColor: '#d6d3d1',
+    historyColor: '#e9c46a',
   },
   {
     name: 'Темный',
     white: '#f5f5f5',
     black: '#3b3b3b',
-    historyColor: '#cbd5e1',
+    historyColor: '#AAFFC7',
   },
   {
     name: 'Минимализм',
     white: '#dee3e6',
     black: '#8ca2ad',
-    historyColor: '#fca5a5',
+    historyColor: '#F7DD7D',
   },
 ];
 
@@ -66,7 +72,7 @@ export class ThemeSettingsComponent implements OnDestroy {
     }
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     document.body.style.overflowY = 'auto';
   }
 

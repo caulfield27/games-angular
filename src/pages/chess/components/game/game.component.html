@@ -70,14 +70,14 @@
             @if (label.col) {
               <span
                 [style.color]="getLabelColor($index)"
-                class="absolute top-[1px] left-[1px] font-semibold"
+                class="absolute top-[1px] left-[1px] font-semibold max-sm:text-sm"
                 >{{ label.col }}</span
               >
             }
             @if (label.row) {
               <span
                 [style.color]="getLabelColor($index)"
-                class="absolute bottom-0 right-0 font-semibold"
+                class="absolute bottom-0 right-0 font-semibold max-sm:text-sm"
                 >{{ label.row }}</span
               >
             }
@@ -240,7 +240,6 @@
     <div
       class="sm:hidden mt-2 sticky bottom-0 left-0 w-full z-50 bg-neutral-900/95 border-t border-white/10 backdrop-blur"
     >
-      @if (chessService.moves().length) {
         <div class="w-full py-2 flex flex-row gap-3 justify-between">
           <button [disabled]="isPrevDisabled" (click)="prevMove()">
             <lucide-icon [img]="LeftIcon" size="26" color="white" />
@@ -289,7 +288,6 @@
             <lucide-icon [img]="RightIcon" size="26" color="white" />
           </button>
         </div>
-      }
       <!-- Actions -->
       <div
         class="flex items-center justify-between px-3 py-2 border-t border-white/10"
