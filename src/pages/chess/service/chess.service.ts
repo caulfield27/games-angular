@@ -209,7 +209,7 @@ export class ChessService {
           s.figure.color !== color,
       )
       .forEach((f) => {
-        const squares = f.figure!.getAllowedSquares(board);
+        const squares = f.figure!.getAllowedSquares(board, [], true);
         if (squares.includes(kingIdx)) {
           const path = f.figure!.getPath(kingIdx, board);
 

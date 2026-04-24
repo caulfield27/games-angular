@@ -13,8 +13,14 @@ export class Queen extends Figure {
     super(Piece.QUEEN, color, position, isPlayer, type);
   }
 
-  public override getAllowedSquares(board: Square[]): number[] {
-    const forbidden = this.forbiddenMoves(board) as MoveDirection[];
+  public override getAllowedSquares(
+    board: Square[],
+    _?: undefined,
+    isCheck?: boolean,
+  ): number[] {
+    const forbidden = isCheck
+      ? []
+      : (this.forbiddenMoves(board) as MoveDirection[]);
     return this.getAvailableFields(forbidden, board);
   }
 

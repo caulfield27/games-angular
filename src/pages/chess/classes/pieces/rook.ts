@@ -13,9 +13,15 @@ export class Rook extends Figure {
     super(Piece.ROOK, color, position, isPlayer, type);
   }
 
-  public override getAllowedSquares(board: Square[]): number[] {
+  public override getAllowedSquares(
+    board: Square[],
+    _?: undefined,
+    isCheck?: boolean,
+  ): number[] {
     const allowed = [];
-    const forbidden = this.forbiddenMoves(board) as MoveDirection[];
+    const forbidden = isCheck
+      ? []
+      : (this.forbiddenMoves(board) as MoveDirection[]);
     if (!forbidden.includes('left'))
       allowed.push(...this.getAvailableFields('left', board));
     if (!forbidden.includes('right'))

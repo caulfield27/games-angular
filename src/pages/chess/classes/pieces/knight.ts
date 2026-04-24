@@ -3,12 +3,23 @@ import { get1Dposition } from '../../utils';
 import { Figure, Square } from '../figure';
 
 export class Knight extends Figure {
-  constructor(color: Color, position: [number, number], isPlayer: boolean, type: GameType) {
+  constructor(
+    color: Color,
+    position: [number, number],
+    isPlayer: boolean,
+    type: GameType,
+  ) {
     super(Piece.KNIGHT, color, position, isPlayer, type);
   }
 
-  public override getAllowedSquares(board: Square[]): number[] {
-    const forbidden = this.forbiddenMoves(board) as MoveDirection[];
+  public override getAllowedSquares(
+    board: Square[],
+    _?: undefined,
+    isCheck?: boolean,
+  ): number[] {
+    const forbidden = isCheck
+      ? []
+      : (this.forbiddenMoves(board) as MoveDirection[]);
     if (forbidden.length) return [];
     return this.getAvailableFields(board);
   }
@@ -31,12 +42,12 @@ export class Knight extends Figure {
       const index = get1Dposition([y + dy, x + dx]);
       if (index === null) continue;
       const figure = board[index].figure;
-      
+
       if (figure === null) allowed.push(index);
       if (figure instanceof Figure) {
         if (
           (!this.isPlayer && this.color === figure.color) ||
-          (this.color !== figure.color)
+          this.color !== figure.color
         ) {
           allowed.push(index);
         }

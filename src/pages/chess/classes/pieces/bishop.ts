@@ -13,9 +13,15 @@ export class Bishop extends Figure {
     super(Piece.BISHOP, color, position, isPlayer, type);
   }
 
-  public override getAllowedSquares(board: Square[]): number[] {
+  public override getAllowedSquares(
+    board: Square[],
+    _?: undefined,
+    isCheck?: boolean,
+  ): number[] {
     const allowed = [];
-    const forbidden = this.forbiddenMoves(board) as MoveDirection[];
+    const forbidden = isCheck
+      ? []
+      : (this.forbiddenMoves(board) as MoveDirection[]);
     if (!forbidden.includes('upleft'))
       allowed.push(...this.getAvailableFields('leftup', board));
     if (!forbidden.includes('downleft'))

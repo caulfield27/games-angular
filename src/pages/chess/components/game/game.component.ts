@@ -84,7 +84,7 @@ export class Game implements OnDestroy, OnInit {
 
   // states
   cellSize = signal<number>(60);
-  boardH = signal<number>(50);
+  boardH = signal<number>(100);
   currentFigure: Figure | null = null;
   beforeUnloadListener: (() => void) | null = null;
 
@@ -121,7 +121,7 @@ export class Game implements OnDestroy, OnInit {
     if (width) {
       const root = document.documentElement;
       root.style.setProperty('--chess-cell', width + 'px');
-      this.boardH.update((prev) => prev + boardHeight);
+      this.boardH.update((prev) => boardHeight-prev);
       this.cellSize.set(width);
     }
   }

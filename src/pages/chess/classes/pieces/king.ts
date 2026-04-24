@@ -19,8 +19,8 @@ export class King extends Figure {
 
   public override getAllowedSquares(
     board: Square[],
-    _: undefined,
-    isCheck: boolean,
+    _?: undefined,
+    isCheck?: boolean,
   ) {
     const forbidden = this.forbiddenMoves(board);
     const fields = this.getAvailableFields(board, isCheck).filter(

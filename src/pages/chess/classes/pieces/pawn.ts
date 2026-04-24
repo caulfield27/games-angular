@@ -15,9 +15,12 @@ export class Pawn extends Figure {
   public override getAllowedSquares(
     board: Square[],
     history?: History[],
+    isCheck?: boolean,
   ): number[] {
     const allowed = [];
-    const forbidden = this.forbiddenMoves(board) as MoveDirection[];
+    const forbidden = isCheck
+      ? []
+      : (this.forbiddenMoves(board) as MoveDirection[]);
     const pawnFields = this.getAvailableFields(forbidden, board, history);
     allowed.push(...pawnFields.up, ...pawnFields.upleft, ...pawnFields.upright);
     return allowed;
@@ -27,7 +30,7 @@ export class Pawn extends Figure {
     forbidden: MoveDirection[],
     board: Square[],
     history?: History[],
-    kingCheck: boolean = false
+    kingCheck: boolean = false,
   ) {
     const position = this.position();
     const [y, x] = position;
@@ -65,7 +68,6 @@ export class Pawn extends Figure {
     }
 
     if (!forbidden.includes('upleft')) {
-      
       const up3 = get1Dposition([y + directions[0], x + directions[0]]) ?? -1;
       const up3Figure = board[up3]?.figure;
       if (up3Figure instanceof Figure && up3Figure.color !== this.color) {
@@ -98,7 +100,6 @@ export class Pawn extends Figure {
     }
 
     if (!forbidden.includes('upright')) {
-      
       const up4 = get1Dposition([y + directions[0], x + directions[2]]) ?? -1;
       const up4Figure = board[up4]?.figure;
       if (up4Figure instanceof Figure && up4Figure.color !== this.color) {
