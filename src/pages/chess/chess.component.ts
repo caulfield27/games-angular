@@ -4,6 +4,8 @@ import {
   Game,
   GameEndModalComponent,
   ThemeSettingsComponent,
+  ChessButton,
+  ChessChip,
 } from './components';
 import {
   LucideAngularModule,
@@ -14,7 +16,7 @@ import {
   ArrowLeft,
   Paintbrush,
 } from 'lucide-angular';
-import { GameType, MenuOption } from './types';
+import { GameSpeed, GameSpeedOption, GameType, MenuOption } from './types';
 import { WebsocketService } from './service/ws.service';
 import { v4 as uuidv4 } from 'uuid';
 import { setupTheme } from './utils';
@@ -27,6 +29,8 @@ import { setupTheme } from './utils';
     Game,
     LucideAngularModule,
     ThemeSettingsComponent,
+    ChessButton,
+    ChessChip,
   ],
 })
 export class Chess implements OnInit {
@@ -44,35 +48,73 @@ export class Chess implements OnInit {
       type: 'online',
       icon: this.GlobeIcon,
       title: 'Играть Онлайн',
-      description: 'Соревнуйтесь с игроками по со всего мира',
+      description: 'Подбор соперника и быстрый старт против игроков со всего мира.',
       iconColor: '#60a5fa',
       iconBg: '#dbeafe',
+      badge: 'Рейтинг',
+      gradient: 'linear-gradient(135deg, #e0f2fe 0%, #ffffff 52%, #ecfeff 100%)',
+      accent: '#0284c7',
     },
     {
       type: 'bot',
       icon: this.BotIcon,
       title: 'Играть против Бота',
-      description: 'Бросьте вызов ИИ противникам',
+      description: 'Тренировка с ИИ и спокойный темп для отработки дебютов.',
       iconColor: '#c084fc',
       iconBg: '#f3e8ff',
+      badge: 'AI sparring',
+      gradient: 'linear-gradient(135deg, #ede9fe 0%, #ffffff 52%, #fdf4ff 100%)',
+      accent: '#7c3aed',
     },
     {
       type: 'friend',
       icon: this.UsersIcon,
       title: 'Играть c Другом',
-      description: 'Пригласить кого-нибудь поиграть',
+      description: 'Личная ссылка на партию и удобный матч с выбранным контролем.',
       iconColor: '#4ade80',
       iconBg: '#dcfce7',
+      badge: 'Private room',
+      gradient: 'linear-gradient(135deg, #d1fae5 0%, #ffffff 52%, #f7fee7 100%)',
+      accent: '#059669',
     },
     {
       type: 'irl',
       icon: this.HandshakeIcon,
       title: 'Игра за доской',
-      description: 'Режим игры вдвоём.',
+      description: 'Локальная партия за одним устройством для игры рядом.',
       iconColor: '#f59e0b',
       iconBg: '#fef3c7',
+      badge: '2 players',
+      gradient: 'linear-gradient(135deg, #fef3c7 0%, #ffffff 52%, #fff7ed 100%)',
+      accent: '#d97706',
     },
   ];
+  readonly speedOptions: GameSpeedOption[] = [
+    {
+      type: 'classic',
+      title: 'Классический',
+      time: '10+0',
+      subtitle: 'Размеренная партия для долгих решений.',
+    },
+    {
+      type: 'blitz',
+      title: 'Блиц',
+      time: '3+2',
+      subtitle: 'Быстрый контроль времени и агрессивный темп.',
+    },
+    {
+      type: 'rapid',
+      title: 'Рапид',
+      time: '5+5',
+      subtitle: 'Баланс между скоростью и продуманной игрой.',
+    },
+  ];
+  public selectedModes: Record<GameType, GameSpeed> = {
+    online: 'blitz',
+    bot: 'classic',
+    friend: 'rapid',
+    irl: 'classic',
+  };
 
   constructor(
     public chessService: ChessService,
@@ -138,12 +180,27 @@ export class Chess implements OnInit {
     this.chessService.gameType.set(type);
   }
 
+  public onModeChoose(gameType: GameType, speed: GameSpeed) {
+    this.selectedModes = {
+      ...this.selectedModes,
+      [gameType]: speed,
+    };
+  }
+
+  public getSelectedMode(gameType: GameType) {
+    return this.speedOptions.find((item) => item.type === this.selectedModes[gameType]) ?? this.speedOptions[0];
+  }
+
   public reset() {
     this.ws.close(1000, this.chessService.roomId ?? '');
     this.chessService.reset();
   }
 
   public dismissGameEndModal() {
+    this.chessService.dismissGameEndModal();
+  }
+
+  public handleRematch() {
     this.chessService.dismissGameEndModal();
   }
 

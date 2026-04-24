@@ -79,21 +79,6 @@ export const PIECE_IMAGE_PATH: Record<string, string> = {
   [Piece.PAWN + Color.BLACK]: '/chess/bp.svg',
 };
 
-// export const PIECE_IMAGE_PATH: Record<string, string> = {
-//   [Piece.KING + Color.WHITE]: '/chess/wk_secondary.svg',
-//   [Piece.KING + Color.BLACK]: '/chess/bk_secondary.svg',
-//   [Piece.QUEEN + Color.WHITE]: '/chess/wq_secondary.svg',
-//   [Piece.QUEEN + Color.BLACK]: '/chess/bq_secondary.svg',
-//   [Piece.BISHOP + Color.WHITE]: '/chess/wb_secondary.svg',
-//   [Piece.BISHOP + Color.BLACK]: '/chess/bb_secondary.svg',
-//   [Piece.KNIGHT + Color.WHITE]: '/chess/wn_secondary.svg',
-//   [Piece.KNIGHT + Color.BLACK]: '/chess/bn_secondary.svg',
-//   [Piece.ROOK + Color.WHITE]: '/chess/wr_secondary.svg',
-//   [Piece.ROOK + Color.BLACK]: '/chess/br_secondary.svg',
-//   [Piece.PAWN + Color.WHITE]: '/chess/wp_secondary.svg',
-//   [Piece.PAWN + Color.BLACK]: '/chess/bp_secondary.svg',
-// };
-
 export const lettersHash: Record<string, string> = {
   0: 'a',
   1: 'b',

@@ -2,6 +2,7 @@ import { LucideIconData } from 'lucide-angular';
 import { Square } from '../classes/figure';
 
 export type GameType = 'bot' | 'online' | 'friend' | 'irl';
+export type GameSpeed = 'classic' | 'blitz' | 'rapid';
 export enum Piece {
   KING = 'king',
   QUEEN = 'queen',
@@ -82,7 +83,17 @@ export interface MenuOption {
   description: string;
   iconColor: string;
   iconBg: string;
+  badge: string;
+  gradient: string;
+  accent: string;
   type: GameType;
+}
+
+export interface GameSpeedOption {
+  type: GameSpeed;
+  title: string;
+  time: string;
+  subtitle: string;
 }
 
 export interface ReviewSquares {
