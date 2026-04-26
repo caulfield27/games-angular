@@ -44,76 +44,83 @@ export class Chess implements OnInit {
 
   isThemeModalOpen: boolean = false;
   readonly menuOptions: MenuOption[] = [
-    {
-      type: 'online',
-      icon: this.GlobeIcon,
-      title: 'Играть Онлайн',
-      description: 'Подбор соперника и быстрый старт против игроков со всего мира.',
-      iconColor: '#60a5fa',
-      iconBg: '#dbeafe',
-      badge: 'Рейтинг',
-      gradient: 'linear-gradient(135deg, #e0f2fe 0%, #ffffff 52%, #ecfeff 100%)',
-      accent: '#0284c7',
-    },
-    {
-      type: 'bot',
-      icon: this.BotIcon,
-      title: 'Играть против Бота',
-      description: 'Тренировка с ИИ и спокойный темп для отработки дебютов.',
-      iconColor: '#c084fc',
-      iconBg: '#f3e8ff',
-      badge: 'AI sparring',
-      gradient: 'linear-gradient(135deg, #ede9fe 0%, #ffffff 52%, #fdf4ff 100%)',
-      accent: '#7c3aed',
-    },
-    {
-      type: 'friend',
-      icon: this.UsersIcon,
-      title: 'Играть c Другом',
-      description: 'Личная ссылка на партию и удобный матч с выбранным контролем.',
-      iconColor: '#4ade80',
-      iconBg: '#dcfce7',
-      badge: 'Private room',
-      gradient: 'linear-gradient(135deg, #d1fae5 0%, #ffffff 52%, #f7fee7 100%)',
-      accent: '#059669',
-    },
-    {
-      type: 'irl',
-      icon: this.HandshakeIcon,
-      title: 'Игра за доской',
-      description: 'Локальная партия за одним устройством для игры рядом.',
-      iconColor: '#f59e0b',
-      iconBg: '#fef3c7',
-      badge: '2 players',
-      gradient: 'linear-gradient(135deg, #fef3c7 0%, #ffffff 52%, #fff7ed 100%)',
-      accent: '#d97706',
-    },
-  ];
-  readonly speedOptions: GameSpeedOption[] = [
-    {
-      type: 'classic',
-      title: 'Классический',
-      time: '10+0',
-      subtitle: 'Размеренная партия для долгих решений.',
-    },
-    {
-      type: 'blitz',
-      title: 'Блиц',
-      time: '3+2',
-      subtitle: 'Быстрый контроль времени и агрессивный темп.',
-    },
-    {
-      type: 'rapid',
-      title: 'Рапид',
-      time: '5+5',
-      subtitle: 'Баланс между скоростью и продуманной игрой.',
-    },
-  ];
+  {
+    type: 'online',
+    icon: this.GlobeIcon,
+    title: 'Онлайн партия',
+    description: 'Быстрый подбор соперника с близким рейтингом и игра в реальном времени.',
+    iconColor: '#60a5fa',
+    iconBg: '#dbeafe',
+    badge: 'Рейтинг',
+    gradient: 'linear-gradient(135deg, #e0f2fe 0%, #ffffff 52%, #ecfeff 100%)',
+    accent: '#0284c7',
+  },
+  {
+    type: 'bot',
+    icon: this.BotIcon,
+    title: 'Против компьютера',
+    description: 'Играйте с ИИ разного уровня сложности и отрабатывайте тактику и дебюты.',
+    iconColor: '#c084fc',
+    iconBg: '#f3e8ff',
+    badge: 'AI',
+    gradient: 'linear-gradient(135deg, #ede9fe 0%, #ffffff 52%, #fdf4ff 100%)',
+    accent: '#7c3aed',
+  },
+  {
+    type: 'friend',
+    icon: this.UsersIcon,
+    title: 'Игра с другом',
+    description: 'Создайте приватную комнату и отправьте ссылку для совместной партии.',
+    iconColor: '#4ade80',
+    iconBg: '#dcfce7',
+    badge: 'Private',
+    gradient: 'linear-gradient(135deg, #d1fae5 0%, #ffffff 52%, #f7fee7 100%)',
+    accent: '#059669',
+  },
+  {
+    type: 'irl',
+    icon: this.HandshakeIcon,
+    title: 'За одной доской',
+    description: 'Локальная партия на одном устройстве — идеально для игры рядом.',
+    iconColor: '#f59e0b',
+    iconBg: '#fef3c7',
+    badge: '2 игрока',
+    gradient: 'linear-gradient(135deg, #fef3c7 0%, #ffffff 52%, #fff7ed 100%)',
+    accent: '#d97706',
+  },
+];
+
+readonly speedOptions: GameSpeedOption[] = [
+  {
+    type: 'bullet',
+    title: 'Пуля',
+    time: '1+0',
+    subtitle: 'Максимально быстрые партии на реакцию и интуицию.',
+  },
+  {
+    type: 'blitz',
+    title: 'Блиц',
+    time: '3+2',
+    subtitle: 'Динамичная игра с упором на тактику и скорость.',
+  },
+  {
+    type: 'rapid',
+    title: 'Рапид',
+    time: '10+0',
+    subtitle: 'Оптимальный баланс между скоростью и качеством решений.',
+  },
+  {
+    type: 'classic',
+    title: 'Классика',
+    time: '15+10',
+    subtitle: 'Глубокая позиционная игра с достаточным временем на расчёт.',
+  },
+];
   public selectedModes: Record<GameType, GameSpeed> = {
-    online: 'blitz',
-    bot: 'classic',
+    online: 'rapid',
+    bot: 'rapid',
     friend: 'rapid',
-    irl: 'classic',
+    irl: 'rapid',
   };
 
   constructor(

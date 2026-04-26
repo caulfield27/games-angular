@@ -1,80 +1,124 @@
 <div class="page_container">
-  <div class="mainsweeper_wrapper">
-    <div class="my_dropdown_wrapper">
-      <dropdown
-        [options]="options"
-        [value]="boardService.level()"
-        [onSelect]="handleLevelSelect.bind(this)"
-      ></dropdown>
-      @if (boardService.isGameStart()) {
-        <div class="hint_wrapper">
+  <section class="minesweeper_shell">
+    <header class="hero_panel">
+      <div class="hero_copy">
+        <p class="eyebrow">Логика и внимание</p>
+        <h1>Сапер</h1>
+        <p class="hero_text">
+          Открывайте безопасные клетки, отмечайте мины флажками и держите темп
+          под контролем.
+        </p>
+      </div>
+
+      <div class="status_card">
+        <span class="status_label">{{ currentLevelName }}</span>
+        <strong class="status_title">{{ statusTitle }}</strong>
+        <p class="status_text">{{ statusText }}</p>
+      </div>
+    </header>
+
+    <div class="mainsweeper_wrapper">
+      <aside class="control_panel">
+        <div class="control_block">
+          <span class="control_label">Сложность</span>
+          <dropdown
+            [options]="options"
+            [value]="boardService.level()"
+            [onSelect]="handleLevelSelect.bind(this)"
+          ></dropdown>
+        </div>
+
+        <div class="control_block">
+          <span class="control_label">Подсказка</span>
           <button
+            type="button"
             (click)="handleUseHint()"
             [ngClass]="[
               'hint_btn',
               boardService.hintAmount() === 0 ? 'disabled' : '',
             ]"
+            [disabled]="boardService.hintAmount() === 0"
+            [attr.aria-label]="hintButtonLabel"
             id="hint_btn"
           >
-            <lucide-icon
-              [img]="Bulb"
-              size="45"
-              color="#ffff48"
-              [absoluteStrokeWidth]="true"
-            ></lucide-icon>
-            <span>{{ boardService.hintAmount() }}</span>
+            <span class="hint_icon_wrap">
+              <lucide-icon
+                [img]="Bulb"
+                size="24"
+                color="currentColor"
+                [absoluteStrokeWidth]="true"
+              ></lucide-icon>
+            </span>
+            <span class="hint_content">
+              <strong>Показать безопасную клетку</strong>
+              <small>Осталось: {{ boardService.hintAmount() }}</small>
+            </span>
           </button>
         </div>
-      }
-    </div>
-    <div class="game_board">
-      <div class="tablo">
-        <div class="tablo_content">
-          <div class="tablo_flag">
-            <tablo [tabloNum]="boardService.flagCounter()" />
-          </div>
-          <div
-            (click)="boardService.restart()"
-            class="smile_container"
-            role="button"
-          >
-            @if (boardService.isFailed()) {
-              <sad-smile />
-            } @else {
-              <happy-smile />
-            }
-          </div>
-          <div class="timer_container">
-            <tablo [tabloNum]="boardService.seconds()" />
+
+        <div class="tip_card">
+          <strong>Как играть</strong>
+          <p>Левый клик открывает клетку, правый ставит флажок.</p>
+        </div>
+      </aside>
+
+      <div class="game_board">
+        <div class="tablo">
+          <div class="tablo_content">
+            <div class="tablo_flag">
+              <div class="metric_caption">
+                <span>Мины</span>
+              </div>
+              <tablo [tabloNum]="boardService.flagCounter()" />
+            </div>
+            <div
+              (click)="boardService.restart()"
+              class="smile_container"
+              role="button"
+              tabindex="0"
+              aria-label="Начать новую игру"
+            >
+              @if (boardService.isFailed()) {
+                <sad-smile />
+              } @else {
+                <happy-smile />
+              }
+            </div>
+            <div class="timer_container">
+              <div class="metric_caption">
+                <span>Время</span>
+              </div>
+              <tablo [tabloNum]="boardService.seconds()" />
+            </div>
           </div>
         </div>
-      </div>
-      <div #container class="mainsweeper_container">
-        @for (field of boardService.fields(); track field.id) {
-          <button
-            (contextmenu)="onFieldCheck($event, $index)"
-            (click)="onFieldClick($index)"
-            [ngClass]="[
-              'field',
-              'field_' + boardService.level().value,
-              'field_' +
-                (field?.minesAround && (field?.minesAround ?? 4) < 4
-                  ? field.minesAround
-                  : 'default'),
-              field.isOpen ? 'open_field' : '',
-              field?.failed ? 'failed' : '',
-              $index === boardService.hintIdx() ? 'hint' : '',
-            ]"
-          >
-            @if (field.isFlaged) {
-              <img src="/minesweeper/flag.png" alt="flag" />
-            } @else if (field.isOpen && field.isMine) {
-              <img src="/minesweeper/bomb.png" alt="bomb" />
-            }
-            {{ field?.minesAround ?? "" }}
-          </button>
-        }
+        <div #container class="mainsweeper_container">
+          @for (field of boardService.fields(); track field.id) {
+            <button
+              (contextmenu)="onFieldCheck($event, $index)"
+              (click)="onFieldClick($index)"
+              [ngClass]="[
+                'field',
+                'field_' + boardService.level().value,
+                'field_' +
+                  (field?.minesAround && (field?.minesAround ?? 4) < 4
+                    ? field.minesAround
+                    : 'default'),
+                field.isOpen ? 'open_field' : '',
+                field?.failed ? 'failed' : '',
+                $index === boardService.hintIdx() ? 'hint' : '',
+              ]"
+            >
+              @if (field.isFlaged) {
+                <img src="/minesweeper/flag.png" alt="flag" />
+              } @else if (field.isOpen && field.isMine) {
+                <img src="/minesweeper/bomb.png" alt="bomb" />
+              }
+              {{ field?.minesAround ?? "" }}
+            </button>
+          }
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </div>

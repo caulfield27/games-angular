@@ -2,7 +2,7 @@ import { LucideIconData } from 'lucide-angular';
 import { Square } from '../classes/figure';
 
 export type GameType = 'bot' | 'online' | 'friend' | 'irl';
-export type GameSpeed = 'classic' | 'blitz' | 'rapid';
+export type GameSpeed = 'classic' | 'blitz' | 'rapid' | 'bullet';
 export enum Piece {
   KING = 'king',
   QUEEN = 'queen',

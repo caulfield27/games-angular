@@ -1,34 +1,102 @@
 <div class="memory_game__container">
-  <div>
-    <header class="header">
-      <div class="timer_wrapper">
-        <span>{{ minutes }}</span>
-        <span>:</span>
-        <span>{{ seconds }}</span>
+  <section class="memory_shell" aria-labelledby="memory-game-title">
+    <header class="hero">
+      <div class="hero_copy">
+        <p class="eyebrow">Игра на память</p>
+        <h1 id="memory-game-title">Найди пару героям</h1>
+        <p class="hero_text">
+          Открывайте карточки, запоминайте их позиции и соберите все пары до
+          окончания времени.
+        </p>
       </div>
-      <h1>Найди пару</h1>
-      <div class="buttons_wrap">
-        <button (click)="handleSettings()">
-          <lucide-icon [img]="SettingsIcon" color="#fff"></lucide-icon>
-        </button>
-        <button (click)="restart()">
-          <lucide-icon [img]="RotateIcon" color="#fff"></lucide-icon>
-        </button>
-      </div>
-    </header>
-    <div [ngClass]="['cards_container', 'card_' + quantity]">
-      @for (card of game.cards(); track card.id) {
-      <div (click)="handleOpenCard(card)" class="card">
-        <div [ngClass]="['content_wrap', card.isActive ? 'active' : '']">
-          <img
-            src="/question.webp"
-            alt="question"
-            [ngClass]="['img', 'front']"
-          />
-          <img src="{{ card.src }}" alt="car" [ngClass]="['img', 'back']" />
+
+      <div class="hero_panel">
+        <div class="stats_grid" aria-label="Game stats">
+          <article class="stat_card">
+            <span class="stat_label">Время</span>
+            <strong class="stat_value">{{ minutes }}:{{ seconds }}</strong>
+          </article>
+
+          <article class="stat_card">
+            <span class="stat_label">Прогресс</span>
+            <strong class="stat_value">{{ progressText }}</strong>
+          </article>
+
+          <article class="stat_card">
+            <span class="stat_label">Сложность</span>
+            <strong class="stat_value">{{ currentLevelLabel }}</strong>
+          </article>
+
+          <article class="stat_card">
+            <span class="stat_label">Карточки</span>
+            <strong class="stat_value">{{ quantity }}</strong>
+          </article>
+        </div>
+
+        <div class="buttons_wrap">
+          <button
+            type="button"
+            class="action_button action_button--secondary"
+            (click)="handleSettings()"
+            aria-label="Открыть настройки игры"
+          >
+            <lucide-icon [img]="SettingsIcon" color="currentColor"></lucide-icon>
+            <span>Настройки</span>
+          </button>
+
+          <button
+            type="button"
+            class="action_button"
+            (click)="restart()"
+            aria-label="Перезапустить игру"
+          >
+            <lucide-icon [img]="RotateIcon" color="currentColor"></lucide-icon>
+            <span>Заново</span>
+          </button>
         </div>
       </div>
-      }
-    </div>
-  </div>
+    </header>
+
+    <section class="board_panel" aria-label="Игровое поле Memory">
+      <div class="board_header">
+        <div>
+          <h2>Игровое поле</h2>
+          <p>Соберите все совпадения и постарайтесь ошибаться как можно реже.</p>
+        </div>
+
+        <div class="timer_wrapper" aria-live="polite">
+          <span class="timer_label">Таймер</span>
+          <strong>{{ minutes }}:{{ seconds }}</strong>
+        </div>
+      </div>
+
+      <div
+        class="cards_container"
+        [style.--memory-columns]="boardColumns"
+        role="grid"
+        aria-label="Сетка карточек"
+      >
+        @for (card of game.cards(); track card.id; let index = $index) {
+        <button
+          type="button"
+          class="card"
+          (click)="handleOpenCard(card)"
+          [disabled]="isCardDisabled(card)"
+          [attr.aria-label]="getCardAriaLabel(card, index)"
+          [attr.aria-pressed]="card.isActive"
+        >
+          <div [ngClass]="['content_wrap', card.isActive ? 'active' : '']">
+            <span class="card_face front" aria-hidden="true">
+              <img src="/question.webp" alt="" class="img img--question" />
+            </span>
+
+            <span class="card_face back" aria-hidden="true">
+              <img [src]="card.src" alt="" class="img img--hero" />
+            </span>
+          </div>
+        </button>
+        }
+      </div>
+    </section>
+  </section>
 </div>

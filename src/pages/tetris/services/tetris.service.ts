@@ -18,6 +18,7 @@ export class TetrisService {
   );
   public level = signal<number>(1);
   public score = signal<number>(0);
+  public totalLines = signal<number>(0);
   public figures: FiguresMap[] = this.shuffleFigures([
     { label: Figures.I, direction: 0 },
     { label: Figures.J, direction: 0 },
@@ -30,8 +31,8 @@ export class TetrisService {
   private matrix = this.getInitialMatrix();
   readonly GRID_ROWS = 10;
   readonly GRID_COLS = 20;
-  readonly CELL_SIZE = this.isMobile ? 20 : 25;
-  readonly NEXT_CELL_SIZE = this.isMobile ? 10 : 20;
+  readonly CELL_SIZE = this.isMobile ? 20 : 30;
+  readonly NEXT_CELL_SIZE = this.isMobile ? 12 : 24;
   private canvas: HTMLCanvasElement | null = null;
   private infoCanvas: HTMLCanvasElement | null = null;
   private coordinates: number[][] | null = null;
@@ -96,6 +97,7 @@ export class TetrisService {
     );
     this.score.set(0);
     this.level.set(1);
+    this.totalLines.set(0);
   }
 
   public play() {
@@ -219,7 +221,8 @@ export class TetrisService {
         }
       }
 
-      if (breakCounter) {
+        if (breakCounter) {
+        this.totalLines.update((prev) => prev + breakCounter);
         const dif =
           breakCounter === 1
             ? 100
@@ -466,5 +469,9 @@ export class TetrisService {
 
   private getInitialMatrix() {
     return BOARD_MATRIX.map((arr) => [...arr]);
+  }
+
+  public dropSpeedMs() {
+    return this.duration;
   }
 }

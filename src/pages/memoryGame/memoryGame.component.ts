@@ -1,11 +1,11 @@
 import { Component, OnDestroy } from '@angular/core';
-import { LucideAngularModule, Settings, RotateCcw } from 'lucide-angular';
-import { GameService } from './services/memoryGame.service';
 import { NgClass } from '@angular/common';
+import { LucideAngularModule, RotateCcw, Settings } from 'lucide-angular';
 import Swal from 'sweetalert2';
-import { ICard, LevelEnum } from './types/types';
 import { launchConfetti } from '../../shared/utils/utils';
 import { getCards, getQuantity, getSettings, getTimer } from './utils/utils';
+import { GameService } from './services/memoryGame.service';
+import { ICard, LevelEnum } from './types/types';
 
 @Component({
   selector: 'memory-game',
@@ -14,17 +14,21 @@ import { getCards, getQuantity, getSettings, getTimer } from './utils/utils';
   imports: [LucideAngularModule, NgClass],
 })
 export class MemoryGame implements OnDestroy {
-  // locale states
   readonly SettingsIcon = Settings;
   readonly RotateIcon = RotateCcw;
+  readonly levelLabels: Record<LevelEnum, string> = {
+    easy: 'Легкий',
+    medium: 'Средний',
+    hard: 'Сложный',
+    gigachad: 'Эксперт',
+  };
 
-  private correctCounter: number = 0;
+  private correctCounter = 0;
   private queue: ICard[] = [];
-  private isGameStart: boolean = false;
+  private isGameStart = false;
 
   constructor(public game: GameService) {}
 
-  // getters
   get minutes() {
     const minutes = this.game.timer().minutes;
     return minutes > 9 ? minutes : `0${minutes}`;
@@ -36,11 +40,38 @@ export class MemoryGame implements OnDestroy {
   }
 
   get quantity() {
-    const settings = this.game.settings;
-    return getQuantity(settings);
+    return getQuantity(this.game.settings);
   }
 
-  // event handlers
+  get matchedPairs() {
+    return this.correctCounter;
+  }
+
+  get totalPairs() {
+    return this.game.cards().length / 2;
+  }
+
+  get boardColumns() {
+    switch (this.quantity) {
+      case 10:
+        return 5;
+      case 16:
+        return 4;
+      case 20:
+        return 5;
+      default:
+        return 8;
+    }
+  }
+
+  get currentLevelLabel() {
+    return this.levelLabels[this.game.settings.level];
+  }
+
+  get progressText() {
+    return `${this.matchedPairs}/${this.totalPairs} пар`;
+  }
+
   restart() {
     this.game.stopTimer();
     this.correctCounter = 0;
@@ -48,12 +79,21 @@ export class MemoryGame implements OnDestroy {
     this.isGameStart = false;
     this.game.timer.set(getTimer(this.game.settings));
     this.game.cards.update((prev) =>
-      prev.map((card) => {
-        card.isActive = false;
-        return card;
-      })
+      prev.map((card) => ({
+        ...card,
+        isActive: false,
+      }))
     );
     setTimeout(this.game.shuffleCards.bind(this.game), 0);
+  }
+
+  isCardDisabled(card: ICard) {
+    return this.queue.length === 2 || card.isActive;
+  }
+
+  getCardAriaLabel(card: ICard, index: number) {
+    const state = card.isActive ? 'открыта' : 'скрыта';
+    return `Карточка ${index + 1}, ${state}`;
   }
 
   handleOpenCard(card: ICard) {
@@ -61,10 +101,10 @@ export class MemoryGame implements OnDestroy {
       this.isGameStart = true;
       this.game.startTimer(() =>
         Swal.fire({
-          title: 'Вы проиграли',
-          text: 'Вы не успели найти все пары во время ):',
+          title: 'Время вышло',
+          text: 'Вы не успели найти все пары до окончания таймера.',
           icon: 'error',
-          confirmButtonText: 'Попробовать ещё',
+          confirmButtonText: 'Попробовать снова',
         }).then((res) => {
           if (res.isConfirmed) {
             this.restart();
@@ -73,7 +113,9 @@ export class MemoryGame implements OnDestroy {
       );
     }
 
-    if (this.queue.length === 2 || card.isActive) return;
+    if (this.queue.length === 2 || card.isActive) {
+      return;
+    }
 
     this.game.updateCardStatus(card.id, true);
 
@@ -95,15 +137,15 @@ export class MemoryGame implements OnDestroy {
 
     if (this.correctCounter === this.game.cards().length / 2) {
       this.game.stopTimer();
-
       launchConfetti(2000);
 
       setTimeout(() => {
         Swal.fire({
-          title: 'Поздравляю, вы выиграли!',
+          title: 'Победа',
+          text: 'Вы нашли все пары.',
           icon: 'success',
           showCancelButton: false,
-          confirmButtonText: 'Сыграть ещё',
+          confirmButtonText: 'Сыграть еще',
         }).then(() => {
           this.restart();
         });
@@ -113,30 +155,30 @@ export class MemoryGame implements OnDestroy {
 
   handleSettings() {
     Swal.fire({
-      title: 'Настройки',
+      title: 'Настройки игры',
       html: `
-    <div class="settings_container">  
-        <div class="setting_wrap">
-            <span>уровень</span>
+        <div class="settings_container">
+          <div class="setting_wrap">
+            <span>Сложность</span>
             <select name="level" id="level">
-                <option value="easy" ${
-                  this.game.settings.level === 'easy' ? 'selected="true"' : ''
-                }>лёгкий</option>
-                <option value="medium" ${
-                  this.game.settings.level === 'medium' ? 'selected="true"' : ''
-                }>средний</option>
-                <option value="hard" ${
-                  this.game.settings.level === 'hard' ? 'selected="true"' : ''
-                }>сложный</option>
-                <option value="gigachad" ${
-                  this.game.settings.level === 'gigachad'
-                    ? 'selected="true"'
-                    : ''
-                }>очень сложный</option>
+              <option value="easy" ${
+                this.game.settings.level === 'easy' ? 'selected="true"' : ''
+              }>Легкий</option>
+              <option value="medium" ${
+                this.game.settings.level === 'medium' ? 'selected="true"' : ''
+              }>Средний</option>
+              <option value="hard" ${
+                this.game.settings.level === 'hard' ? 'selected="true"' : ''
+              }>Сложный</option>
+              <option value="gigachad" ${
+                this.game.settings.level === 'gigachad'
+                  ? 'selected="true"'
+                  : ''
+              }>Эксперт</option>
             </select>
+          </div>
         </div>
-    </div>
-    `,
+      `,
       showCancelButton: true,
       cancelButtonText: 'Отмена',
       confirmButtonText: 'Сохранить',

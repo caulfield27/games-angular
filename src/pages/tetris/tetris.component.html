@@ -1,90 +1,176 @@
 <div class="tetris_wrapper">
-  <div class="tetris_main_wrapper">
-    <span class="record_span">Ваш рекорд-{{ tetrisService.bestScore() }}</span>
-    <div class="tetris_container">
-      <div class="tetris_cavnvas_container">
-        <div class="tetris_info_section_mobile">
-          <div class="tetris_info_wrapper">
-            <h1>СЧЕТ</h1>
-            <span>{{ tetrisService.score() }}</span>
+  <section class="tetris_shell">
+    <header class="hero_panel">
+      <div class="hero_copy">
+        <h1>Tetris</h1>
+        <p class="hero_text">
+          Держите стек низким, планируйте следующий блок и ускоряйтесь без
+          ошибок.
+        </p>
+      </div>
+
+      <div class="hero_status">
+        <span class="status_label">{{ gameStatusTitle }}</span>
+        <strong class="status_title">{{ gameActionLabel }}</strong>
+        <p class="status_text">{{ gameStatusText }}</p>
+        <span class="record_chip">Рекорд: {{ tetrisService.bestScore() }}</span>
+      </div>
+    </header>
+
+    <div class="tetris_layout">
+      <div class="stage_panel">
+        @if (tetrisService.isMobile) {
+        <div class="mobile_preview_card">
+          <div class="card_heading">
+            <span>Следующий блок</span>
           </div>
-          <div class="tetris_info_wrapper">
-            <h1>УРОВЕНЬ</h1>
-            <span>{{ tetrisService.level() }}</span>
-          </div>
-          <div class="tetris_info_wrapper">
-            <h1>ДАЛЕЕ</h1>
-            @if (tetrisService.isMobile) {
+          <div class="next_canvas_wrap">
             <canvas style="image-rendering: pixelated" #infoCanvas></canvas>
+          </div>
+        </div>
+        }
+
+        <div class="stage_topbar">
+          <div class="metric_card">
+            <span>Счёт</span>
+            <strong>{{ tetrisService.score() }}</strong>
+          </div>
+          <div class="metric_card">
+            <span>Уровень</span>
+            <strong>{{ tetrisService.level() }}</strong>
+          </div>
+          <div class="metric_card">
+            <span>Линии</span>
+            <strong>{{ tetrisService.totalLines() }}</strong>
+          </div>
+          <div class="metric_card">
+            <span>Скорость</span>
+            <strong>{{ tetrisService.dropSpeedMs() }}мс</strong>
+          </div>
+        </div>
+
+        <div class="playfield_shell">
+          <div class="tetris_cavnvas_container">
+            <canvas class="tetris_canvas" #canvas></canvas>
+
+            @if (!tetrisService.gameStarted() || tetrisService.gameStopped()) {
+              <button class="overlay_action_btn" (click)="tetrisService.play()">
+                <lucide-icon
+                  [size]="tetrisService.isMobile ? 34 : 54"
+                  [img]="Play"
+                  color="currentColor"
+                />
+                <span>{{ gameActionLabel }}</span>
+              </button>
+            }
+
+            @if (tetrisService.gameStarted() && !tetrisService.gameStopped()) {
+              <button (click)="onPause()" class="floating_pause_btn" aria-label="Поставить игру на паузу">
+                <lucide-icon [size]="20" [img]="Pause" color="currentColor" />
+              </button>
             }
           </div>
         </div>
-        <canvas class="tetris_canvas" #canvas></canvas>
-        <div class="control_wrapper_mobile">
-          <button (click)="moveUp()">
-            <lucide-icon size="30" [img]="ArrowUp" />
+
+        <div class="control_panel_mobile">
+          <button class="touch_button touch_button--rotate" (click)="moveUp()">
+            <lucide-icon size="26" [img]="ArrowUp" />
+            <span>Поворот</span>
           </button>
-          <button (pointerdown)="onMouseDown('right')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
-            <lucide-icon size="30" [img]="ArrowRight" />
-          </button>
-          <button (pointerdown)="onMouseDown('down')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
-            <lucide-icon size="30" [img]="ArrowDown" />
-          </button>
-          <button (pointerdown)="onMouseDown('left')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
-            <lucide-icon size="30" [img]="ArrowLeft" />
-          </button>
-        </div>
-        @if(!tetrisService.gameStarted() || tetrisService.gameStopped()){
-        <button class="tetris_play_btn" (click)="tetrisService.play()">
-          <lucide-icon
-            [size]="tetrisService.isMobile ? 40 : 80"
-            [img]="Play"
-            color="white"
-          />
-        </button>
-        } @if(tetrisService.gameStarted() && !tetrisService.gameStopped()){
-        <button (click)="onPause()" class="tetris_pause_btn">
-          <lucide-icon
-            [size]="tetrisService.isMobile ? 40 : 60"
-            [img]="Pause"
-            color="white"
-          />
-        </button>
-        }
-      </div>
-      <div class="tetris_info_section">
-        <div class="tetris_info_wrapper">
-          <h1>СЧЕТ</h1>
-          <span>{{ tetrisService.score() }}</span>
-        </div>
-        <div class="tetris_info_wrapper">
-          <h1>УРОВЕНЬ</h1>
-          <span>{{ tetrisService.level() }}</span>
-        </div>
-        <div class="tetris_info_wrapper">
-          <h1>ДАЛЕЕ</h1>
-          @if (!tetrisService.isMobile) {
-          <canvas style="image-rendering: pixelated" #infoCanvas></canvas>
-          }
-        </div>
-        <div class="tetris_info_wrapper">
-          <h1>УПРАВЛЕНИЕ</h1>
-          <div class="control_wrapper">
-            <button (click)="moveUp()">
-              <lucide-icon size="25" [img]="ArrowUp" />
+
+          <div class="touch_pad">
+            <button
+              class="touch_button"
+              (pointerdown)="onMouseDown('left')"
+              (pointercancel)="onMouseUp()"
+              (pointerup)="onMouseUp()"
+            >
+              <lucide-icon size="28" [img]="ArrowLeft" />
             </button>
-            <button (pointerdown)="onMouseDown('right')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
-              <lucide-icon size="25" [img]="ArrowRight" />
+            <button
+              class="touch_button"
+              (pointerdown)="onMouseDown('down')"
+              (pointercancel)="onMouseUp()"
+              (pointerup)="onMouseUp()"
+            >
+              <lucide-icon size="28" [img]="ArrowDown" />
             </button>
-            <button (pointerdown)="onMouseDown('down')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
-              <lucide-icon size="25" [img]="ArrowDown" />
-            </button>
-            <button (pointerdown)="onMouseDown('left')" (pointercancel)="onMouseUp()" (pointerup)="onMouseUp()">
-              <lucide-icon size="25" [img]="ArrowLeft" />
+            <button
+              class="touch_button"
+              (pointerdown)="onMouseDown('right')"
+              (pointercancel)="onMouseUp()"
+              (pointerup)="onMouseUp()"
+            >
+              <lucide-icon size="28" [img]="ArrowRight" />
             </button>
           </div>
         </div>
       </div>
+
+      @if (!tetrisService.isMobile) {
+      <aside class="sidebar_panel">
+        <div class="sidebar_card preview_card">
+          <div class="card_heading">
+            <span>Следующий блок</span>
+          </div>
+          <div class="next_canvas_wrap">
+            <canvas style="image-rendering: pixelated" #infoCanvas></canvas>
+          </div>
+        </div>
+
+        <div class="sidebar_card">
+          <div class="card_heading">
+            <span>Управление</span>
+          </div>
+          <div class="controls_legend">
+            <div class="legend_item">
+              <span class="legend_key">← →</span>
+              <span>Сдвиг фигуры</span>
+            </div>
+            <div class="legend_item">
+              <span class="legend_key">↑</span>
+              <span>Поворот</span>
+            </div>
+            <div class="legend_item">
+              <span class="legend_key">↓</span>
+              <span>Ускорить падение</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar_card desktop_controls_card">
+          <div class="card_heading">
+            <span>Тач-кнопки</span>
+          </div>
+          <div class="control_wrapper">
+            <button (click)="moveUp()">
+              <lucide-icon size="22" [img]="ArrowUp" />
+            </button>
+            <button
+              (pointerdown)="onMouseDown('right')"
+              (pointercancel)="onMouseUp()"
+              (pointerup)="onMouseUp()"
+            >
+              <lucide-icon size="22" [img]="ArrowRight" />
+            </button>
+            <button
+              (pointerdown)="onMouseDown('down')"
+              (pointercancel)="onMouseUp()"
+              (pointerup)="onMouseUp()"
+            >
+              <lucide-icon size="22" [img]="ArrowDown" />
+            </button>
+            <button
+              (pointerdown)="onMouseDown('left')"
+              (pointercancel)="onMouseUp()"
+              (pointerup)="onMouseUp()"
+            >
+              <lucide-icon size="22" [img]="ArrowLeft" />
+            </button>
+          </div>
+        </div>
+      </aside>
+      }
     </div>
-  </div>
+  </section>
 </div>

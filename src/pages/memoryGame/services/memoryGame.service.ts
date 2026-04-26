@@ -1,5 +1,4 @@
 import { Injectable, signal } from '@angular/core';
-import { images } from '../constants/data';
 import { ICard, ISettings, Timer } from '../types/types';
 import { getCards, getSettings, getTimer, shuffle } from '../utils/utils';
 
@@ -25,8 +24,11 @@ export class GameService {
   }
 
   startTimer(timeOverCb: () => void) {
+    this.stopTimer();
+
     this.intervalId = setInterval(() => {
       const timer = this.timer();
+
       if (timer.seconds === 0) {
         if (timer.minutes === 0) {
           this.stopTimer();
@@ -46,6 +48,7 @@ export class GameService {
   stopTimer() {
     if (this.intervalId) {
       clearInterval(this.intervalId);
+      this.intervalId = null;
     }
   }
 }

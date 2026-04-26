@@ -84,7 +84,7 @@ export class Game implements OnDestroy, OnInit {
 
   // states
   cellSize = signal<number>(60);
-  boardH = signal<number>(100);
+  boardH = signal<number>(175);
   currentFigure: Figure | null = null;
   beforeUnloadListener: (() => void) | null = null;
 

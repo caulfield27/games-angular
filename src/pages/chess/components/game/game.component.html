@@ -1,298 +1,306 @@
-<div class="relative w-full pt-16">
-  <div class="flex max-w-7xl flex-col md:items-start">
-    <div class="flex flex-col gap-2">
-      <div
-        class="flex w-full flex-row items-center justify-between py-1 text-neutral-50 font-semibold max-[480px]:px-1"
+<div class="relative flex w-full justify-center px-6 pb-8 pt-20 max-lg:px-4 max-sm:px-0">
+  <div class="flex w-full max-w-7xl flex-col gap-5">
+    <div
+      class="flex justify-center items-center"
+    >
+      <section
+        class="rounded-[2rem] max-sm:rounded-none max-sm:px-0 border border-neutral-200/80 bg-white p-4 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.38)]"
       >
-        <div class="flex flex-row gap-2">
+        <div class="flex flex-col gap-3">
           <div
-            class="flex items-center justify-center rounded-md bg-neutral-700 p-1.5"
+            class="flex w-full items-center justify-between rounded-[1.5rem] max-sm:rounded-none border border-neutral-200 bg-neutral-50 px-4 py-3 font-semibold max-sm:px-3 max-sm:py-2"
           >
-            <lucide-icon [img]="UserIcon" />
-          </div>
-          <div class="flex flex-col items-start justify-between">
-            <span class="text-xs">{{ chessService.opponent.name() }}</span>
-            <div class="flex flex-row">
-              @for (
-                piece of chessService.opponent.takenPieces();
-                track $index
-              ) {
-                <img
-                  [style.margin-left]="$index > 0 ? '-5px' : '0px'"
-                  width="16"
-                  [src]="PIECE_PATH[piece + chessService.player.color]"
-                  alt="chess figure"
-                />
-              }
-              @if (chessService.opponent.advantage()) {
-                <span class="text-xs text-neutral-400"
-                  >+{{ chessService.opponent.advantage() }}</span
-                >
-              }
-            </div>
-          </div>
-        </div>
-        <!-- <div
-          class="flex flex-row items-center justify-center gap-1.5 rounded-md bg-neutral-900 px-2.5 py-1"
-        >
-          <lucide-icon [img]="TimerIcon" size="20" />
-          <div class="mt-[2px] flex flex-row items-center justify-center">
-            <span>04</span>
-            <span>:</span>
-            <span>59</span>
-          </div>
-        </div> -->
-      </div>
-
-      <div class="flex flex-row items-stretch">
-        <div
-          class="grid grid-cols-8 grid-rows-8 relative sm:rounded-[4px] overflow-hidden aspect-square"
-          id="board"
-          #board
-        >
-          <promotion-dialog
-            [cellSize]="cellSize()"
-            (handlePromotion)="onPromotionChoose($event)"
-          />
-          @for (square of chessService.board(); track $index) {
-            <div
-              class="relative"
-              (click)="onMove(square, $index)"
-              [style.background]="getSquareBg($index)"
-              #cell
-              [ngStyle]="getGridArea($index, square.figure?.position() ?? null)"
-            >
-              @let label = getLabel($index);
-              @let figure = isFigure(square.figure);
-              @if (label.col) {
-                <span
-                  [style.color]="getLabelColor($index)"
-                  class="absolute top-[1px] left-[1px] font-semibold max-sm:text-[10px]"
-                  >{{ label.col }}</span
-                >
-              }
-              @if (label.row) {
-                <span
-                  [style.color]="getLabelColor($index)"
-                  class="absolute bottom-0 right-[1px] font-semibold max-sm:text-[10px]"
-                  >{{ label.row }}</span
-                >
-              }
-
-              @if (
-                !chessService.inReview() &&
-                ($index === lastMove[0] || $index === lastMove[1])
-              ) {
-                <div class="history"></div>
-              }
-
-              @if (square.canMove && figure) {
-                <div class="take_square"></div>
-              }
-              @if (square.canMove && !figure) {
-                <div class="available_square"></div>
-              }
-              @if (figure) {
-                <div
-                  (pointerdown)="onPieceChoose(square)"
-                  role="button"
-                  [cdkDragDisabled]="isDragDisabled(square.figure!)"
-                  cdkDrag
-                  cdkDragBoundary="#board"
-                  class="relative z-[2] cursor-grab touch-none"
-                  (cdkDragEnded)="onDragEnd($event)"
-                  [cdkDragData]="square"
-                >
-                  <img
-                    [ngClass]="
-                      $index === chessService.checkIndex()
-                        ? 'check'
-                        : $index === chessService.mateIndex()
-                          ? 'mate'
-                          : ''
-                    "
-                    width="60"
-                    height="60"
-                    [src]="square.figure!.image"
-                    [alt]="square.figure!.piece"
-                  />
-                </div>
-              }
-            </div>
-          }
-        </div>
-        <aside
-          class="max-sm:hidden flex flex-col justify-between items-start min-w-72 max-w-72 border-l-0 border border-white/10 bg-neutral-900/80 p-4 shadow-2xl shadow-black/30 backdrop-blur rounded-tr-2xl rounded-br-2xl"
-        >
-          <main
-            [style.height]="boardH() + 'px'"
-            class="w-full overflow-y-auto flex flex-col gap-1"
-          >
-            @for (move of chessService.moves(); track $index) {
+            <div class="flex items-center gap-3">
               <div
-                #moveListDesktop
-                class="w-full flex items-center justify-between text-white"
+                class="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-200 text-neutral-700"
               >
-                <span class="w-[33%]">{{ move[0] || "" }}.</span>
-                <span
-                  [class]="
-                    $index === chessService.currentMove()[0] &&
-                    move[1] ===
-                      chessService.moves()[$index][
-                        chessService.currentMove()[1]
-                      ]
-                      ? 'bg-neutral-800'
-                      : ''
-                  "
-                  class="w-[33%] p-1 rounded-md flex justify-center items-center"
-                  >{{ move[1] || "" }}</span
-                >
-                <span
-                  [class]="
-                    $index === chessService.currentMove()[0] &&
-                    move[2] ===
-                      chessService.moves()[$index][
-                        chessService.currentMove()[1]
-                      ]
-                      ? 'bg-neutral-800'
-                      : ''
-                  "
-                  [class]
-                  class="w-[33%] p-1 rounded-md flex justify-center items-center"
-                  >{{ move[2] || "" }}</span
-                >
+                <lucide-icon [img]="UserIcon" />
               </div>
-            }
-          </main>
-          <footer class="flex flex-row items-center justify-between w-full">
-            <div class="flex flex-row gap-3">
-              <button
-                class="p-2 rounded-md bg-neutral-800 hover:bg-neutral-950"
-              >
-                <lucide-icon
-                  [img]="FlagIcon"
-                  size="18"
-                  class="text-neutral-300"
-                />
-              </button>
-              <button
-                class="p-2 rounded-md bg-neutral-800 hover:bg-neutral-950"
-              >
-                <lucide-icon
-                  [img]="DrawIcon"
-                  size="18"
-                  class="text-neutral-300"
-                />
-              </button>
-              <button
-                class="p-2 rounded-md bg-neutral-800 hover:bg-neutral-950"
-              >
-                <lucide-icon
-                  [img]="ExitIcon"
-                  size="18"
-                  class="text-neutral-300"
-                />
-              </button>
+              <div class="flex flex-col items-start gap-1">
+                <span class="text-sm text-neutral-900">{{
+                  chessService.opponent.name()
+                }}</span>
+                <div class="flex flex-row items-center">
+                  @for (
+                    piece of chessService.opponent.takenPieces();
+                    track $index
+                  ) {
+                    <img
+                      [style.margin-left]="$index > 0 ? '-5px' : '0px'"
+                      width="16"
+                      [src]="PIECE_PATH[piece + chessService.player.color]"
+                      alt="chess figure"
+                    />
+                  }
+                  @if (chessService.opponent.advantage()) {
+                    <span class="text-xs text-neutral-400"
+                      >+{{ chessService.opponent.advantage() }}</span
+                    >
+                  }
+                </div>
+              </div>
             </div>
-            <div class="flex flex-row gap-3">
-              <button [disabled]="isPrevDisabled" (click)="prevMove()">
-                <lucide-icon
-                  [img]="LeftIcon"
-                  size="30"
-                  color="white"
-                  [class]="isPrevDisabled ? 'opacity-60' : ''"
-                />
-              </button>
-              <button [disabled]="isNextDisabled" (click)="nextMove()">
-                <lucide-icon
-                  [img]="RightIcon"
-                  size="30"
-                  color="white"
-                  [class]="isNextDisabled ? 'opacity-60' : ''"
-                />
-              </button>
-            </div>
-          </footer>
-        </aside>
-      </div>
-
-      <div
-        class="flex w-full flex-row items-center justify-between py-1 text-neutral-50 font-semibold max-[480px]:px-1"
-      >
-        <div class="flex flex-row gap-2">
-          <div
-            class="flex items-center justify-center rounded-md bg-neutral-700 p-1.5"
-          >
-            <lucide-icon [img]="UserIcon" />
           </div>
-          <div class="flex flex-col items-start justify-between">
-            <span class="text-xs">{{ chessService.player.name() }}</span>
-            <div class="flex flex-row">
-              @for (piece of chessService.player.takenPieces(); track $index) {
-                <img
-                  [style.margin-left]="$index > 0 ? '-5px' : '0px'"
-                  width="16"
-                  [src]="PIECE_PATH[piece + chessService.opponent.color]"
-                  alt="chess figure"
+
+          <div class="flex flex-row items-stretch gap-0">
+            <div
+              class="relative overflow-hidden rounded-tl-md rounded-bl-md border border-neutral-200 bg-white max-sm:rounded-none"
+            >
+              <div
+                class="grid grid-cols-8 grid-rows-8 relative aspect-square rounded-tl-md rounded-bl-md overflow-hidden max-sm:rounded-none"
+                id="board"
+                #board
+              >
+                <promotion-dialog
+                  [cellSize]="cellSize()"
+                  (handlePromotion)="onPromotionChoose($event)"
                 />
-              }
-              @if (chessService.player.advantage()) {
-                <span class="text-xs text-neutral-400"
-                  >+{{ chessService.player.advantage() }}</span
+                @for (square of chessService.board(); track $index) {
+                  <div
+                    class="relative"
+                    (click)="onMove(square, $index)"
+                    [style.background]="getSquareBg($index)"
+                    #cell
+                    [ngStyle]="
+                      getGridArea($index, square.figure?.position() ?? null)
+                    "
+                  >
+                    @let label = getLabel($index);
+                    @let figure = isFigure(square.figure);
+                    @if (label.col) {
+                      <span
+                        [style.color]="getLabelColor($index)"
+                        class="absolute left-[2px] top-[1px] font-semibold max-sm:text-[10px]"
+                        >{{ label.col }}</span
+                      >
+                    }
+                    @if (label.row) {
+                      <span
+                        [style.color]="getLabelColor($index)"
+                        class="absolute bottom-0 right-[2px] font-semibold max-sm:text-[10px]"
+                        >{{ label.row }}</span
+                      >
+                    }
+
+                    @if (
+                      !chessService.inReview() &&
+                      ($index === lastMove[0] || $index === lastMove[1])
+                    ) {
+                      <div class="history"></div>
+                    }
+
+                    @if (square.canMove && figure) {
+                      <div class="take_square"></div>
+                    }
+                    @if (square.canMove && !figure) {
+                      <div class="available_square"></div>
+                    }
+                    @if (figure) {
+                      <div
+                        (pointerdown)="onPieceChoose(square)"
+                        role="button"
+                        [cdkDragDisabled]="isDragDisabled(square.figure!)"
+                        cdkDrag
+                        cdkDragBoundary="#board"
+                        class="relative z-[2] cursor-grab touch-none"
+                        (cdkDragEnded)="onDragEnd($event)"
+                        [cdkDragData]="square"
+                      >
+                        <img
+                          [ngClass]="
+                            $index === chessService.checkIndex()
+                              ? 'check'
+                              : $index === chessService.mateIndex()
+                                ? 'mate'
+                                : ''
+                          "
+                          width="60"
+                          height="60"
+                          [src]="square.figure!.image"
+                          [alt]="square.figure!.piece"
+                        />
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <aside
+              class="match-sidebar max-sm:hidden min-w-80 max-w-80 rounded-r-md border border-l-0 border-neutral-200 bg-neutral-50/90 p-4"
+            >
+              <div class="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <p
+                    class="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-400"
+                  >
+                    Партия
+                  </p>
+                  <h3 class="mt-1 text-lg font-semibold text-neutral-900">
+                    История ходов
+                  </h3>
+                </div>
+                <div
+                  class="rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-semibold text-neutral-500"
                 >
-              }
+                  {{ chessService.moves().length }} ходов
+                </div>
+              </div>
+
+              <main
+                [style.height]="boardH() + 'px'"
+                class="moves-scroll flex w-full flex-col gap-1 overflow-y-auto pr-1"
+              >
+                @for (move of chessService.moves(); track $index) {
+                  <div
+                    #moveListDesktop
+                    class="grid w-full grid-cols-[3rem_1fr_1fr] items-center gap-2 rounded-2xl px-2 py-1 text-sm text-neutral-600"
+                  >
+                    <span>{{ move[0] || "" }}.</span>
+                    <span
+                      [class]="
+                        $index === chessService.currentMove()[0] &&
+                        move[1] ===
+                          chessService.moves()[$index][
+                            chessService.currentMove()[1]
+                          ]
+                          ? 'bg-neutral-900 text-white'
+                          : ''
+                      "
+                      class="rounded-xl px-2 py-2 text-center"
+                      >{{ move[1] || "" }}</span
+                    >
+                    <span
+                      [class]="
+                        $index === chessService.currentMove()[0] &&
+                        move[2] ===
+                          chessService.moves()[$index][
+                            chessService.currentMove()[1]
+                          ]
+                          ? 'bg-neutral-900 text-white'
+                          : ''
+                      "
+                      class="rounded-xl px-2 py-2 text-center"
+                      >{{ move[2] || "" }}</span
+                    >
+                  </div>
+                }
+              </main>
+
+              <footer
+                class="mt-4 flex w-full items-center justify-between border-t border-neutral-200 pt-4"
+              >
+                <div class="flex flex-row gap-3">
+                  <button
+                    class="rounded-2xl border border-neutral-200 bg-white p-3 text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100"
+                  >
+                    <lucide-icon [img]="FlagIcon" size="18" />
+                  </button>
+                  <button
+                    class="rounded-2xl border border-neutral-200 bg-white p-3 text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100"
+                  >
+                    <lucide-icon [img]="DrawIcon" size="18" />
+                  </button>
+                  <button
+                    class="rounded-2xl border border-neutral-200 bg-white p-3 text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100"
+                  >
+                    <lucide-icon [img]="ExitIcon" size="18" />
+                  </button>
+                </div>
+                <div class="flex flex-row gap-2">
+                  <button
+                    [disabled]="isPrevDisabled"
+                    (click)="prevMove()"
+                    class="rounded-2xl border border-neutral-200 bg-white p-2 text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <lucide-icon [img]="LeftIcon" size="24" />
+                  </button>
+                  <button
+                    [disabled]="isNextDisabled"
+                    (click)="nextMove()"
+                    class="rounded-2xl border border-neutral-200 bg-white p-2 text-neutral-700 transition hover:border-neutral-300 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <lucide-icon [img]="RightIcon" size="24" />
+                  </button>
+                </div>
+              </footer>
+            </aside>
+          </div>
+
+          <div
+            class="flex w-full items-center justify-between rounded-[1.5rem] max-sm:rounded-none border border-neutral-200 bg-neutral-50 px-4 py-3 font-semibold text-neutral-50 max-sm:px-3 max-sm:py-2"
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-11 w-11 items-center justify-center rounded-2xl bg-neutral-700 text-white"
+              >
+                <lucide-icon [img]="UserIcon" />
+              </div>
+              <div class="flex flex-col items-start gap-1">
+                <span class="text-sm">{{ chessService.player.name() }}</span>
+                <div class="flex flex-row items-center">
+                  @for (piece of chessService.player.takenPieces(); track $index) {
+                    <img
+                      [style.margin-left]="$index > 0 ? '-5px' : '0px'"
+                      width="16"
+                      [src]="PIECE_PATH[piece + chessService.opponent.color]"
+                      alt="chess figure"
+                    />
+                  }
+                  @if (chessService.player.advantage()) {
+                    <span class="text-xs text-neutral-400"
+                      >+{{ chessService.player.advantage() }}</span
+                    >
+                  }
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <!-- <div
-          class="flex flex-row items-center justify-center gap-1.5 rounded-md bg-neutral-900 px-2.5 py-1"
-        >
-          <lucide-icon [img]="TimerIcon" size="20" />
-          <div class="mt-[2px] flex flex-row items-center justify-center">
-            <span>04</span>
-            <span>:</span>
-            <span>59</span>
-          </div>
-        </div> -->
-      </div>
+      </section>
     </div>
 
     <div
-      class="sm:hidden mt-2 sticky bottom-0 left-0 w-full z-50 bg-neutral-900/95 border-t border-white/10 backdrop-blur"
+      class="rounded-[1.5rem] max-sm:rounded-none border border-neutral-200 bg-white/95 p-3 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.4)] sm:hidden"
     >
-      <div class="w-full py-2 flex flex-row gap-3 justify-between">
-        <button [disabled]="isPrevDisabled" (click)="prevMove()">
-          <lucide-icon [img]="LeftIcon" size="26" color="white" />
+      <div class="flex items-center gap-2 overflow-x-auto pb-2">
+        <button
+          [disabled]="isPrevDisabled"
+          (click)="prevMove()"
+          class="shrink-0 rounded-xl border border-neutral-200 bg-neutral-50 p-2 text-neutral-700 disabled:opacity-40"
+        >
+          <lucide-icon [img]="LeftIcon" size="24" />
         </button>
-        <div class="w-[70vw] overflow-x-auto flex flex-row gap-3">
+
+        <div class="flex flex-1 gap-3 overflow-x-auto">
           @for (move of chessService.moves(); track $index) {
             <div
               #moveListMobile
-              class="flex items-center gap-1 text-white text-sm shrink-0"
+              class="flex shrink-0 items-center gap-1 text-sm text-neutral-700"
             >
               <span class="text-neutral-400">{{ move[0] || "" }}.</span>
 
               <span
-                class="px-2 py-1 rounded-md"
+                class="rounded-xl px-2 py-1"
                 [class]="
                   $index === chessService.currentMove()[0] &&
                   move[1] ===
                     chessService.moves()[$index][chessService.currentMove()[1]]
-                    ? 'bg-neutral-800'
-                    : ''
+                    ? 'bg-neutral-900 text-white'
+                    : 'bg-neutral-100'
                 "
               >
                 {{ move[1] || "" }}
               </span>
 
               <span
-                class="px-2 py-1 rounded-md"
+                class="rounded-xl px-2 py-1"
                 [class]="
                   $index === chessService.currentMove()[0] &&
                   move[2] ===
                     chessService.moves()[$index][chessService.currentMove()[1]]
-                    ? 'bg-neutral-800'
-                    : ''
+                    ? 'bg-neutral-900 text-white'
+                    : 'bg-neutral-100'
                 "
               >
                 {{ move[2] || "" }}
@@ -300,34 +308,34 @@
             </div>
           }
         </div>
-        <button [disabled]="isNextDisabled" (click)="nextMove()">
-          <lucide-icon [img]="RightIcon" size="26" color="white" />
+
+        <button
+          [disabled]="isNextDisabled"
+          (click)="nextMove()"
+          class="shrink-0 rounded-xl border border-neutral-200 bg-neutral-50 p-2 text-neutral-700 disabled:opacity-40"
+        >
+          <lucide-icon [img]="RightIcon" size="24" />
         </button>
       </div>
-      <!-- Actions -->
-      <div
-        class="flex items-center justify-between px-3 py-2 border-t border-white/10"
-      >
+
+      <div class="mt-3 flex items-center justify-between border-t border-neutral-200 pt-3">
         <div class="flex gap-3">
-          <button class="p-2 rounded-md bg-neutral-800">
-            <lucide-icon [img]="FlagIcon" size="18" color="white" />
+          <button
+            class="rounded-xl border border-neutral-200 bg-neutral-50 p-2 text-neutral-700"
+          >
+            <lucide-icon [img]="FlagIcon" size="18" />
           </button>
-          <button class="p-2 rounded-md bg-neutral-800">
-            <lucide-icon [img]="DrawIcon" size="18" color="white" />
+          <button
+            class="rounded-xl border border-neutral-200 bg-neutral-50 p-2 text-neutral-700"
+          >
+            <lucide-icon [img]="DrawIcon" size="18" />
           </button>
-          <button class="p-2 rounded-md bg-neutral-800">
-            <lucide-icon [img]="ExitIcon" size="18" color="white" />
+          <button
+            class="rounded-xl border border-neutral-200 bg-neutral-50 p-2 text-neutral-700"
+          >
+            <lucide-icon [img]="ExitIcon" size="18" />
           </button>
         </div>
-
-        <!-- <div class="flex gap-3">
-          <button [disabled]="isPrevDisabled" (click)="prevMove()">
-            <lucide-icon [img]="LeftIcon" size="26" color="white" />
-          </button>
-          <button [disabled]="isNextDisabled" (click)="nextMove()">
-            <lucide-icon [img]="RightIcon" size="26" color="white" />
-          </button>
-        </div> -->
       </div>
     </div>
   </div>

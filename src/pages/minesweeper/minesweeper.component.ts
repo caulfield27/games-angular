@@ -5,12 +5,12 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { Lightbulb, LucideAngularModule } from 'lucide-angular';
 import { BoardService } from './services/board.service';
 import { Tablo } from './components/tablo/tablo.component';
-import { NgClass } from '@angular/common';
 import { HappySmile } from './icons/happySmile.component';
 import { SadSmile } from './icons/sadSmile.component';
-import { Lightbulb, LucideAngularModule } from 'lucide-angular';
 import { dropdownOptions } from './constants';
 import { IDropdownOption, ILevelOption } from '../../shared/types/types';
 import { Dropdown } from '@/shared/components/dropdown/dropdown.component';
@@ -30,10 +30,49 @@ import { Dropdown } from '@/shared/components/dropdown/dropdown.component';
 })
 export class Minesweeper implements AfterViewInit, OnDestroy {
   @ViewChild('container') container!: ElementRef<HTMLDivElement>;
+
   readonly Bulb = Lightbulb;
   readonly options = dropdownOptions;
 
   constructor(public boardService: BoardService) {}
+
+  get currentLevelName() {
+    return this.boardService.level().name;
+  }
+
+  get statusTitle() {
+    if (this.boardService.isFailed()) {
+      return 'Игра окончена';
+    }
+
+    if (this.boardService.isGameOver) {
+      return 'Поле раскрыто';
+    }
+
+    return this.boardService.isGameStart() ? 'Игра идет' : 'Новая партия';
+  }
+
+  get statusText() {
+    if (this.boardService.isFailed()) {
+      return 'Вы попали на мину. Нажмите на смайлик, чтобы начать заново.';
+    }
+
+    if (!this.boardService.isGameStart()) {
+      return 'Выберите сложность и откройте первую клетку. Первая попытка всегда безопасна.';
+    }
+
+    if (this.boardService.hintAmount() === 0) {
+      return 'Подсказки закончились. Отмечайте флажками клетки, в которых уверены.';
+    }
+
+    return 'Используйте подсказку, если поле зашло в тупик, и следите за счетчиком мин.';
+  }
+
+  get hintButtonLabel() {
+    return this.boardService.hintAmount() > 0
+      ? `Подсказка: ${this.boardService.hintAmount()}`
+      : 'Подсказок не осталось';
+  }
 
   ngAfterViewInit(): void {
     this.updateVariables();
@@ -82,8 +121,9 @@ export class Minesweeper implements AfterViewInit, OnDestroy {
       fields[idx].isOpen ||
       fields[idx].isFlaged ||
       this.boardService.isGameOver
-    )
+    ) {
       return;
+    }
 
     if (fields[idx].isMine) {
       this.boardService.isFailed.set(true);
