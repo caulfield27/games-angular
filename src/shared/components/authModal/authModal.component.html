@@ -19,14 +19,14 @@
           class="flex-1 pb-4 text-center font-semibold transition-colors relative"
           [ngClass]="
             activeTab === 'login'
-              ? 'text-blue-600'
+              ? 'text-yellow-400'
               : 'text-gray-500 hover:text-gray-700'
           "
         >
           Вход
           @if (activeTab === "login") {
             <div
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400"
             ></div>
           }
         </button>
@@ -35,14 +35,14 @@
           class="flex-1 pb-4 text-center font-semibold transition-colors relative"
           [ngClass]="
             activeTab === 'register'
-              ? 'text-blue-600'
+              ? 'text-yellow-400'
               : 'text-gray-500 hover:text-gray-700'
           "
         >
           Регистрация
           @if (activeTab === "register") {
             <div
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+              class="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400"
             ></div>
           }
         </button>
@@ -63,7 +63,7 @@
               <input
                 type="text"
                 name="username"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свой никнейм"
                 required
               />
@@ -83,7 +83,7 @@
               <input
                 type="password"
                 name="password"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свой пароль"
                 required
               />
@@ -91,7 +91,7 @@
           </div>
 
           <div class="flex items-center justify-between text-sm">
-            <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">
+            <a href="#" class="text-yellow-400 hover:text-yellow-500 font-medium">
               Забыли пароль?
             </a>
           </div>
@@ -99,7 +99,7 @@
           <button
             [disabled]="isLogging"
             type="submit"
-            class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+            class="w-full bg-yellow-400 text-white py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors shadow-lg shadow-yellow-300/30"
           >
             @if (isLogging) {
               Выполняется...
@@ -123,7 +123,7 @@
               <input
                 type="text"
                 name="username"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свой никнейм"
                 required
               />
@@ -143,7 +143,7 @@
               <input
                 type="email"
                 name="email"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
                 placeholder="Введите свою почту"
                 required
               />
@@ -163,7 +163,7 @@
               <input
                 type="password"
                 name="password"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
                 placeholder="Создайте пароль"
                 required
                 minLength="{6}"
@@ -175,7 +175,7 @@
             <label class="flex items-start">
               <input
                 type="checkbox"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2 mt-0.5"
+                class="rounded border-gray-300 text-yellow-400 focus:ring-yellow-300 mr-2 mt-0.5"
                 required
               />
               <span class="text-gray-600">
@@ -188,7 +188,7 @@
           <button
             [disabled]="isRegistring"
             type="submit"
-            class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+            class="w-full bg-yellow-600 text-white py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors shadow-lg shadow-yellow-300/30"
           >
             @if (isRegistring) {
               Выполняется...

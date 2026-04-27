@@ -14,12 +14,15 @@ export class WaitingOpponent implements OnInit, OnDestroy {
   private interval!: any;
 
   ngOnInit() {
+    window.scrollTo({top: 0})
+    document.body.style.overflow = 'hidden';
     this.interval = setInterval(() => {
       this.seconds++;
     }, 1000);
   }
 
   ngOnDestroy() {
+    document.body.style.overflow = 'auto';
     clearInterval(this.interval);
   }
 

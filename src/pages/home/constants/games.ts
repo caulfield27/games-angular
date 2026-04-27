@@ -33,7 +33,7 @@ export const games: IGames[] = [
   },
   {
     name: 'Шахматы онлайн',
-    image: '/chess_preview.webp',
+    image: '/chess_preview.svg',
     href: 'chess',
     tags: ['2D', 'Strategy', 'Board Game', 'Multiplayer'],
   },

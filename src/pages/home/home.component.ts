@@ -2,7 +2,9 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { GameCard } from './components/gameCard/gameCard.component';
 import { GamesFiltersService } from './services/filters.service';
 import { AuthService } from '@/shared/services/auth.service';
+import { PwaService } from '@/shared/services/pwa.service';
 import {
+  Download,
   Gamepad2,
   LucideAngularModule,
   User,
@@ -22,6 +24,7 @@ export class HomePage {
   @ViewChild('searchInput') searchInputRef!: ElementRef<HTMLInputElement>;
 
   readonly GamepadIcon = Gamepad2;
+  readonly DownloadIcon = Download;
   readonly SearchIcon = Search;
   readonly UserIcon = User;
   readonly LoginIcon = LogIn;
@@ -33,6 +36,7 @@ export class HomePage {
   constructor(
     public filters: GamesFiltersService,
     public auth: AuthService,
+    public pwa: PwaService,
   ) {}
 
   getSearchValue() {
@@ -60,6 +64,10 @@ export class HomePage {
 
   onModalOpen() {
     this.auth.isModalOpen.set(true);
+  }
+
+  onInstallApp() {
+    this.pwa.install();
   }
 
   toggleMenu() {

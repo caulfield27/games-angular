@@ -1,97 +1,84 @@
-<header class="bg-blue-600 shadow-lg">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <div
-        class="flex items-center space-x-2 cursor-pointer group flex-shrink-0"
-      >
-        <div
-          class="bg-white p-2 rounded-lg transform group-hover:scale-110 transition-transform duration-200"
-        >
+<div class="home-shell">
+  <header class="home-topbar">
+    <div class="home-topbar__inner">
+      <div class="home-brand">
+        <div class="home-brand__icon">
           <lucide-icon
             [img]="GamepadIcon"
-            class="w-6 h-6 text-blue-600"
+            class="h-6 w-6"
             [strokeWidth]="2.5"
           />
         </div>
-        <span class="hidden sm:inline text-xl sm:text-2xl font-bold text-white">
-          GameHub
-        </span>
-        <span class="sm:hidden text-lg font-bold text-white"> GH </span>
       </div>
 
-      <div class="hidden md:block flex-1 max-w-2xl mx-8">
-        <div class="relative">
-          <lucide-icon
-            [img]="SearchIcon"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-          />
-          <input
-            #searchInput
-            (focus)="onFocus($event)"
-            (blur)="onBlur($event)"
-            (input)="onSearch($event)"
-            type="search"
-            placeholder="Найти игру..."
-            class="w-full pl-14 pr-4 py-2.5 bg-white/90 border border-white rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-200"
-          />
-        </div>
+      <div class="home-search home-search--desktop">
+        <lucide-icon
+          [img]="SearchIcon"
+          class="home-search__icon"
+          [strokeWidth]="2.2"
+        />
+        <input
+          #searchInput
+          (focus)="onFocus($event)"
+          (blur)="onBlur($event)"
+          (input)="onSearch($event)"
+          type="search"
+          placeholder="Найти игру..."
+          class="home-search__field"
+        />
       </div>
 
-      <div class="hidden sm:block">
+      <div class="home-actions">
+        @if (pwa.canInstall()) {
+          <button (click)="onInstallApp()" class="home-install">
+            <lucide-icon
+              [img]="DownloadIcon"
+              class="h-4 w-4"
+              [strokeWidth]="2.5"
+            />
+            <span>Скачать приложение</span>
+          </button>
+        }
+
         @if (auth.isAuthed()) {
-          <button
-            class="flex items-center space-x-2 bg-white/20 hover:bg-white/30 border border-white rounded-lg px-4 py-2 transition-all duration-200 group"
-          >
-            <div
-              class="w-8 h-8 rounded-full bg-white flex items-center justify-center"
-            >
+          <button class="home-profile">
+            <span class="home-profile__avatar">
               <lucide-icon
                 [img]="UserIcon"
-                class="w-5 h-5 text-blue-600"
+                class="h-4 w-4"
                 [strokeWidth]="2.5"
               />
-            </div>
-            <span
-              class="text-white font-medium group-hover:text-blue-100 transition-colors"
-            >
-              {{auth.user()?.username ?? 'player'}}
             </span>
+            <span>{{ auth.user()?.username ?? "player" }}</span>
           </button>
         } @else {
-          <button
-            (click)="onModalOpen()"
-            class="flex items-center space-x-2 bg-white hover:bg-blue-50 text-blue-600 font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
-          >
+          <button (click)="onModalOpen()" class="home-login">
             <lucide-icon
               [img]="LoginIcon"
-              class="w-5 h-5"
+              class="h-4 w-4"
               [strokeWidth]="2.5"
             />
             <span>Войти</span>
           </button>
         }
-      </div>
 
-      <div class="sm:hidden flex items-center space-x-2">
-        <button
-          (click)="toggleMenu()"
-          class="p-2 text-white hover:bg-blue-700 rounded-lg transition-colors"
-        >
+        <button (click)="toggleMenu()" class="home-menu">
           @if (isMenuOpen) {
-            <lucide-icon [img]="Xicon" class="w-6 h-6" />
+            <lucide-icon [img]="Xicon" class="h-5 w-5" />
           } @else {
-            <lucide-icon [img]="MenuIcon" class="w-6 h-6" />
+            <lucide-icon [img]="MenuIcon" class="h-5 w-5" />
           }
         </button>
       </div>
     </div>
 
     @if (isMenuOpen) {
-      <div class="sm:hidden pb-4 space-y-3">
-        <div class="relative">
+      <div class="home-mobile-panel">
+        <div class="home-search">
           <lucide-icon
             [img]="SearchIcon"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            class="home-search__icon"
+            [strokeWidth]="2.2"
           />
           <input
             #searchInput
@@ -100,72 +87,66 @@
             (input)="onSearch($event)"
             type="search"
             placeholder="Найти игру..."
-            class="w-full pl-14 pr-4 py-2.5 bg-white/90 border border-white rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-200"
+            class="home-search__field"
           />
         </div>
-        <div class="flex gap-2 pt-2">
-          @if (auth.isAuthed()) {
-            <button
-              class="flex-1 flex items-center justify-center space-x-2 bg-white/20 hover:bg-white/30 border border-white text-white rounded-lg px-4 py-2 transition-all duration-200 font-medium"
-            >
-              <lucide-icon [img]="UserIcon" class="w-5 h-5" />
-              <span>{{auth.user()?.username ?? ""}}</span>
-            </button>
-          } @else {
-            <button
-              class="flex-1 bg-white hover:bg-blue-50 text-blue-600 font-semibold py-2 rounded-lg transition-all duration-200 shadow-lg"
-            >
-              Войти
-            </button>
-            <button
-              class="flex-1 bg-white/20 hover:bg-white/30 border border-white text-white font-semibold py-2 rounded-lg transition-all duration-200"
-            >
-              Зарегистрироваться
-            </button>
-          }
-        </div>
+
+        @if (auth.isAuthed()) {
+          <button class="home-profile home-profile--mobile">
+            <span class="home-profile__avatar">
+              <lucide-icon [img]="UserIcon" class="h-4 w-4" />
+            </span>
+            <span>{{ auth.user()?.username ?? "player" }}</span>
+          </button>
+        } @else {
+          <button (click)="onModalOpen()" class="home-login home-login--mobile">
+            <lucide-icon [img]="LoginIcon" class="h-4 w-4" />
+            <span>Войти</span>
+          </button>
+        }
+
+        @if (pwa.canInstall()) {
+          <button (click)="onInstallApp()" class="home-install home-install--mobile">
+            <lucide-icon [img]="DownloadIcon" class="h-4 w-4" />
+            <span>Скачать приложение</span>
+          </button>
+        }
       </div>
     }
-  </div>
-</header>
+  </header>
 
-<div
-  class="py-[30px] px-4 max-w-[1220px] mx-auto flex flex-col gap-[50px] justify-center items-center max-[480px]:py-8 max-[480px]:px-4 max-[480px]:gap-6"
->
-  <div
-    class="flex flex-col gap-6 justify-center items-center max-[480px]:gap-3"
-  >
-    <div
-      class="min-w-[600px] max-[480px]:min-w-0 max-[480px]:w-full flex flex-wrap justify-center items-center gap-2.5"
-    >
-      @for (tag of filters.activeTags(); track tag) {
-        <span
-          class="px-2 py-2 rounded-[10px] border border-gray-300 bg-white !text-[16px] font-semibold flex items-center gap-2 cursor-default"
-        >
-          {{ tag }}
-          <button
-            (click)="onTagClear(tag)"
-            class="border-none outline-none bg-transparent text-base cursor-pointer rounded-md px-1 py-[2px] flex items-center justify-center hover:bg-gray-200 !text-[16px]"
-          >
-            &#10006;
-          </button>
-        </span>
-      }
-    </div>
-  </div>
-
-  <div
-    class="flex flex-wrap justify-center items-start gap-[30px] max-[480px]:flex-col max-[480px]:items-center"
-  >
-    @for (game of filters.gamesArray(); track game.name) {
-      <game-card
-        class="game-card"
-        [name]="game.name"
-        [href]="game.href"
-        [image]="game.image"
-        [tags]="game.tags"
-        [searchInput]="getSearchValue()"
-      />
+  <main class="home-content">
+    @if (filters.activeTags().length) {
+      <section class="home-toolbar">
+        <div class="home-toolbar__chips">
+          @for (tag of filters.activeTags(); track tag) {
+            <span class="home-chip home-chip--active">
+              {{ tag }}
+              <button (click)="onTagClear(tag)" type="button">&#10006;</button>
+            </span>
+          }
+        </div>
+      </section>
     }
-  </div>
+
+    @if (filters.gamesArray().length) {
+      <section class="home-grid">
+        @for (game of filters.gamesArray(); track game.name) {
+          <game-card
+            class="game-card"
+            [name]="game.name"
+            [href]="game.href"
+            [image]="game.image"
+            [tags]="game.tags"
+            [searchInput]="getSearchValue()"
+          />
+        }
+      </section>
+    } @else {
+      <section class="home-empty">
+        <h3>Ничего не найдено</h3>
+        <p>Попробуйте другой запрос или снимите часть активных тегов.</p>
+      </section>
+    }
+  </main>
 </div>

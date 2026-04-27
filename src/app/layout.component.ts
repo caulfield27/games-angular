@@ -6,6 +6,7 @@ import { handleAppBackground } from '@/shared/utils/utils';
 import { SeoService } from '../shared/services/seo.service';
 import { AuthModal } from '@/shared/components/authModal/authModal.component';
 import { AuthService } from '@/shared/services/auth.service';
+import { PwaService } from '@/shared/services/pwa.service';
 import { User } from '@/shared/types/types';
 import { AxiosError } from 'axios';
 
@@ -34,6 +35,7 @@ export class Layout {
     private router: Router,
     private seoService: SeoService,
     public authService: AuthService,
+    private pwaService: PwaService,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -50,6 +52,8 @@ export class Layout {
   readonly house = House;
 
   ngOnInit(): void {
+    this.pwaService.init();
+
     // this.authService
     //   .getMe()
     //   .then((res) => {

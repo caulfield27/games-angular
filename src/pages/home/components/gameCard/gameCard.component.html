@@ -1,39 +1,27 @@
-<div class="flex flex-col gap-5 items-start max-[480px]:gap-3">
-  <article
-    class="w-[350px] h-[175px] max-[480px]:w-full overflow-hidden rounded-lg cursor-pointer shadow-[0_2px_var(--primary-bg)] transition-all duration-300 hover:border hover:border-[#292929]"
-  >
-    <a [routerLink]="href" class="block w-full h-full">
-      <img
-        [src]="image"
-        [alt]="name"
-        class="w-full h-full object-cover transition-transform duration-300 hover:scale-125"
-      />
-    </a>
-  </article>
+<article class="game-tile">
+  <a [routerLink]="href" class="game-tile__media">
+    <img [src]="image" [alt]="name" class="game-tile__image" />
+    <div class="game-tile__shade"></div>
 
-  <div class="flex flex-col items-start gap-2">
-    <a
-      [routerLink]="href"
-      class="no-underline text-[24px] text-neutral-800 font-extrabold hover:underline"
-    >
-      {{ name }}
-    </a>
-    <div class="flex flex-wrap gap-5 max-w-[350px] max-[480px]:max-w-full">
-      @for (tag of tags; track tag; let last = $last) {
-        <span
-          (click)="onTagAdd(tag)"
-          role="button"
-          class="text-base max-[480px]:text-sm font-semibold relative cursor-pointer hover:border-b-2 hover:border-[var(--primary-text-color)]"
-        >
+    <div class="game-tile__topline">
+      <span class="game-tile__label">2D game</span>
+      <span class="game-tile__label game-tile__label--accent">
+        {{ tags[0] }}
+      </span>
+    </div>
+
+    <div class="game-tile__headline">
+      <h3>{{ name }}</h3>
+    </div>
+  </a>
+
+  <div class="game-tile__body">
+    <div class="game-tile__tags">
+      @for (tag of tags; track tag) {
+        <button (click)="onTagAdd(tag)" type="button" class="game-tile__tag">
           {{ tag }}
-
-          @if (!last) {
-            <span
-              class="absolute right-[-12px] top-1/2 -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-gray-400"
-            ></span>
-          }
-        </span>
+        </button>
       }
     </div>
   </div>
-</div>
+</article>

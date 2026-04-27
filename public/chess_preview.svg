@@ -1,0 +1,182 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="130" y1="38" x2="1016" y2="780" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7ED"/>
+      <stop offset="0.48" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F5F5F4"/>
+    </linearGradient>
+    <linearGradient id="cardA" x1="78" y1="98" x2="560" y2="355" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E0F2FE"/>
+      <stop offset="0.56" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#ECFEFF"/>
+    </linearGradient>
+    <linearGradient id="cardB" x1="78" y1="402" x2="560" y2="650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EDE9FE"/>
+      <stop offset="0.56" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FDF4FF"/>
+    </linearGradient>
+    <filter id="shadow" x="22" y="45" width="1136" height="708" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="24"/>
+      <feGaussianBlur stdDeviation="24"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.0588235 0 0 0 0 0.0901961 0 0 0 0 0.164706 0 0 0 0.18 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="800" rx="36" fill="url(#bg)"/>
+  <circle cx="1035" cy="102" r="180" fill="#FFF1D6" fill-opacity="0.95"/>
+  <circle cx="111" cy="725" r="140" fill="#F5D0FE" fill-opacity="0.4"/>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="70" width="1060" height="612" rx="34" fill="white" fill-opacity="0.86"/>
+  </g>
+
+  <rect x="92" y="96" width="488" height="250" rx="30" fill="url(#cardA)" stroke="#E5E7EB"/>
+  <rect x="92" y="370" width="488" height="250" rx="30" fill="url(#cardB)" stroke="#E5E7EB"/>
+  <rect x="626" y="96" width="412" height="524" rx="34" fill="#FFFFFF" stroke="#E5E7EB"/>
+
+  <rect x="126" y="132" width="74" height="74" rx="24" fill="#DBEAFE"/>
+  <circle cx="163" cy="169" r="19" fill="#60A5FA"/>
+  <path d="M164 150L167.3 160.2H178L169.4 166.5L172.7 176.7L164 170.4L155.3 176.7L158.6 166.5L150 160.2H160.7L164 150Z" fill="white"/>
+  <rect x="442" y="132" width="104" height="36" rx="18" fill="white" fill-opacity="0.92"/>
+  <text x="494" y="155" text-anchor="middle" fill="#404040" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">РЕЙТИНГ</text>
+  <text x="126" y="243" fill="#171717" font-family="Arial, sans-serif" font-size="38" font-weight="700">Онлайн партия</text>
+  <text x="126" y="284" fill="#525252" font-family="Arial, sans-serif" font-size="22">Быстрый подбор соперника и игра в реальном времени.</text>
+  <rect x="126" y="304" width="92" height="32" rx="16" fill="white"/>
+  <text x="172" y="325" text-anchor="middle" fill="#0284C7" font-family="Arial, sans-serif" font-size="16" font-weight="700">Рапид 10+0</text>
+
+  <rect x="126" y="406" width="74" height="74" rx="24" fill="#F3E8FF"/>
+  <rect x="145" y="425" width="36" height="36" rx="18" fill="#C084FC"/>
+  <circle cx="157" cy="443" r="4" fill="white"/>
+  <circle cx="169" cy="443" r="4" fill="white"/>
+  <path d="M154 453C157 448.5 169 448.5 172 453" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <rect x="466" y="406" width="80" height="36" rx="18" fill="white" fill-opacity="0.92"/>
+  <text x="506" y="429" text-anchor="middle" fill="#525252" font-family="Arial, sans-serif" font-size="18" font-weight="700" letter-spacing="2">AI</text>
+  <text x="126" y="517" fill="#171717" font-family="Arial, sans-serif" font-size="38" font-weight="700">Против компьютера</text>
+  <text x="126" y="558" fill="#525252" font-family="Arial, sans-serif" font-size="22">Тренируйте дебюты, тактику и эндшпиль в браузере.</text>
+  <rect x="126" y="578" width="94" height="32" rx="16" fill="white"/>
+  <text x="173" y="599" text-anchor="middle" fill="#7C3AED" font-family="Arial, sans-serif" font-size="16" font-weight="700">Блиц 3+2</text>
+
+  <g transform="translate(658 126)">
+    <rect x="0" y="0" width="348" height="348" rx="22" fill="#D7B899"/>
+    <g>
+      <rect x="0" y="0" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="87" y="0" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="174" y="0" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="261" y="0" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="43.5" y="43.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="130.5" y="43.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="217.5" y="43.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="304.5" y="43.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="0" y="87" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="87" y="87" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="174" y="87" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="261" y="87" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="43.5" y="130.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="130.5" y="130.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="217.5" y="130.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="304.5" y="130.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="0" y="174" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="87" y="174" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="174" y="174" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="261" y="174" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="43.5" y="217.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="130.5" y="217.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="217.5" y="217.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="304.5" y="217.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="0" y="261" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="87" y="261" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="174" y="261" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="261" y="261" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="43.5" y="304.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="130.5" y="304.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="217.5" y="304.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+      <rect x="304.5" y="304.5" width="43.5" height="43.5" fill="#F6E7CB"/>
+    </g>
+    <g fill="#B58863">
+      <rect x="43.5" y="0" width="43.5" height="43.5"/>
+      <rect x="130.5" y="0" width="43.5" height="43.5"/>
+      <rect x="217.5" y="0" width="43.5" height="43.5"/>
+      <rect x="304.5" y="0" width="43.5" height="43.5"/>
+      <rect x="0" y="43.5" width="43.5" height="43.5"/>
+      <rect x="87" y="43.5" width="43.5" height="43.5"/>
+      <rect x="174" y="43.5" width="43.5" height="43.5"/>
+      <rect x="261" y="43.5" width="43.5" height="43.5"/>
+      <rect x="43.5" y="87" width="43.5" height="43.5"/>
+      <rect x="130.5" y="87" width="43.5" height="43.5"/>
+      <rect x="217.5" y="87" width="43.5" height="43.5"/>
+      <rect x="304.5" y="87" width="43.5" height="43.5"/>
+      <rect x="0" y="130.5" width="43.5" height="43.5"/>
+      <rect x="87" y="130.5" width="43.5" height="43.5"/>
+      <rect x="174" y="130.5" width="43.5" height="43.5"/>
+      <rect x="261" y="130.5" width="43.5" height="43.5"/>
+      <rect x="43.5" y="174" width="43.5" height="43.5"/>
+      <rect x="130.5" y="174" width="43.5" height="43.5"/>
+      <rect x="217.5" y="174" width="43.5" height="43.5"/>
+      <rect x="304.5" y="174" width="43.5" height="43.5"/>
+      <rect x="0" y="217.5" width="43.5" height="43.5"/>
+      <rect x="87" y="217.5" width="43.5" height="43.5"/>
+      <rect x="174" y="217.5" width="43.5" height="43.5"/>
+      <rect x="261" y="217.5" width="43.5" height="43.5"/>
+      <rect x="43.5" y="261" width="43.5" height="43.5"/>
+      <rect x="130.5" y="261" width="43.5" height="43.5"/>
+      <rect x="217.5" y="261" width="43.5" height="43.5"/>
+      <rect x="304.5" y="261" width="43.5" height="43.5"/>
+      <rect x="0" y="304.5" width="43.5" height="43.5"/>
+      <rect x="87" y="304.5" width="43.5" height="43.5"/>
+      <rect x="174" y="304.5" width="43.5" height="43.5"/>
+      <rect x="261" y="304.5" width="43.5" height="43.5"/>
+    </g>
+
+    <rect x="217.5" y="130.5" width="43.5" height="43.5" fill="#86EFAC" fill-opacity="0.75"/>
+    <rect x="217.5" y="87" width="43.5" height="43.5" fill="#FCD34D" fill-opacity="0.88"/>
+
+    <image href="chess/bk.svg" x="8" y="5" width="27" height="27"/>
+    <image href="chess/bq.svg" x="47" y="4" width="35" height="35"/>
+    <image href="chess/br.svg" x="92" y="8" width="24" height="24"/>
+    <image href="chess/bb.svg" x="133" y="5" width="27" height="27"/>
+    <image href="chess/bn.svg" x="177" y="4" width="33" height="33"/>
+    <image href="chess/br.svg" x="223" y="8" width="24" height="24"/>
+    <image href="chess/bk.svg" x="269" y="5" width="27" height="27"/>
+    <image href="chess/bq.svg" x="308" y="4" width="35" height="35"/>
+
+    <image href="chess/bp.svg" x="8" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="52" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="95" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="139" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="182" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="226" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="269" y="49" width="27" height="27"/>
+    <image href="chess/bp.svg" x="313" y="49" width="27" height="27"/>
+
+    <image href="chess/wp.svg" x="8" y="268" width="27" height="27"/>
+    <image href="chess/wp.svg" x="52" y="268" width="27" height="27"/>
+    <image href="chess/wp.svg" x="95" y="268" width="27" height="27"/>
+    <image href="chess/wp.svg" x="139" y="268" width="27" height="27"/>
+    <image href="chess/wp.svg" x="182" y="225" width="27" height="27"/>
+    <image href="chess/wp.svg" x="226" y="268" width="27" height="27"/>
+    <image href="chess/wp.svg" x="269" y="268" width="27" height="27"/>
+    <image href="chess/wp.svg" x="313" y="268" width="27" height="27"/>
+
+    <image href="chess/wr.svg" x="8" y="315" width="27" height="27"/>
+    <image href="chess/wn.svg" x="47" y="311" width="35" height="35"/>
+    <image href="chess/wb.svg" x="91" y="311" width="31" height="31"/>
+    <image href="chess/wq.svg" x="132" y="306" width="39" height="39"/>
+    <image href="chess/wk.svg" x="179" y="311" width="30" height="30"/>
+    <image href="chess/wb.svg" x="221" y="311" width="31" height="31"/>
+    <image href="chess/wn.svg" x="264" y="311" width="35" height="35"/>
+    <image href="chess/wr.svg" x="312" y="315" width="27" height="27"/>
+  </g>
+
+  <rect x="658" y="496" width="348" height="88" rx="24" fill="#FAFAFA" stroke="#E5E7EB"/>
+  <text x="686" y="531" fill="#737373" font-family="Arial, sans-serif" font-size="20">Выбранный формат</text>
+  <text x="686" y="567" fill="#171717" font-family="Arial, sans-serif" font-size="34" font-weight="700">Рапид</text>
+  <rect x="895" y="520" width="83" height="34" rx="17" fill="#FFFFFF"/>
+  <text x="936.5" y="543" text-anchor="middle" fill="#404040" font-family="Arial, sans-serif" font-size="18" font-weight="700">10+0</text>
+
+  <text x="74" y="744" fill="#171717" font-family="Arial, sans-serif" font-size="54" font-weight="700">Шахматы онлайн</text>
+  <text x="74" y="780" fill="#525252" font-family="Arial, sans-serif" font-size="24">Онлайн, с другом, локально и против компьютера</text>
+</svg>

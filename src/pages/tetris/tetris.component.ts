@@ -5,16 +5,16 @@ import {
   OnDestroy,
   ViewChild,
 } from '@angular/core';
-import {
-  ArrowBigDown,
-  ArrowBigLeft,
-  ArrowBigRight,
-  ArrowBigUp,
-  LucideAngularModule,
-  Pause,
-  Play,
-} from 'lucide-angular';
 import { TetrisService } from './services/tetris.service';
+import {
+  LucideAngularModule,
+  ArrowBigRight,
+  ArrowBigLeft,
+  ArrowBigDown,
+  ArrowBigUp,
+  Play,
+  Pause,
+} from 'lucide-angular';
 import { Move } from './types';
 
 @Component({
@@ -39,38 +39,10 @@ export class Tetris implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('infoCanvas') infoCanvas!: ElementRef<HTMLCanvasElement>;
 
-  get gameActionLabel() {
-    return this.tetrisService.gameStarted() && !this.tetrisService.gameStopped()
-      ? 'Пауза'
-      : this.tetrisService.gameStarted()
-        ? 'Продолжить'
-        : 'Старт';
-  }
-
-  get gameStatusTitle() {
-    if (!this.tetrisService.gameStarted()) {
-      return 'Готов к старту';
-    }
-
-    return this.tetrisService.gameStopped() ? 'Пауза' : 'Игра идет';
-  }
-
-  get gameStatusText() {
-    if (!this.tetrisService.gameStarted()) {
-      return 'Запустите игру и собирайте линии, пока скорость не станет безумной.';
-    }
-
-    return this.tetrisService.gameStopped()
-      ? 'Игра остановлена. Нажмите старт, чтобы продолжить с текущего места.'
-      : 'Следите за следующим блоком и удерживайте ритм падения.';
-  }
-
   ngAfterViewInit(): void {
     if (this.canvas.nativeElement && this.infoCanvas.nativeElement) {
-      this.tetrisService.init(
-        this.canvas.nativeElement,
-        this.infoCanvas.nativeElement,
-      );
+      const tetris = this.tetrisService;
+      tetris.init(this.canvas.nativeElement, this.infoCanvas.nativeElement);
     }
   }
 
@@ -90,8 +62,8 @@ export class Tetris implements AfterViewInit, OnDestroy {
     if (this.prevTs === null) {
       this.tetrisService.moveFigure(move);
       this.prevTs = ts;
-      this.currentAnimationFrameId = requestAnimationFrame((nextTs) =>
-        this.requestMove(nextTs, move),
+      this.currentAnimationFrameId = requestAnimationFrame((ts) =>
+        this.requestMove(ts, move)
       );
       return;
     }
@@ -102,22 +74,20 @@ export class Tetris implements AfterViewInit, OnDestroy {
       this.tetrisService.moveFigure(move);
       this.prevTs = ts;
     }
-
-    this.currentAnimationFrameId = requestAnimationFrame((nextTs) =>
-      this.requestMove(nextTs, move),
+    this.currentAnimationFrameId = requestAnimationFrame((ts) =>
+      this.requestMove(ts, move)
     );
   }
 
   onMouseDown(move: Move) {
     this.currentAnimationFrameId = requestAnimationFrame((ts) =>
-      this.requestMove(ts, move),
+      this.requestMove(ts, move)
     );
   }
 
   onMouseUp() {
     if (this.currentAnimationFrameId != null) {
       cancelAnimationFrame(this.currentAnimationFrameId);
-      this.currentAnimationFrameId = null;
       this.prevTs = null;
     }
   }
