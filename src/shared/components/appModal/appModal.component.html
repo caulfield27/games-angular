@@ -1,0 +1,60 @@
+@if (modal.modal(); as cfg) {
+  <!-- Backdrop -->
+  <div class="backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true" [attr.aria-label]="cfg.title">
+
+    <!-- Modal card -->
+    <div class="modal-card">
+
+      <!-- Header: ribbon title bar -->
+      <div class="modal-header">
+        @if (cfg.icon) {
+          <span [class]="'modal-icon modal-icon--' + cfg.icon">
+            @switch (cfg.icon) {
+              @case ('success') { ✓ }
+              @case ('error')   { ✗ }
+              @case ('settings'){ ⚙ }
+              @default          { ℹ }
+            }
+          </span>
+        }
+        <span class="modal-title">{{ cfg.title }}</span>
+        <button class="modal-close" (click)="onDismiss()" aria-label="Close">✕</button>
+      </div>
+
+      <!-- Body: tinted ribbon body -->
+      <div [class]="'modal-body modal-body--' + (cfg.icon ?? 'info')">
+
+        @if (cfg.body) {
+          <p class="modal-text">{{ cfg.body }}</p>
+        }
+
+        <!-- Settings form (difficulty selector) -->
+        @if (cfg.settingsLevel !== undefined) {
+          <div class="settings-form">
+            <label class="settings-label" for="modal-level">Сложность</label>
+            <select #levelSelect id="modal-level" class="settings-select" [value]="cfg.settingsLevel">
+              <option value="easy">Легкий</option>
+              <option value="medium">Средний</option>
+              <option value="hard">Сложный</option>
+              <option value="gigachad">Эксперт</option>
+            </select>
+          </div>
+        }
+
+      </div>
+
+      <!-- Footer: action buttons -->
+      <div class="modal-footer">
+        @if (cfg.cancelText) {
+          <button class="modal-btn modal-btn--secondary" (click)="onDismiss()">
+            {{ cfg.cancelText }}
+          </button>
+        }
+        <button class="modal-btn modal-btn--primary" (click)="onConfirm()">
+          {{ cfg.confirmText ?? 'OK' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

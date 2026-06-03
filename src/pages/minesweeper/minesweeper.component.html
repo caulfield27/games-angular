@@ -1,80 +1,129 @@
-<div class="page_container">
-  <div class="mainsweeper_wrapper">
-    <div class="my_dropdown_wrapper">
-      <dropdown
-        [options]="options"
-        [value]="boardService.level()"
-        [onSelect]="handleLevelSelect.bind(this)"
-      ></dropdown>
-      @if (boardService.isGameStart()) {
-        <div class="hint_wrapper">
-          <button
-            (click)="handleUseHint()"
-            [ngClass]="[
-              'hint_btn',
-              boardService.hintAmount() === 0 ? 'disabled' : '',
-            ]"
-            id="hint_btn"
-          >
-            <lucide-icon
-              [img]="Bulb"
-              size="45"
-              color="#ffff48"
-              [absoluteStrokeWidth]="true"
-            ></lucide-icon>
-            <span>{{ boardService.hintAmount() }}</span>
-          </button>
-        </div>
-      }
+<div class="page-frame">
+
+  <!-- Top Banner -->
+  <div class="top-banner">
+    <div class="banner-left">
+      <span class="banner-title">MINESWEEPER</span>
+      <span class="banner-tagline">CLEAR ALL MINES. ONLINE.</span>
     </div>
-    <div class="game_board">
-      <div class="tablo">
-        <div class="tablo_content">
-          <div class="tablo_flag">
-            <tablo [tabloNum]="boardService.flagCounter()" />
-          </div>
-          <div
-            (click)="boardService.restart()"
-            class="smile_container"
-            role="button"
-          >
-            @if (boardService.isFailed()) {
-              <sad-smile />
-            } @else {
-              <happy-smile />
-            }
-          </div>
-          <div class="timer_container">
-            <tablo [tabloNum]="boardService.seconds()" />
-          </div>
-        </div>
-      </div>
-      <div #container class="mainsweeper_container">
-        @for (field of boardService.fields(); track field.id) {
-          <button
-            (contextmenu)="onFieldCheck($event, $index)"
-            (click)="onFieldClick($index)"
-            [ngClass]="[
-              'field',
-              'field_' + boardService.level().value,
-              'field_' +
-                (field?.minesAround && (field?.minesAround ?? 4) < 4
-                  ? field.minesAround
-                  : 'default'),
-              field.isOpen ? 'open_field' : '',
-              field?.failed ? 'failed' : '',
-              $index === boardService.hintIdx() ? 'hint' : '',
-            ]"
-          >
-            @if (field.isFlaged) {
-              <img src="/minesweeper/flag.png" alt="flag" />
-            } @else if (field.isOpen && field.isMine) {
-              <img src="/minesweeper/bomb.png" alt="bomb" />
-            }
-            {{ field?.minesAround ?? "" }}
-          </button>
-        }
-      </div>
+    <div class="banner-right">
+      <span class="new-burst">NEW!</span>
     </div>
   </div>
+
+  <!-- White page canvas -->
+  <div class="page-canvas">
+    <div class="layout">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+
+        <!-- Difficulty ribbon card -->
+        <div class="ribbon-card">
+          <div class="ribbon-title">DIFFICULTY</div>
+          <div class="ribbon-body ribbon-body--sage">
+            <dropdown
+              [options]="options"
+              [value]="boardService.level()"
+              [onSelect]="handleLevelSelect.bind(this)"
+            ></dropdown>
+          </div>
+        </div>
+
+        <!-- Hint ribbon card -->
+        @if (boardService.isGameStart()) {
+          <div class="ribbon-card">
+            <div class="ribbon-title">HINT POWER-UP</div>
+            <div class="ribbon-body ribbon-body--sky">
+              <button
+                (click)="handleUseHint()"
+                [ngClass]="[
+                  'hint-btn',
+                  boardService.hintAmount() === 0 ? 'hint-btn--disabled' : ''
+                ]"
+              >
+                <lucide-icon
+                  [img]="Bulb"
+                  size="28"
+                  color="#000000"
+                  [absoluteStrokeWidth]="true"
+                ></lucide-icon>
+                <span class="hint-count">× {{ boardService.hintAmount() }}</span>
+              </button>
+            </div>
+          </div>
+        }
+
+      </aside>
+
+      <!-- Game scroll area -->
+      <div class="game-scroll">
+
+        <!-- #container is moved here so CSS vars cascade to both tablo and board -->
+        <div #container class="game-column">
+
+          <!-- Tablo panel -->
+          <div class="tablo-panel">
+            <div class="tablo-segment">
+              <div class="tablo-label">MINES</div>
+              <tablo [tabloNum]="boardService.flagCounter()" />
+            </div>
+            <div
+              class="tablo-restart"
+              (click)="boardService.restart()"
+              role="button"
+              title="Restart game"
+            >
+              @if (boardService.isFailed()) {
+                <sad-smile />
+              } @else {
+                <happy-smile />
+              }
+            </div>
+            <div class="tablo-segment">
+              <div class="tablo-label">TIME</div>
+              <tablo [tabloNum]="boardService.seconds()" />
+            </div>
+          </div>
+
+          <!-- Mine board grid -->
+          <div class="mine-board">
+            @for (field of boardService.fields(); track field.id) {
+              <button
+                (contextmenu)="onFieldCheck($event, $index)"
+                (click)="onFieldClick($index)"
+                [ngClass]="[
+                  'cell',
+                  'cell--' + boardService.level().value,
+                  field.isOpen ? 'cell--open' : 'cell--hidden',
+                  field.isOpen && field.isMine ? 'cell--mine' : '',
+                  field.isFlaged ? 'cell--flagged' : '',
+                  field?.failed ? 'cell--failed' : '',
+                  $index === boardService.hintIdx() ? 'cell--hint' : '',
+                  field?.minesAround
+                    ? 'cell--n' + ((field?.minesAround ?? 4) < 4 ? field.minesAround : 'high')
+                    : '',
+                ]"
+              >
+                @if (field.isFlaged) {
+                  <img src="/minesweeper/flag.png" alt="flag" />
+                } @else if (field.isOpen && field.isMine) {
+                  <img src="/minesweeper/bomb.png" alt="bomb" />
+                }
+                {{ field?.minesAround ?? "" }}
+              </button>
+            }
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer band -->
+  <div class="footer-band">
+    <span>MINESWEEPER &copy; CLASSIC EDITION &nbsp;&middot;&nbsp; RIGHT-CLICK TO FLAG MINES</span>
+  </div>
+
 </div>

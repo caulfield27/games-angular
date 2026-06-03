@@ -1,102 +1,116 @@
-<div class="memory_game__container">
-  <section class="memory_shell" aria-labelledby="memory-game-title">
-    <header class="hero">
-      <div class="hero_copy">
-        <p class="eyebrow">Игра на память</p>
-        <h1 id="memory-game-title">Найди пару героям</h1>
-        <p class="hero_text">
-          Открывайте карточки, запоминайте их позиции и соберите все пары до
-          окончания времени.
-        </p>
-      </div>
+<div class="page-frame">
 
-      <div class="hero_panel">
-        <div class="stats_grid" aria-label="Game stats">
-          <article class="stat_card">
-            <span class="stat_label">Время</span>
-            <strong class="stat_value">{{ minutes }}:{{ seconds }}</strong>
-          </article>
+  <!-- Top Banner -->
+  <div class="top-banner">
+    <div class="banner-left">
+      <span class="banner-title">MEMORY GAME</span>
+      <span class="banner-tagline">FIND ALL MATCHING PAIRS. ONLINE.</span>
+    </div>
+    <div class="banner-right">
+      <span class="new-burst">NEW!</span>
+    </div>
+  </div>
 
-          <article class="stat_card">
-            <span class="stat_label">Прогресс</span>
-            <strong class="stat_value">{{ progressText }}</strong>
-          </article>
+  <!-- White page canvas -->
+  <div class="page-canvas">
+    <div class="layout">
 
-          <article class="stat_card">
-            <span class="stat_label">Сложность</span>
-            <strong class="stat_value">{{ currentLevelLabel }}</strong>
-          </article>
+      <!-- Sidebar: stats + controls -->
+      <aside class="sidebar">
 
-          <article class="stat_card">
-            <span class="stat_label">Карточки</span>
-            <strong class="stat_value">{{ quantity }}</strong>
-          </article>
-        </div>
-
-        <div class="buttons_wrap">
-          <button
-            type="button"
-            class="action_button action_button--secondary"
-            (click)="handleSettings()"
-            aria-label="Открыть настройки игры"
-          >
-            <lucide-icon [img]="SettingsIcon" color="currentColor"></lucide-icon>
-            <span>Настройки</span>
-          </button>
-
-          <button
-            type="button"
-            class="action_button"
-            (click)="restart()"
-            aria-label="Перезапустить игру"
-          >
-            <lucide-icon [img]="RotateIcon" color="currentColor"></lucide-icon>
-            <span>Заново</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <section class="board_panel" aria-label="Игровое поле Memory">
-      <div class="board_header">
-        <div>
-          <h2>Игровое поле</h2>
-          <p>Соберите все совпадения и постарайтесь ошибаться как можно реже.</p>
-        </div>
-
-        <div class="timer_wrapper" aria-live="polite">
-          <span class="timer_label">Таймер</span>
-          <strong>{{ minutes }}:{{ seconds }}</strong>
-        </div>
-      </div>
-
-      <div
-        class="cards_container"
-        [style.--memory-columns]="boardColumns"
-        role="grid"
-        aria-label="Сетка карточек"
-      >
-        @for (card of game.cards(); track card.id; let index = $index) {
-        <button
-          type="button"
-          class="card"
-          (click)="handleOpenCard(card)"
-          [disabled]="isCardDisabled(card)"
-          [attr.aria-label]="getCardAriaLabel(card, index)"
-          [attr.aria-pressed]="card.isActive"
-        >
-          <div [ngClass]="['content_wrap', card.isActive ? 'active' : '']">
-            <span class="card_face front" aria-hidden="true">
-              <img src="/question.webp" alt="" class="img img--question" />
-            </span>
-
-            <span class="card_face back" aria-hidden="true">
-              <img [src]="card.src" alt="" class="img img--hero" />
-            </span>
+        <!-- Stats ribbon card -->
+        <div class="ribbon-card">
+          <div class="ribbon-title">GAME STATS</div>
+          <div class="ribbon-body ribbon-body--sage">
+            <dl class="stats-list">
+              <div class="stat-row">
+                <dt class="stat-label">TIME LEFT</dt>
+                <dd class="stat-value" aria-live="polite">{{ minutes }}:{{ seconds }}</dd>
+              </div>
+              <div class="stat-row">
+                <dt class="stat-label">PROGRESS</dt>
+                <dd class="stat-value">{{ progressText }}</dd>
+              </div>
+              <div class="stat-row">
+                <dt class="stat-label">LEVEL</dt>
+                <dd class="stat-value">{{ currentLevelLabel }}</dd>
+              </div>
+              <div class="stat-row">
+                <dt class="stat-label">CARDS</dt>
+                <dd class="stat-value">{{ quantity }}</dd>
+              </div>
+            </dl>
           </div>
-        </button>
-        }
-      </div>
-    </section>
-  </section>
+        </div>
+
+        <!-- Controls ribbon card -->
+        <div class="ribbon-card">
+          <div class="ribbon-title">CONTROLS</div>
+          <div class="ribbon-body ribbon-body--sky">
+            <div class="controls">
+              <button
+                type="button"
+                class="btn-secondary"
+                (click)="handleSettings()"
+                aria-label="Открыть настройки игры"
+              >
+                <lucide-icon [img]="SettingsIcon" color="currentColor" size="13"></lucide-icon>
+                <span>SETTINGS</span>
+              </button>
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="restart()"
+                aria-label="Перезапустить игру"
+              >
+                <lucide-icon [img]="RotateIcon" color="currentColor" size="13"></lucide-icon>
+                <span>RESTART</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Board area -->
+      <main class="board-area">
+        <div class="board-title-bar">
+          SUPERHERO PAIRS &mdash; {{ currentLevelLabel }}
+        </div>
+        <div
+          class="cards-grid"
+          [style.--memory-columns]="boardColumns"
+          role="grid"
+          aria-label="Сетка карточек"
+        >
+          @for (card of game.cards(); track card.id; let index = $index) {
+            <button
+              type="button"
+              class="card"
+              (click)="handleOpenCard(card)"
+              [disabled]="isCardDisabled(card)"
+              [attr.aria-label]="getCardAriaLabel(card, index)"
+              [attr.aria-pressed]="card.isActive"
+            >
+              <div [ngClass]="['card-inner', card.isActive ? 'card-inner--active' : '']">
+                <span class="card-face card-face--front" aria-hidden="true">
+                  <img src="/question.webp" alt="" class="card-img card-img--q" />
+                </span>
+                <span class="card-face card-face--back" aria-hidden="true">
+                  <img [src]="card.src" alt="" class="card-img card-img--hero" />
+                </span>
+              </div>
+            </button>
+          }
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Footer band -->
+  <div class="footer-band">
+    <span>MEMORY GAME &copy; CLASSIC EDITION &nbsp;&middot;&nbsp; FLIP CARDS TO FIND MATCHING PAIRS</span>
+  </div>
+
 </div>

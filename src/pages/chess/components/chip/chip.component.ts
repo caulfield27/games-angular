@@ -10,7 +10,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
       type="button"
       (click)="onClick()"
       [ngClass]="chipClasses"
-      class="shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200"
+      class="shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[13px] font-medium transition-all duration-150"
     >
       {{ label }}
     </button>
@@ -27,9 +27,8 @@ export class ChessChip {
 
   get chipClasses() {
     if (this.active) {
-      return 'border-transparent bg-gradient-to-r from-[#ea580c] to-[#c2410c] text-white shadow-lg hover:scale-[1.03]';
+      return 'border-[#ff4f00] bg-[#ff4f00] text-[#fffefb]';
     }
-
-    return 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50';
+    return 'border-[#c5c0b1] bg-[#fffefb] text-[#605d52] hover:border-[#201515] hover:text-[#201515]';
   }
 }

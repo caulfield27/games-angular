@@ -1,203 +1,136 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-  <div
-    (click)="onClose()"
-    class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity"
-  ></div>
-  <div
-    class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all"
-  >
-    <button
-      (click)="onClose()"
-      class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
-    >
-      <lucide-icon [img]="Xicon" size="24" />
-    </button>
-    <div class="p-8">
-      <div class="flex border-b border-gray-200 mb-6">
-        <button
-          (click)="setActiveTab('login')"
-          class="flex-1 pb-4 text-center font-semibold transition-colors relative"
-          [ngClass]="
-            activeTab === 'login'
-              ? 'text-yellow-400'
-              : 'text-gray-500 hover:text-gray-700'
-          "
-        >
-          Вход
-          @if (activeTab === "login") {
-            <div
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400"
-            ></div>
-          }
-        </button>
-        <button
-          (click)="setActiveTab('register')"
-          class="flex-1 pb-4 text-center font-semibold transition-colors relative"
-          [ngClass]="
-            activeTab === 'register'
-              ? 'text-yellow-400'
-              : 'text-gray-500 hover:text-gray-700'
-          "
-        >
-          Регистрация
-          @if (activeTab === "register") {
-            <div
-              class="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400"
-            ></div>
-          }
-        </button>
-      </div>
+<!-- Backdrop -->
+<div class="backdrop" (click)="onClose()" role="dialog" aria-modal="true" aria-label="Авторизация">
 
-      @if (activeTab === "login") {
-        <form (submit)="handleLogin($event)" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Имя пользователя
-            </label>
-            <div class="relative">
-              <lucide-icon
-                [img]="UserIcon"
-                class="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size="20"
-              />
-              <input
-                type="text"
-                name="username"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
-                placeholder="Введите свой никнейм"
-                required
-              />
-            </div>
-          </div>
+  <!-- Modal card -->
+  <div class="modal-card" (click)="$event.stopPropagation()">
 
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Пароль
-            </label>
-            <div class="relative">
-              <lucide-icon
-                [img]="LockIcon"
-                class="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size="20"
-              />
-              <input
-                type="password"
-                name="password"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
-                placeholder="Введите свой пароль"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between text-sm">
-            <a href="#" class="text-yellow-400 hover:text-yellow-500 font-medium">
-              Забыли пароль?
-            </a>
-          </div>
-
-          <button
-            [disabled]="isLogging"
-            type="submit"
-            class="w-full bg-yellow-400 text-white py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors shadow-lg shadow-yellow-300/30"
-          >
-            @if (isLogging) {
-              Выполняется...
-            } @else {
-              Войти
-            }
-          </button>
-        </form>
-      } @else if (activeTab === "register") {
-        <form (submit)="handleRegister($event)" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Никнейм
-            </label>
-            <div class="relative">
-              <lucide-icon
-                [img]="UserIcon"
-                class="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size="20"
-              />
-              <input
-                type="text"
-                name="username"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
-                placeholder="Введите свой никнейм"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Почта
-            </label>
-            <div class="relative">
-              <lucide-icon
-                [img]="MailIcon"
-                class="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size="20"
-              />
-              <input
-                type="email"
-                name="email"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
-                placeholder="Введите свою почту"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Пароль
-            </label>
-            <div class="relative">
-              <lucide-icon
-                [img]="LockIcon"
-                class="absolute left-1.5 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size="20"
-              />
-              <input
-                type="password"
-                name="password"
-                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-300 focus:border-transparent transition-all outline-none"
-                placeholder="Создайте пароль"
-                required
-                minLength="{6}"
-              />
-            </div>
-          </div>
-
-          <div class="text-sm">
-            <label class="flex items-start">
-              <input
-                type="checkbox"
-                class="rounded border-gray-300 text-yellow-400 focus:ring-yellow-300 mr-2 mt-0.5"
-                required
-              />
-              <span class="text-gray-600">
-                Я согласен с условиями предоставления услуг и политикой
-                конфиденциальности.
-              </span>
-            </label>
-          </div>
-
-          <button
-            [disabled]="isRegistring"
-            type="submit"
-            class="w-full bg-yellow-600 text-white py-3 rounded-lg font-semibold hover:bg-yellow-500 transition-colors shadow-lg shadow-yellow-300/30"
-          >
-            @if (isRegistring) {
-              Выполняется...
-            } @else {
-              Создать аккаунт
-            }
-          </button>
-        </form>
-      }
+    <!-- Header: ribbon title bar with tabs -->
+    <div class="modal-header">
+      <button
+        class="tab-btn"
+        [class.tab-btn--active]="activeTab === 'login'"
+        (click)="setActiveTab('login')"
+        type="button"
+      >ВХОД</button>
+      <button
+        class="tab-btn"
+        [class.tab-btn--active]="activeTab === 'register'"
+        (click)="setActiveTab('register')"
+        type="button"
+      >РЕГИСТРАЦИЯ</button>
+      <button class="modal-close" (click)="onClose()" aria-label="Закрыть">✕</button>
     </div>
+
+    <!-- Login form -->
+    @if (activeTab === 'login') {
+      <form (submit)="handleLogin($event)" class="modal-body modal-body--sky">
+        <div class="field">
+          <label class="field-label" for="auth-username">Имя пользователя</label>
+          <div class="field-input-wrap">
+            <lucide-icon [img]="UserIcon" size="15" class="field-icon" />
+            <input
+              type="text"
+              id="auth-username"
+              name="username"
+              class="field-input"
+              placeholder="Введите никнейм"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="auth-password">Пароль</label>
+          <div class="field-input-wrap">
+            <lucide-icon [img]="LockIcon" size="15" class="field-icon" />
+            <input
+              type="password"
+              id="auth-password"
+              name="password"
+              class="field-input"
+              placeholder="Введите пароль"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="modal-btn modal-btn--secondary" (click)="onClose()">
+            Отмена
+          </button>
+          <button type="submit" class="modal-btn modal-btn--primary" [disabled]="isLogging">
+            {{ isLogging ? 'Выполняется...' : 'Войти' }}
+          </button>
+        </div>
+      </form>
+    }
+
+    <!-- Register form -->
+    @if (activeTab === 'register') {
+      <form (submit)="handleRegister($event)" class="modal-body modal-body--sage">
+        <div class="field">
+          <label class="field-label" for="reg-username">Никнейм</label>
+          <div class="field-input-wrap">
+            <lucide-icon [img]="UserIcon" size="15" class="field-icon" />
+            <input
+              type="text"
+              id="reg-username"
+              name="username"
+              class="field-input"
+              placeholder="Введите никнейм"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="reg-email">Почта</label>
+          <div class="field-input-wrap">
+            <lucide-icon [img]="MailIcon" size="15" class="field-icon" />
+            <input
+              type="email"
+              id="reg-email"
+              name="email"
+              class="field-input"
+              placeholder="Введите почту"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="reg-password">Пароль</label>
+          <div class="field-input-wrap">
+            <lucide-icon [img]="LockIcon" size="15" class="field-icon" />
+            <input
+              type="password"
+              id="reg-password"
+              name="password"
+              class="field-input"
+              placeholder="Создайте пароль"
+              required
+              minlength="6"
+            />
+          </div>
+        </div>
+
+        <div class="field field--checkbox">
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox-input" required />
+            <span>Я согласен с условиями предоставления услуг и политикой конфиденциальности.</span>
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="modal-btn modal-btn--secondary" (click)="onClose()">
+            Отмена
+          </button>
+          <button type="submit" class="modal-btn modal-btn--primary" [disabled]="isRegistring">
+            {{ isRegistring ? 'Выполняется...' : 'Создать аккаунт' }}
+          </button>
+        </div>
+      </form>
+    }
+
   </div>
 </div>

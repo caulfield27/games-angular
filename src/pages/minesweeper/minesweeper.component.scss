@@ -1,255 +1,303 @@
-.page_container{
-  height: 100%;
+@use 'design' as *;
+
+// ─── PAGE FRAME ────────────────────────────────────────────────────────────
+.page-frame { @include page-frame; }
+
+// ─── TOP BANNER ────────────────────────────────────────────────────────────
+.top-banner { @include top-banner; }
+
+.banner-left {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-size: cover;
-  padding: 80px 32px 32px 32px;
-
-  @media screen and (max-width: 500px) {
-    padding: 80px 16px 16px 16px;
-  }
+  align-items: baseline;
+  gap: $s-lg;
+  flex-wrap: wrap;
 }
 
-.mainsweeper_wrapper {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto;
-  gap: 20px;
-  overflow: hidden;
+.banner-title {
+  @include t-display;
+  color: $canvas;
+  text-transform: uppercase;
 
-  @media screen and (max-width: 480px) {
-    display: flex;
+  @media (max-width: 480px) { font-size: 22px; }
+  @media (max-width: 360px) { font-size: 18px; }
+}
+
+.banner-tagline {
+  @include t-h2;
+  color: $canvas;
+
+  @media (max-width: 600px) { display: none; }
+}
+
+.banner-right { flex-shrink: 0; }
+
+.new-burst { @include new-burst; }
+
+// ─── PAGE CANVAS ───────────────────────────────────────────────────────────
+.page-canvas {
+  background: $canvas;
+  flex: 1;
+  padding: $s-lg;
+
+  @media (max-width: 600px) { padding: $s-sm; }
+}
+
+// ─── LAYOUT ────────────────────────────────────────────────────────────────
+.layout {
+  display: flex;
+  flex-direction: row;
+  gap: $s-sect;
+  align-items: flex-start;
+
+  @media (max-width: 768px) {
     flex-direction: column;
+    gap: $s-lg;
   }
 }
 
-.my_dropdown_wrapper {
-  margin-top: 50px;
-  grid-column: 1;
-  justify-self: end;
-
-  @media screen and (max-width: 480px) {
-    margin-top: 0;
-  }
-}
-
-
-.mainsweeper_container {
-  display: grid;
-  grid-template-columns: repeat(var(--rows), var(--size));
-  grid-template-rows: repeat(var(--cols), var(--size));
-  height: auto;
-  overflow: hidden;
-  border-radius: 2px;
-  position: relative;
-  border-right: 10px solid #fff;
-  border-bottom: 10px solid #fff;
-  border-left: 10px solid #878787;
-  border-top: 10px solid #878787;
-
-  @media screen and (max-width: 480px) {
-    border-right: 3px solid #fff;
-    border-bottom: 3px solid #fff;
-    border-left: 3px solid #878787;
-    border-top: 3px solid #878787;
-  }
-}
-
-.game_board {
-  grid-column: 2/3;
-  justify-self: center;
-  align-items: center;
+// ─── SIDEBAR ───────────────────────────────────────────────────────────────
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border-top: 15px solid #fff;
-  border-left: 15px solid #fff;
-  border-bottom: 15px solid #878787;
-  border-right: 15px solid #878787;
-  background: gainsboro;
-  padding: 10px;
+  gap: $s-sect;
 
-  @media screen and (max-width: 480px) {
-    border-top: 5px solid #fff;
-    border-left: 5px solid #fff;
-    border-bottom: 5px solid #878787;
-    border-right: 5px solid #878787;
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: row;
+    gap: $s-lg;
+    flex-wrap: wrap;
   }
 }
 
-.tablo {
-  width: 100%;
-  border-right: 10px solid #fff;
-  border-bottom: 10px solid #fff;
-  border-left: 10px solid #878787;
-  border-top: 10px solid #878787;
+// ─── RIBBON CARDS ──────────────────────────────────────────────────────────
+.ribbon-card {
+  border: 1px solid $frame-ink;
 
-  @media screen and (max-width: 480px) {
-    border-right: 3px solid #fff;
-    border-bottom: 3px solid #fff;
-    border-left: 3px solid #878787;
-    border-top: 3px solid #878787;
+  @media (max-width: 768px) {
+    flex: 1;
+    min-width: 140px;
   }
 }
 
-.tablo_content {
+.ribbon-title { @include ribbon-title; }
+
+.ribbon-body {
+  @include ribbon-body-base;
+
+  &--sage       { background: $tint-sage; }
+  &--sky        { background: $tint-sky; }
+  &--steel      { background: $tint-steel; }
+  &--lime       { background: $tint-lime; }
+  &--periwinkle { background: $tint-periwinkle; }
+  &--salmon     { background: $tint-salmon; }
+}
+
+// ─── HINT BUTTON (yellow sticker chrome) ───────────────────────────────────
+.hint-btn {
+  background: $yellow-sticker;
+  color: $ink;
+  border: 2px solid $frame-ink;
+  padding: $s-s $s-md;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $s-sm;
   width: 100%;
-  height: 100%;
-  background: gainsboro;
+  @include t-btn;
+  text-transform: uppercase;
+
+  &--disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &:active:not(.hint-btn--disabled) {
+    filter: brightness(0.88);
+  }
+}
+
+.hint-count {
+  @include t-btn;
+  font-size: 15px;
+}
+
+// ─── GAME SCROLL ───────────────────────────────────────────────────────────
+.game-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+// ─── GAME COLUMN (#container) ──────────────────────────────────────────────
+// CSS vars --rows/--cols/--size injected here cascade to tablo-panel & mine-board.
+// Desktop: max-content width. Mobile: 100% + fluid 1fr board columns.
+.game-column {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+
+  @media (max-width: 768px) { width: 100%; }
+}
+
+// ─── TABLO PANEL ───────────────────────────────────────────────────────────
+.tablo-panel {
+  background: $tint-steel;
+  border: 1px solid $frame-ink;
+  border-bottom: none;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
-}
+  padding: $s-md $s-lg;
+  gap: $s-lg;
+  width: 100%;
+  box-sizing: border-box;
 
-.field_easy {
-  font-size: 2vw;
-  border-top: 4px solid #fff;
-  border-left: 4px solid #fff;
-  border-bottom: 4px solid #878787;
-  border-right: 4px solid #878787;
-
-  @media screen and (max-width: 480px) {
-    border-top: 2px solid #fff;
-    border-left: 2px solid #fff;
-    border-bottom: 2px solid #878787;
-    border-right: 2px solid #878787;
+  @media (max-width: 768px) {
+    padding: $s-s $s-sm;
+    gap: $s-sm;
   }
 }
 
-.field_medium {
-  font-size: 1.5vw;
-  border-top: 3px solid #fff;
-  border-left: 3px solid #fff;
-  border-bottom: 3px solid #878787;
-  border-right: 3px solid #878787;
+.tablo-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $s-xxs;
+}
 
-  @media screen and (max-width: 480px) {
-    border-top: 1px solid #fff;
-    border-left: 1px solid #fff;
-    border-bottom: 1px solid #878787;
-    border-right: 1px solid #878787;
+.tablo-label {
+  @include t-btn;
+  text-transform: uppercase;
+  color: $ink;
+  letter-spacing: 0.5px;
+}
+
+.tablo-restart {
+  cursor: pointer;
+  background: $yellow-sticker;
+  border: 2px solid $frame-ink;
+  padding: $s-xs;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:active { filter: brightness(0.85); }
+}
+
+// ─── MINE BOARD GRID ───────────────────────────────────────────────────────
+.mine-board {
+  display: grid;
+  grid-template-columns: repeat(var(--rows), var(--size));
+  grid-template-rows:    repeat(var(--cols), var(--size));
+  border: 1px solid $frame-ink;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(var(--rows), 1fr);
+    grid-template-rows: unset;
+    width: 100%;
   }
 }
 
-.field_hard {
-  font-size: 1vw;
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-bottom: 2px solid #878787;
-  border-right: 2px solid #878787;
-
-  @media screen and (max-width: 480px) {
-    border-top: 1px solid #fff;
-    border-left: 1px solid #fff;
-    border-bottom: 1px solid #878787;
-    border-right: 1px solid #878787;
-  }
-}
-
-.field {
-  aspect-ratio: 1/1;
+// ─── CELLS ─────────────────────────────────────────────────────────────────
+.cell {
+  aspect-ratio: 1 / 1;
   outline: none;
-  font-weight: 600;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
-  background: #bfbfbf;
-
-  &:active {
-    scale: 0.9;
-  }
-
-  @media screen and (max-width: 480px) {
-    font-size: 16px;
-  }
-}
-
-.open_field {
-  border: 1px solid #bfbfbf;
-  background: #e2e2e2 !important;
-  pointer-events: none;
-}
-
-.failed {
-  border-bottom: 1px solid #a00c0c;
-  background: #e00707 !important;
-}
-
-.hint{
-  background-color: #45de45;
-}
-
-.field_1{
-  color: #0B24FB;
-}
-.field_2{
-  color: #0E7A11;
-}
-.field_3{
-  color: #852123;
-}
-.field_default{
-  color: #FC0D1B;
-}
-
-
-.smile_container {
-  cursor: pointer;
-  padding: 3px;
-  border-bottom: 5px solid #878787;
-  border-right: 5px solid #878787;
-  border-left: 5px solid #fff;
-  border-top: 5px solid #fff;
-
-  &:active {
-    scale: 0.95;
-  }
-}
-
-.tablo_flag {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
+  border: 1px solid $frame-ink;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: calc(var(--size) * 0.44);
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 
   img {
-    width: 40px;
+    width:  calc(var(--size) * 0.62);
+    height: calc(var(--size) * 0.62);
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5));
   }
 
-  span {
-    font-size: 40px;
-    font-weight: 600;
-    color: gray;
+  @media (max-width: 768px) {
+    font-size: clamp(7px, calc(80vw / var(--rows) * 0.44), 20px);
+
+    img { width: 60%; height: 60%; }
   }
+
+  &:active:not(.cell--open) { filter: brightness(0.82); }
+
+  &--hidden   { background: $tint-periwinkle; }
+  &--open     { background: $canvas; cursor: default; pointer-events: none; }
+  &--mine     { background: $tint-salmon; }
+  &--flagged  { background: $yellow-sticker; }
+  &--failed   { background: $primary !important; }
+  &--hint     { background: $tint-lime !important; }
+
+  &--n1    { color: #0B24FB; }
+  &--n2    { color: #0E7A11; }
+  &--n3    { color: #852123; }
+  &--nhigh { color: #FC0D1B; }
 }
 
-.hint_wrapper {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+// ─── FOOTER BAND ───────────────────────────────────────────────────────────
+.footer-band { @include footer-band; }
 
-.hint_btn {
-  border: none;
-  outline: none;
-  background: transparent;
-  cursor: pointer;
-  position: relative;
+// ─── DROPDOWN OVERRIDE ─────────────────────────────────────────────────────
+:host ::ng-deep {
+  .dropdown_container { width: 100%; }
 
-  span{
-    position: absolute;
-    left: 50%;
-    top: 5%;
-    transform: translate(-50%);
-    color: #ffff48;
-    font-weight: 600;
-
+  .my_dropdown_btn {
+    border-radius: 0 !important;
+    border: 1px solid $frame-ink !important;
+    background: $canvas !important;
+    color: $ink !important;
+    font-family: Helvetica, Arial, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    padding: $s-s $s-lg !important;
+    width: 100%;
+    min-width: unset !important;
+    cursor: pointer;
   }
+
+  .my_dropdown_ul {
+    border-radius: 0 !important;
+    border: 1px solid $frame-ink !important;
+    background: $canvas !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    top: 100% !important;
+  }
+
+  .my_dropdown_list_item {
+    border-radius: 0 !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    padding: $s-s $s-md !important;
+    border-bottom: 1px solid #cccccc !important;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:last-child { border-bottom: none !important; }
+
+    &:not(.active_li):not(.disabled):hover {
+      background: #cdd4b8 !important;
+      cursor: pointer;
+    }
+  }
+
+  .active_li { background: $tint-sage !important; }
 }

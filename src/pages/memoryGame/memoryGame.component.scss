@@ -1,290 +1,255 @@
-.memory_game__container {
-  min-height: 100svh;
-  padding: 32px 20px 48px;
-  background:
-    radial-gradient(circle at top, rgba(248, 208, 63, 0.14), transparent 28%),
-    linear-gradient(180deg, rgba(8, 15, 38, 0.96), rgba(15, 28, 58, 0.96));
-  font-family: "Bangers", cursive;
-  color: #fff;
-}
+@use 'design' as *;
 
-.memory_shell {
-  width: min(1200px, 100%);
-  margin: 0 auto;
-  display: grid;
-  gap: 24px;
-}
+// ─── PAGE FRAME ────────────────────────────────────────────────────────────
+.page-frame { @include page-frame; }
 
-.hero,
-.board_panel {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(8, 13, 31, 0.68);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
-}
+// ─── TOP BANNER ────────────────────────────────────────────────────────────
+.top-banner { @include top-banner; }
 
-.hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 420px);
-  gap: 24px;
-  border-radius: 28px;
-  padding: 28px;
-}
-
-.hero_copy {
-  display: grid;
-  gap: 12px;
-  align-content: center;
-}
-
-.eyebrow {
-  margin: 0;
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  color: #f9d548;
-}
-
-.hero_copy h1,
-.board_header h2 {
-  margin: 0;
-  color: #fff6b0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.hero_copy h1 {
-  font-size: clamp(2.2rem, 5vw, 4.5rem);
-  line-height: 0.92;
-}
-
-.hero_text,
-.board_header p {
-  margin: 0;
-  font-family: "Oswald", sans-serif;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.hero_panel {
-  display: grid;
-  gap: 16px;
-  align-content: start;
-}
-
-.stats_grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.stat_card {
-  display: grid;
-  gap: 6px;
-  padding: 16px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.stat_label,
-.timer_label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.66);
-}
-
-.stat_value,
-.timer_wrapper strong {
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  color: #ffffff;
-}
-
-.buttons_wrap {
+.banner-left {
   display: flex;
-  gap: 12px;
+  align-items: baseline;
+  gap: $s-lg;
   flex-wrap: wrap;
 }
 
-.action_button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ff4fa0, #ff7bc3);
-  color: #fff;
-  font: inherit;
-  letter-spacing: 0.08em;
+.banner-title {
+  @include t-display;
+  color: $canvas;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 12px 24px rgba(255, 79, 160, 0.24);
+
+  @media (max-width: 480px) { font-size: 22px; }
+  @media (max-width: 360px) { font-size: 18px; }
 }
 
-.action_button--secondary {
-  background: linear-gradient(135deg, #ff8ac6, #ffb3d9);
-  color: #3f1231;
+.banner-tagline {
+  @include t-h2;
+  color: $canvas;
+
+  @media (max-width: 600px) { display: none; }
 }
 
-.action_button:hover,
-.action_button:focus-visible {
-  transform: translateY(-2px);
+.banner-right { flex-shrink: 0; }
+
+.new-burst { @include new-burst; }
+
+// ─── PAGE CANVAS ───────────────────────────────────────────────────────────
+.page-canvas {
+  background: $canvas;
+  flex: 1;
+  padding: $s-lg;
+
+  @media (max-width: 600px) { padding: $s-sm; }
 }
 
-.action_button:focus-visible,
-.card:focus-visible {
-  outline: 3px solid rgba(249, 213, 72, 0.95);
-  outline-offset: 3px;
+// ─── LAYOUT ────────────────────────────────────────────────────────────────
+.layout {
+  display: flex;
+  flex-direction: row;
+  gap: $s-sect;
+  align-items: flex-start;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+    gap: $s-lg;
+    align-items: center;
+  }
 }
 
-.board_panel {
-  border-radius: 32px;
-  padding: 24px;
+// ─── SIDEBAR ───────────────────────────────────────────────────────────────
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $s-sect;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    flex-direction: row;
+    gap: $s-lg;
+    flex-wrap: wrap;
+  }
 }
 
-.board_header {
+// ─── RIBBON CARDS ──────────────────────────────────────────────────────────
+.ribbon-card {
+  border: 1px solid $frame-ink;
+
+  @media (max-width: 900px) {
+    flex: 1;
+    min-width: 180px;
+  }
+}
+
+.ribbon-title { @include ribbon-title; }
+
+.ribbon-body {
+  @include ribbon-body-base;
+
+  &--sage       { background: $tint-sage; }
+  &--sky        { background: $tint-sky; }
+  &--steel      { background: $tint-steel; }
+  &--lime       { background: $tint-lime; }
+  &--periwinkle { background: $tint-periwinkle; }
+  &--salmon     { background: $tint-salmon; }
+}
+
+// ─── STATS LIST ────────────────────────────────────────────────────────────
+.stats-list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $s-sm;
+}
+
+.stat-row {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 24px;
+  align-items: baseline;
+  gap: $s-sm;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  padding-bottom: $s-xs;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
 }
 
-.cards_container {
+.stat-label {
+  @include t-label;
+  text-transform: uppercase;
+  color: $ink;
+  flex-shrink: 0;
+}
+
+.stat-value {
+  font-family: 'Arial Black', Helvetica, sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: $ink;
+  text-align: right;
+  margin: 0;
+}
+
+// ─── CONTROLS ──────────────────────────────────────────────────────────────
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: $s-sm;
+}
+
+.btn-primary  { @include btn-primary;  width: 100%; }
+.btn-secondary { @include btn-secondary; width: 100%; }
+
+// ─── BOARD AREA ────────────────────────────────────────────────────────────
+.board-area {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid $frame-ink;
+
+  @media (max-width: 900px) { width: 100%; }
+}
+
+.board-title-bar { @include ribbon-title; }
+
+// ─── CARDS GRID ────────────────────────────────────────────────────────────
+.cards-grid {
+  background: $tint-steel;
+  padding: $s-lg;
   display: grid;
   grid-template-columns: repeat(var(--memory-columns, 4), minmax(0, 1fr));
-  gap: 16px;
+  gap: $s-sm;
+
+  @media (max-width: 900px) { padding: $s-md; gap: $s-xs; }
+
+  @media (max-width: 600px) {
+    padding: $s-sm;
+    gap: $s-xs;
+    grid-template-columns: repeat(min(4, var(--memory-columns, 4)), minmax(0, 1fr));
+  }
+
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(min(3, var(--memory-columns, 3)), minmax(0, 1fr));
+  }
 }
 
+// ─── CARD FLIP UNIT ────────────────────────────────────────────────────────
 .card {
-  perspective: 1000px;
-  position: relative;
+  perspective: 900px;
   width: 100%;
   aspect-ratio: 1 / 1;
   padding: 0;
   border: 0;
-  border-radius: 22px;
-  cursor: pointer;
   background: transparent;
-  transition: transform 0.2s ease;
+  cursor: pointer;
+
+  &:disabled { cursor: default; }
+
+  &:focus-visible .card-inner {
+    outline: 3px solid $primary;
+    outline-offset: 2px;
+  }
 }
 
-.card:not(:disabled):hover {
-  transform: translateY(-4px);
-}
-
-.content_wrap {
+.card-inner {
   width: 100%;
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.5s ease;
+  transition: transform 0.45s ease;
+  border: 1px solid $frame-ink;
+
+  &--active { transform: rotateY(180deg); }
 }
 
-.card_face {
+.card-face {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   backface-visibility: hidden;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.22);
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
 }
 
-.front {
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.18), transparent 55%),
-    linear-gradient(145deg, #ff6cb5, #ffb3d9);
+// Front (hidden) — periwinkle tint + hard bevel (DESIGN.MD elevation level 3)
+.card-face--front {
+  background: $tint-periwinkle;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.45),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.22);
 }
 
-.back {
+// Back (revealed) — canvas white
+.card-face--back {
   transform: rotateY(180deg);
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.24), transparent 55%),
-    linear-gradient(145deg, #ffe3f1, #ffc2df);
+  background: $canvas;
+  border-top: 3px solid $tint-periwinkle;
 }
 
-.active {
-  transform: rotateY(180deg);
-}
-
-.img {
-  width: min(70%, 88px);
-  height: min(70%, 88px);
+.card-img {
+  display: block;
   object-fit: contain;
   user-select: none;
   pointer-events: none;
 }
 
-.img--question {
-  width: min(52%, 64px);
-  height: min(52%, 64px);
+.card-img--q {
+  width: min(52%, 56px);
+  height: min(52%, 56px);
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.35));
 }
 
-.img--hero {
-  display: block;
-  width: min(68%, 82px);
-  height: min(68%, 82px);
-  object-position: center center;
-  position: absolute;
+.card-img--hero {
+  width:  min(72%, 90px);
+  height: min(72%, 90px);
+  object-position: center;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.4));
 }
 
-.timer_wrapper {
-  display: grid;
-  gap: 6px;
-  padding: 14px 16px;
-  border-radius: 20px;
-  background: rgba(249, 213, 72, 0.08);
-  border: 1px solid rgba(249, 213, 72, 0.18);
-}
-
-@media screen and (max-width: 960px) {
-  .hero {
-    grid-template-columns: 1fr;
-  }
-
-  .board_header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media screen and (max-width: 720px) {
-  .memory_game__container {
-    padding: 72px 16px 32px;
-  }
-
-  .hero,
-  .board_panel {
-    padding: 20px;
-    border-radius: 24px;
-  }
-
-  .cards_container {
-    grid-template-columns: repeat(min(4, var(--memory-columns, 4)), minmax(0, 1fr));
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .stats_grid,
-  .buttons_wrap {
-    grid-template-columns: 1fr;
-  }
-
-  .buttons_wrap {
-    display: grid;
-  }
-
-  .cards_container {
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-  }
-
-  .action_button {
-    width: 100%;
-  }
-}
+// ─── FOOTER BAND ───────────────────────────────────────────────────────────
+.footer-band { @include footer-band; }

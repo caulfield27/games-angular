@@ -1,11 +1,11 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { LucideAngularModule, RotateCcw, Settings } from 'lucide-angular';
-import Swal from 'sweetalert2';
 import { launchConfetti } from '../../shared/utils/utils';
 import { getCards, getQuantity, getSettings, getTimer } from './utils/utils';
 import { GameService } from './services/memoryGame.service';
 import { ICard, LevelEnum } from './types/types';
+import { AppModalService } from '../../shared/services/modal.service';
 
 @Component({
   selector: 'memory-game',
@@ -23,6 +23,7 @@ export class MemoryGame implements OnDestroy {
     gigachad: 'Эксперт',
   };
 
+  private readonly modalService = inject(AppModalService);
   private correctCounter = 0;
   private queue: ICard[] = [];
   private isGameStart = false;
@@ -100,13 +101,13 @@ export class MemoryGame implements OnDestroy {
     if (!this.isGameStart) {
       this.isGameStart = true;
       this.game.startTimer(() =>
-        Swal.fire({
+        this.modalService.open({
           title: 'Время вышло',
-          text: 'Вы не успели найти все пары до окончания таймера.',
+          body: 'Вы не успели найти все пары до окончания таймера.',
           icon: 'error',
-          confirmButtonText: 'Попробовать снова',
-        }).then((res) => {
-          if (res.isConfirmed) {
+          confirmText: 'Попробовать снова',
+        }).then(({ isConfirmed }) => {
+          if (isConfirmed) {
             this.restart();
           }
         })
@@ -140,12 +141,11 @@ export class MemoryGame implements OnDestroy {
       launchConfetti(2000);
 
       setTimeout(() => {
-        Swal.fire({
+        this.modalService.open({
           title: 'Победа',
-          text: 'Вы нашли все пары.',
+          body: 'Вы нашли все пары.',
           icon: 'success',
-          showCancelButton: false,
-          confirmButtonText: 'Сыграть еще',
+          confirmText: 'Сыграть еще',
         }).then(() => {
           this.restart();
         });
@@ -154,43 +154,18 @@ export class MemoryGame implements OnDestroy {
   }
 
   handleSettings() {
-    Swal.fire({
+    this.modalService.open({
       title: 'Настройки игры',
-      html: `
-        <div class="settings_container">
-          <div class="setting_wrap">
-            <span>Сложность</span>
-            <select name="level" id="level">
-              <option value="easy" ${
-                this.game.settings.level === 'easy' ? 'selected="true"' : ''
-              }>Легкий</option>
-              <option value="medium" ${
-                this.game.settings.level === 'medium' ? 'selected="true"' : ''
-              }>Средний</option>
-              <option value="hard" ${
-                this.game.settings.level === 'hard' ? 'selected="true"' : ''
-              }>Сложный</option>
-              <option value="gigachad" ${
-                this.game.settings.level === 'gigachad'
-                  ? 'selected="true"'
-                  : ''
-              }>Эксперт</option>
-            </select>
-          </div>
-        </div>
-      `,
-      showCancelButton: true,
-      cancelButtonText: 'Отмена',
-      confirmButtonText: 'Сохранить',
-      preConfirm: () => {
-        const level = document.getElementById('level') as HTMLInputElement;
+      icon: 'settings',
+      settingsLevel: this.game.settings.level,
+      confirmText: 'Сохранить',
+      cancelText: 'Отмена',
+    }).then(({ isConfirmed, selectedLevel }) => {
+      if (isConfirmed && selectedLevel) {
         this.game.settings = {
-          level: level.value as LevelEnum,
+          level: selectedLevel as LevelEnum,
           category: 'superheroes',
         };
-      },
-    }).then((res) => {
-      if (res?.isConfirmed) {
         localStorage.setItem('settings', JSON.stringify(this.game.settings));
         this.game.cards.set(getCards(getSettings()));
         this.restart();

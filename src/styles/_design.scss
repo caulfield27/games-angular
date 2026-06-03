@@ -1,0 +1,211 @@
+// ═══════════════════════════════════════════════════════════════════════════
+//  DESIGN.MD GLOBAL TOKENS — Dell 1996 Inspired Design System
+//  Import with:  @use 'design' as *;
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── Colors ─────────────────────────────────────────────────────────────────
+$primary:         #e91d2a;   // Dell Red — CTA panels & phone callout only
+$canvas:          #ffffff;   // True white — page surface, card title bars
+$frame-ink:       #000000;   // Pure black — page frame, borders, button fills
+$yellow-sticker:  #fcc20f;   // Dell Yellow — BUY a DELL / NEW! stickers
+$purple-stripe:   #6a26a4;   // Dell Purple — accent inside sticker wordmark
+$link:            #0000ee;   // Classic Mosaic / Netscape 3.x link blue
+$ink:             #000000;   // Body text
+
+// Ribbon-card tint family (one per product / section line)
+$tint-olive:      #8e8a25;
+$tint-sage:       #b3bd95;
+$tint-salmon:     #d77a7a;
+$tint-peach:      #e6915d;
+$tint-lime:       #c0d4a7;
+$tint-sky:        #9ab6c8;
+$tint-steel:      #a5b8c0;
+$tint-periwinkle: #8c9ae0;
+
+// ─── Spacing ────────────────────────────────────────────────────────────────
+$s-xxs:   2px;
+$s-xs:    4px;
+$s-s:     6px;
+$s-sm:    8px;
+$s-m:     10px;
+$s-md:    12px;
+$s-lg:    16px;
+$s-xl:    20px;
+$s-xxl:   24px;
+$s-sect:  32px;
+$s-sect-m: 40px;
+$s-sect-l: 48px;
+
+// ─── Typography mixins ──────────────────────────────────────────────────────
+// Arial Black / Helvetica / Times New Roman — no webfonts (1996 system stack)
+
+@mixin t-display {
+  font-family: 'Arial Black', Helvetica, sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.0;
+}
+
+@mixin t-h1 {
+  font-family: 'Arial Black', Helvetica, sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+@mixin t-h2 {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@mixin t-h3 {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@mixin t-body {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@mixin t-body-sm {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@mixin t-caption {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+@mixin t-btn {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.0;
+}
+
+@mixin t-label {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.0;
+}
+
+// ─── Component patterns (reusable blocks) ───────────────────────────────────
+
+// page-frame: 8 px literal black border around the entire viewport
+@mixin page-frame {
+  min-height: 100%;
+  background: $frame-ink;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) { padding: 4px; }
+  @media (max-width: 480px) { padding: 2px; }
+}
+
+// top-banner: pure-black strip running across the top
+@mixin top-banner {
+  background: $frame-ink;
+  color: $canvas;
+  padding: $s-md $s-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-lg;
+  flex-shrink: 0;
+}
+
+// ribbon-card title bar
+@mixin ribbon-title {
+  background: $canvas;
+  color: $ink;
+  @include t-h3;
+  text-transform: uppercase;
+  padding: $s-s $s-md;
+  border-bottom: 1px solid $frame-ink;
+  letter-spacing: 0.3px;
+}
+
+// ribbon-card body base
+@mixin ribbon-body-base {
+  @include t-body;
+  padding: $s-md $s-lg;
+}
+
+// button-primary: black fill, white text
+@mixin btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $s-sm;
+  background: $frame-ink;
+  color: $canvas;
+  border: 1px solid $frame-ink;
+  padding: $s-s $s-lg;
+  @include t-btn;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+
+  &:active { filter: brightness(1.25); }
+}
+
+// button-secondary: white fill, black border
+@mixin btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $s-sm;
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: $s-s $s-lg;
+  @include t-btn;
+  text-transform: uppercase;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+
+  &:active { filter: brightness(0.9); }
+}
+
+// footer-band
+@mixin footer-band {
+  background: $canvas;
+  color: $ink;
+  border-top: 1px solid $frame-ink;
+  padding: $s-lg;
+  @include t-body-sm;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: $s-xs;
+}
+
+// new-burst sticker (angled yellow "NEW!" overlay)
+@mixin new-burst {
+  display: inline-block;
+  background: $yellow-sticker;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: $s-xs $s-sm;
+  @include t-btn;
+  text-transform: uppercase;
+  transform: rotate(-10deg);
+  filter: drop-shadow(1px 1px 0 #000);
+  flex-shrink: 0;
+}

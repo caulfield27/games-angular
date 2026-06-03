@@ -10,13 +10,13 @@ import { LucideAngularModule, LucideIconData } from 'lucide-angular';
     <button
       (click)="onClick()"
       [ngClass]="buttonClasses"
-      class="p-3 w-full flex items-center justify-center gap-3 rounded-2xl font-bold text-white text-2xl max-sm:text-xl transition-transform duration-200"
+      class="w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-[18px] font-semibold leading-[27px] transition-opacity"
     >
       @if (icon) {
         <lucide-angular
           [img]="icon"
           [style.color]="iconColor"
-          class="w-6 h-6"
+          class="w-5 h-5"
         />
       }
       {{ label }}
@@ -35,13 +35,11 @@ export class ChessButton {
   }
 
   get buttonClasses() {
-    const base = 'cursor-pointer hover:scale-[1.05] shadow-lg';
+    const base = 'cursor-pointer hover:opacity-90 active:opacity-75';
     const variants: Record<string, string> = {
-      primary:
-        'bg-gradient-to-r from-[#ea580c] to-[#c2410c] hover:from-[#c2410c] hover:to-[#ea580c]',
-      secondary:
-        'bg-gradient-to-r from-[#43e97b] to-[#38f9d7] hover:from-[#2ecc71] hover:to-[#1abc9c]',
-      dark: 'bg-neutral-800 hover:bg-neutral-700',
+      primary: 'bg-[#ff4f00] text-[#fffefb]',
+      secondary: 'bg-[#201515] text-[#fffefb]',
+      dark: 'bg-[#201515] text-[#fffefb]',
     };
     return `${base} ${variants[this.variant]}`;
   }

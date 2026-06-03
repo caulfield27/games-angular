@@ -1,12 +1,12 @@
 import { AuthService } from '@/shared/services/auth.service';
-import { NgClass } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LucideAngularModule, X, Lock, Mail, User } from 'lucide-angular';
 
 @Component({
   selector: 'auth-modal',
   templateUrl: './authModal.component.html',
-  imports: [LucideAngularModule, NgClass],
+  styleUrl: './authModal.component.scss',
+  imports: [LucideAngularModule],
 })
 export class AuthModal implements OnInit, OnDestroy {
   readonly Xicon = X;

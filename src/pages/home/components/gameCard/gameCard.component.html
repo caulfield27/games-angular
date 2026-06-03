@@ -1,20 +1,17 @@
 <article class="game-tile">
+
+  <!-- Image area (links to game) -->
   <a [routerLink]="href" class="game-tile__media">
     <img [src]="image" [alt]="name" class="game-tile__image" />
-    <div class="game-tile__shade"></div>
-
-    <div class="game-tile__topline">
-      <span class="game-tile__label">2D game</span>
-      <span class="game-tile__label game-tile__label--accent">
-        {{ tags[0] }}
-      </span>
-    </div>
-
-    <div class="game-tile__headline">
-      <h3>{{ name }}</h3>
-    </div>
   </a>
 
+  <!-- Ribbon title bar -->
+  <div class="game-tile__title-bar">
+    <h3 class="game-tile__name">{{ name }}</h3>
+    <span class="game-tile__badge">2D</span>
+  </div>
+
+  <!-- Tinted body with tag chips -->
   <div class="game-tile__body">
     <div class="game-tile__tags">
       @for (tag of tags; track tag) {
@@ -24,4 +21,5 @@
       }
     </div>
   </div>
+
 </article>

@@ -1,0 +1,163 @@
+@use 'design' as *;
+
+// ─── BACKDROP ──────────────────────────────────────────────────────────────
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $s-lg;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+// ─── MODAL CARD (DESIGN.MD ex-modal-card) ──────────────────────────────────
+.modal-card {
+  background: $canvas;
+  border: 2px solid $frame-ink;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  // Hard bevel elevation (DESIGN.MD level 3)
+  box-shadow: 4px 4px 0 $frame-ink;
+  animation: modal-in 0.15s ease;
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
+}
+
+@keyframes modal-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+// ─── HEADER (ribbon-card title bar) ────────────────────────────────────────
+.modal-header {
+  background: $canvas;
+  border-bottom: 1px solid $frame-ink;
+  padding: $s-s $s-md;
+  display: flex;
+  align-items: center;
+  gap: $s-sm;
+}
+
+.modal-title {
+  @include t-h3;
+  text-transform: uppercase;
+  color: $ink;
+  flex: 1;
+  letter-spacing: 0.3px;
+}
+
+// cert-seal style icon (DESIGN.MD rounded.full only for seals)
+.modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  @include t-btn;
+  flex-shrink: 0;
+  line-height: 1;
+
+  &--success  { background: $tint-lime;    color: $ink; border: 1px solid $frame-ink; }
+  &--error    { background: $primary;      color: $canvas; border: 1px solid $frame-ink; }
+  &--info     { background: $tint-sky;     color: $ink; border: 1px solid $frame-ink; }
+  &--settings { background: $tint-steel;   color: $ink; border: 1px solid $frame-ink; }
+}
+
+.modal-close {
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  @include t-btn;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+
+  &:active { filter: brightness(0.85); }
+}
+
+// ─── BODY (ribbon-card body with icon-based tint) ──────────────────────────
+.modal-body {
+  @include t-body;
+  padding: $s-md $s-lg;
+
+  &--success  { background: $tint-lime; }
+  &--error    { background: $tint-salmon; }
+  &--info     { background: $tint-sky; }
+  &--settings { background: $tint-steel; }
+}
+
+.modal-text {
+  @include t-body;
+  color: $ink;
+  margin: 0;
+}
+
+// ─── SETTINGS FORM ─────────────────────────────────────────────────────────
+.settings-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-md;
+  margin-top: $s-sm;
+}
+
+.settings-label {
+  @include t-label;
+  text-transform: uppercase;
+  color: $ink;
+}
+
+.settings-select {
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: $s-xs $s-sm;
+  @include t-body;
+  cursor: pointer;
+  min-width: 120px;
+  appearance: auto;
+  outline: none;
+
+  &:focus { border-color: $primary; }
+}
+
+// ─── FOOTER ────────────────────────────────────────────────────────────────
+.modal-footer {
+  border-top: 1px solid $frame-ink;
+  padding: $s-sm $s-md;
+  display: flex;
+  gap: $s-sm;
+  justify-content: flex-end;
+  background: $canvas;
+}
+
+.modal-btn {
+  @include t-btn;
+  text-transform: uppercase;
+  padding: $s-s $s-lg;
+  border: 1px solid $frame-ink;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  min-width: 90px;
+
+  &--primary  { background: $frame-ink; color: $canvas; &:active { filter: brightness(1.3); } }
+  &--secondary { background: $canvas; color: $ink; &:active { filter: brightness(0.9); } }
+
+  @media (max-width: 380px) {
+    min-width: 0;
+    flex: 1;
+  }
+}

@@ -1,27 +1,36 @@
 <div
-  class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in max-sm:h-[100svh] overflow-y-auto"
+  class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 backdrop-blur-sm"
 >
   <div
-    class="bg-white border border-neutral-200/80 rounded-[2rem] max-sm:rounded-none px-10 py-5 text-center min-w-[500px] max-w-[500px] max-sm:min-w-full flex flex-col gap-4 max-sm:h-[100svh] overflow-y-auto shadow-[0_24px_60px_-38px_rgba(15,23,42,0.38)]"
+    class="flex max-h-[100svh] w-[480px] max-w-[calc(100vw-32px)] flex-col gap-5 overflow-y-auto rounded-xl border border-[#c5c0b1] bg-[#fffefb] px-6 py-5 max-sm:rounded-none max-sm:max-w-full max-sm:h-[100svh]"
   >
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold">Выберите тему</h2>
-
-      <button (click)="close()" class="px-2 py-1 rounded-lg hover:bg-neutral-100">
+      <div>
+        <p class="text-[13px] font-medium uppercase tracking-[1px] text-[#939084]">
+          Настройки
+        </p>
+        <h2 class="mt-0.5 text-[20px] font-semibold text-[#201515]">
+          Выберите тему
+        </h2>
+      </div>
+      <button
+        (click)="close()"
+        class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#c5c0b1] text-[18px] text-[#605d52] transition hover:bg-[#f8f4f0]"
+      >
         ✕
       </button>
     </div>
 
-    <div class="mt-6 grid grid-cols-2 gap-6 max-sm:flex flex-col">
+    <div class="grid grid-cols-2 gap-4">
       @for (theme of themes; track theme.name) {
         <div
           (click)="selectTheme(theme)"
-          class="cursor-pointer rounded-xl p-3 transition hover:bg-neutral-100"
-          [class.ring-2]="theme === selectedTheme"
-          [class.ring-blue-500]="theme === selectedTheme"
+          class="cursor-pointer rounded-xl border-2 p-3 transition hover:bg-[#f8f4f0]"
+          [class.border-[#ff4f00]]="theme === selectedTheme"
+          [class.border-transparent]="theme !== selectedTheme"
         >
           <div
-            class="mx-auto grid w-[120px] grid-cols-8 overflow-hidden rounded-md"
+            class="mx-auto grid w-[108px] grid-cols-8 overflow-hidden rounded-md"
           >
             @for (sq of preview; track $index) {
               <div
@@ -30,14 +39,14 @@
               ></div>
             }
           </div>
-
-          <p class="mt-3 text-center text-sm font-medium">
+          <p class="mt-2.5 text-center text-[14px] text-[#201515]">
             {{ theme.name }}
           </p>
         </div>
       }
     </div>
-    <div class="w-full flex flex-col gap-2.5 sticky bottom-0">
+
+    <div class="mt-auto pt-2">
       <chess-button
         class="w-full"
         variant="primary"

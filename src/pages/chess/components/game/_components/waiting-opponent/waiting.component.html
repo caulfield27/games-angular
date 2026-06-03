@@ -1,28 +1,26 @@
 <div
-  class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
+  class="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
 >
   <div
-    class="bg-white border border-neutral-200/80 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.38)] rounded-2xl p-10 text-center w-[360px]"
+    class="flex w-[340px] max-w-[calc(100vw-32px)] flex-col items-center gap-5 rounded-xl border border-[#c5c0b1] bg-[#fffefb] p-8 text-center"
   >
-    <div class="text-5xl mb-4 animate-pulse">♟</div>
-    <h2 class="text-xl font-semibold mb-2">Подбор противника</h2>
-    <div class="text-gray-400 text-sm mb-6">
-      Время ожидания: {{ formattedTime }}
+    <div class="text-[40px] leading-none">♟</div>
+
+    <div>
+      <h2 class="text-[20px] font-semibold leading-[25px] text-[#201515]">
+        Подбор противника
+      </h2>
+      <p class="mt-1 text-[14px] text-[#939084]">
+        Время ожидания: {{ formattedTime }}
+      </p>
     </div>
-    <div class="flex justify-center mb-6">
+
+    <div class="flex justify-center">
       <div
-        class="h-14 w-14 border-4 border-gray-600 border-t-white rounded-full animate-spin"
+        class="h-11 w-11 animate-spin rounded-full border-4 border-[#c5c0b1] border-t-[#ff4f00]"
       ></div>
     </div>
-    <div class="flex justify-center gap-2 mb-8">
-      <span class="w-2 h-2 bg-white rounded-full animate-bounce"></span>
-      <span
-        class="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0.2s]"
-      ></span>
-      <span
-        class="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:0.4s]"
-      ></span>
-    </div>
-    <chess-button label="Отмена" (handleClick)="cancelSearch()" />
+
+    <chess-button label="Отмена" variant="secondary" (handleClick)="cancelSearch()" />
   </div>
 </div>

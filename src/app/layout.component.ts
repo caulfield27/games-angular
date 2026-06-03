@@ -5,6 +5,7 @@ import { LucideAngularModule, House } from 'lucide-angular';
 import { handleAppBackground } from '@/shared/utils/utils';
 import { SeoService } from '../shared/services/seo.service';
 import { AuthModal } from '@/shared/components/authModal/authModal.component';
+import { AppModal } from '@/shared/components/appModal/appModal.component';
 import { AuthService } from '@/shared/services/auth.service';
 import { PwaService } from '@/shared/services/pwa.service';
 import { User } from '@/shared/types/types';
@@ -12,21 +13,13 @@ import { AxiosError } from 'axios';
 
 @Component({
   selector: 'layout',
-  imports: [RouterOutlet, LucideAngularModule, AuthModal],
+  imports: [RouterOutlet, LucideAngularModule, AuthModal, AppModal],
   template: `
-    <!-- @if (!isHome) {
-      <button
-        class="z-10 fixed top-3 left-3 flex flex-row gap-2 justify-center items-center p-3 rounded-xl bg-yellow-400 font-semibold text-[#464646] hover:bg-yellow-300"
-        (click)="goHome()"
-      >
-        <lucide-icon [img]="house"></lucide-icon>
-        Вернуться на главную
-      </button>
-    } -->
     <router-outlet />
     @if (authService.isModalOpen()) {
       <auth-modal />
     }
+    <app-modal />
   `,
 })
 // export class Layout implements OnInit {

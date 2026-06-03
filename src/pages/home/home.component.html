@@ -1,139 +1,123 @@
-<div class="home-shell">
-  <header class="home-topbar">
-    <div class="home-topbar__inner">
-      <div class="home-brand">
-        <div class="home-brand__icon">
-          <lucide-icon
-            [img]="GamepadIcon"
-            class="h-6 w-6"
-            [strokeWidth]="2.5"
-          />
-        </div>
-      </div>
+<div class="page-frame">
 
-      <div class="home-search home-search--desktop">
-        <lucide-icon
-          [img]="SearchIcon"
-          class="home-search__icon"
-          [strokeWidth]="2.2"
-        />
+  <!-- ── Top Banner (sticky) ─────────────────────────────────────────────── -->
+  <header class="top-banner">
+    <div class="banner-brand">
+      <div class="brand-icon">
+        <lucide-icon [img]="GamepadIcon" [strokeWidth]="2.5" />
+      </div>
+      <span class="brand-name">ARCADE GAMES</span>
+    </div>
+
+    <div class="banner-search banner-search--desktop">
+      <lucide-icon [img]="SearchIcon" class="search-icon" [strokeWidth]="2.2" />
+      <input
+        #searchInput
+        (focus)="onFocus($event)"
+        (blur)="onBlur($event)"
+        (input)="onSearch($event)"
+        type="search"
+        placeholder="Найти игру..."
+        class="search-field"
+      />
+    </div>
+
+    <div class="banner-actions">
+      @if (pwa.canInstall()) {
+        <button (click)="onInstallApp()" class="btn-secondary">
+          <lucide-icon [img]="DownloadIcon" [strokeWidth]="2.5" />
+          <span>Скачать</span>
+        </button>
+      }
+
+      @if (auth.isAuthed()) {
+        <button class="btn-secondary">
+          <lucide-icon [img]="UserIcon" [strokeWidth]="2.5" />
+          <span>{{ auth.user()?.username ?? "player" }}</span>
+        </button>
+      } @else {
+        <button (click)="onModalOpen()" class="btn-primary">
+          <lucide-icon [img]="LoginIcon" [strokeWidth]="2.5" />
+          <span>Войти</span>
+        </button>
+      }
+
+      <button (click)="toggleMenu()" class="btn-menu">
+        @if (isMenuOpen) {
+          <lucide-icon [img]="Xicon" />
+        } @else {
+          <lucide-icon [img]="MenuIcon" />
+        }
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Mobile slide-down panel ─────────────────────────────────────────── -->
+  @if (isMenuOpen) {
+    <div class="mobile-panel">
+      <div class="banner-search">
+        <lucide-icon [img]="SearchIcon" class="search-icon" [strokeWidth]="2.2" />
         <input
-          #searchInput
           (focus)="onFocus($event)"
           (blur)="onBlur($event)"
           (input)="onSearch($event)"
           type="search"
           placeholder="Найти игру..."
-          class="home-search__field"
+          class="search-field"
         />
       </div>
 
-      <div class="home-actions">
-        @if (pwa.canInstall()) {
-          <button (click)="onInstallApp()" class="home-install">
-            <lucide-icon
-              [img]="DownloadIcon"
-              class="h-4 w-4"
-              [strokeWidth]="2.5"
-            />
-            <span>Скачать приложение</span>
-          </button>
-        }
-
-        @if (auth.isAuthed()) {
-          <button class="home-profile">
-            <span class="home-profile__avatar">
-              <lucide-icon
-                [img]="UserIcon"
-                class="h-4 w-4"
-                [strokeWidth]="2.5"
-              />
-            </span>
-            <span>{{ auth.user()?.username ?? "player" }}</span>
-          </button>
-        } @else {
-          <button (click)="onModalOpen()" class="home-login">
-            <lucide-icon
-              [img]="LoginIcon"
-              class="h-4 w-4"
-              [strokeWidth]="2.5"
-            />
-            <span>Войти</span>
-          </button>
-        }
-
-        <button (click)="toggleMenu()" class="home-menu">
-          @if (isMenuOpen) {
-            <lucide-icon [img]="Xicon" class="h-5 w-5" />
-          } @else {
-            <lucide-icon [img]="MenuIcon" class="h-5 w-5" />
-          }
+      @if (auth.isAuthed()) {
+        <button class="btn-secondary btn--full">
+          <lucide-icon [img]="UserIcon" />
+          <span>{{ auth.user()?.username ?? "player" }}</span>
         </button>
-      </div>
+      } @else {
+        <button (click)="onModalOpen()" class="btn-primary btn--full">
+          <lucide-icon [img]="LoginIcon" />
+          <span>Войти</span>
+        </button>
+      }
+
+      @if (pwa.canInstall()) {
+        <button (click)="onInstallApp()" class="btn-secondary btn--full">
+          <lucide-icon [img]="DownloadIcon" />
+          <span>Скачать приложение</span>
+        </button>
+      }
     </div>
+  }
 
-    @if (isMenuOpen) {
-      <div class="home-mobile-panel">
-        <div class="home-search">
-          <lucide-icon
-            [img]="SearchIcon"
-            class="home-search__icon"
-            [strokeWidth]="2.2"
-          />
-          <input
-            #searchInput
-            (focus)="onFocus($event)"
-            (blur)="onBlur($event)"
-            (input)="onSearch($event)"
-            type="search"
-            placeholder="Найти игру..."
-            class="home-search__field"
-          />
+  <!-- ── White page canvas ───────────────────────────────────────────────── -->
+  <div class="page-canvas">
+
+    <!-- Section eyebrow -->
+    <div class="section-eyebrow">GAMES CATALOG</div>
+
+    <!-- Active-tag filter bar -->
+    @if (filters.activeTags().length) {
+      <div class="filter-bar">
+        <div class="ribbon-card filter-bar__card">
+          <div class="ribbon-title filter-bar__title">ACTIVE FILTERS</div>
+          <div class="ribbon-body ribbon-body--lime">
+            <div class="filter-chips">
+              @for (tag of filters.activeTags(); track tag) {
+                <span class="chip chip--active">
+                  {{ tag }}
+                  <button (click)="onTagClear(tag)" type="button" class="chip-remove">&#10006;</button>
+                </span>
+              }
+            </div>
+          </div>
         </div>
-
-        @if (auth.isAuthed()) {
-          <button class="home-profile home-profile--mobile">
-            <span class="home-profile__avatar">
-              <lucide-icon [img]="UserIcon" class="h-4 w-4" />
-            </span>
-            <span>{{ auth.user()?.username ?? "player" }}</span>
-          </button>
-        } @else {
-          <button (click)="onModalOpen()" class="home-login home-login--mobile">
-            <lucide-icon [img]="LoginIcon" class="h-4 w-4" />
-            <span>Войти</span>
-          </button>
-        }
-
-        @if (pwa.canInstall()) {
-          <button (click)="onInstallApp()" class="home-install home-install--mobile">
-            <lucide-icon [img]="DownloadIcon" class="h-4 w-4" />
-            <span>Скачать приложение</span>
-          </button>
-        }
       </div>
     }
-  </header>
 
-  <main class="home-content">
-    @if (filters.activeTags().length) {
-      <section class="home-toolbar">
-        <div class="home-toolbar__chips">
-          @for (tag of filters.activeTags(); track tag) {
-            <span class="home-chip home-chip--active">
-              {{ tag }}
-              <button (click)="onTagClear(tag)" type="button">&#10006;</button>
-            </span>
-          }
-        </div>
-      </section>
-    }
-
+    <!-- Games grid -->
     @if (filters.gamesArray().length) {
-      <section class="home-grid">
+      <section class="games-grid">
         @for (game of filters.gamesArray(); track game.name) {
           <game-card
-            class="game-card"
             [name]="game.name"
             [href]="game.href"
             [image]="game.image"
@@ -143,10 +127,22 @@
         }
       </section>
     } @else {
-      <section class="home-empty">
-        <h3>Ничего не найдено</h3>
-        <p>Попробуйте другой запрос или снимите часть активных тегов.</p>
-      </section>
+      <div class="empty-state">
+        <div class="ribbon-card">
+          <div class="ribbon-title">НИЧЕГО НЕ НАЙДЕНО</div>
+          <div class="ribbon-body ribbon-body--salmon">
+            <p>Попробуйте другой запрос или снимите часть активных тегов.</p>
+          </div>
+        </div>
+      </div>
     }
-  </main>
+
+  </div>
+
+  <!-- ── Footer band ─────────────────────────────────────────────────────── -->
+  <div class="footer-band">
+    <span>ARCADE GAMES &copy; CLASSIC EDITION</span>
+    <span class="footer-legal">&nbsp;&middot;&nbsp; All games are browser-based &middot; No download required</span>
+  </div>
+
 </div>

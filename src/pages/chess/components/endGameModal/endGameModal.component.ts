@@ -31,117 +31,104 @@ export interface GameEndData {
   template: `
     <div
       *ngIf="isOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-2 sm:p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
       (click)="onBackdropClick($event)"
     >
       <div
-        class="relative my-4 w-full max-w-xl overflow-hidden rounded-md bg-neutral-100 text-[#2d2140]"
+        class="relative my-4 w-full max-w-md overflow-hidden rounded-xl border border-[#c5c0b1] bg-[#fffefb]"
         (click)="$event.stopPropagation()"
       >
-        <div class="relative">
-          <header
-            class="flex items-start justify-between gap-3 px-4 py-4 text-white sm:gap-4 sm:rounded-b-[28px] sm:px-7 sm:py-5"
-            [ngClass]="getHeaderClasses()"
+        <!-- Header -->
+        <header
+          class="flex items-start justify-between gap-3 px-6 py-5"
+          [ngClass]="getHeaderClasses()"
+        >
+          <div class="min-w-0">
+            <p class="mb-1 text-[13px] font-medium uppercase tracking-[1px] text-[#fffefb]/70">
+              {{ getBadgeText() }}
+            </p>
+            <h2 class="text-[28px] font-semibold leading-[32px] text-[#fffefb]">
+              {{ getTitle() }}
+            </h2>
+          </div>
+          <button
+            type="button"
+            (click)="onClose()"
+            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#fffefb]/30 bg-[#fffefb]/10 text-[18px] font-bold text-[#fffefb] transition hover:bg-[#fffefb]/20"
+            aria-label="Закрыть"
           >
-            <div class="min-w-0">
-              <div class="mb-1 text-[11px] font-black uppercase tracking-[0.24em] text-white/75">
-                {{ getBadgeText() }}
-              </div>
-              <h2 class="text-xl font-black leading-none sm:text-[2.2rem]">
-                {{ getTitle() }}
-              </h2>
-            </div>
+            ×
+          </button>
+        </header>
 
-            <button
-              type="button"
-              (click)="onClose()"
-              class="close-button flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-white/60 bg-white/15 text-2xl font-black text-white"
-              aria-label="Закрыть модальное окно"
-            >
-              ×
+        <!-- Body -->
+        <main class="px-6 py-5">
+          <!-- Scoreboard -->
+          <div class="scoreboard-card rounded-xl border border-[#c5c0b1] bg-[#f8f4f0] px-4 py-5">
+            <div class="scoreboard-layout flex items-center justify-between gap-3">
+              <div class="player-column">
+                <div class="avatar-shell" [ngClass]="isPlayerWinner() ? 'winner-ring' : ''">
+                  <div class="crown-badge" *ngIf="isPlayerWinner()">👑</div>
+                  <div class="avatar-face player-face">{{ getPlayerAvatar() }}</div>
+                </div>
+                <div class="mt-3 min-w-0 text-center">
+                  <div class="truncate text-[14px] font-semibold text-[#201515]">{{ getPlayerName() }}</div>
+                  <div class="text-[12px] uppercase tracking-[1px] text-[#939084]">
+                    {{ getPlayerCaption() }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="score-center flex flex-col items-center justify-center">
+                <div class="score-value">
+                  {{ getPlayerScore() }} <span class="score-divider">–</span> {{ getOpponentScore() }}
+                </div>
+              </div>
+
+              <div class="player-column">
+                <div class="avatar-shell" [ngClass]="isOpponentWinner() ? 'winner-ring' : ''">
+                  <div class="crown-badge" *ngIf="isOpponentWinner()">👑</div>
+                  <div class="avatar-face opponent-face">{{ getOpponentAvatar() }}</div>
+                </div>
+                <div class="mt-3 min-w-0 text-center">
+                  <div class="truncate text-[14px] font-semibold text-[#201515]">{{ getOpponentName() }}</div>
+                  <div class="text-[12px] uppercase tracking-[1px] text-[#939084]">
+                    {{ getOpponentCaption() }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="mt-4 grid grid-cols-2 gap-3 max-sm:flex max-sm:flex-col">
+            <div class="action-button">
+              <chess-button label="Новая игра" variant="primary" (handleClick)="onNewGame()" />
+            </div>
+            <div class="action-button">
+              <chess-button label="Реванш" variant="secondary" (handleClick)="onRematch()" />
+            </div>
+          </div>
+          <div class="mt-3 action-button">
+            <chess-button label="Посмотреть игру" variant="secondary" (handleClick)="onClose()" />
+          </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="flex items-center justify-between border-t border-[#c5c0b1] bg-[#f8f4f0] px-6 py-4">
+          <p class="text-[13px] text-[#939084]">Поделиться результатом</p>
+          <div class="flex items-center gap-2">
+            <button type="button" class="share-link" (click)="shareResult('x')" aria-label="X">
+              <lucide-icon [img]="XIcon" size="16"></lucide-icon>
             </button>
-          </header>
-
-          <main class="px-4 py-4 sm:px-7 sm:py-7">
-            <div class="scoreboard-card rounded-[24px] border-2 border-white bg-white px-4 py-5 sm:rounded-[30px] sm:px-5 sm:py-6">
-              <div class="scoreboard-layout flex items-center justify-between gap-3">
-                <div class="player-column">
-                  <div class="avatar-shell" [ngClass]="isPlayerWinner() ? 'winner-ring' : ''">
-                    <div class="crown-badge" *ngIf="isPlayerWinner()">👑</div>
-                    <div class="avatar-face player-face">{{ getPlayerAvatar() }}</div>
-                  </div>
-                  <div class="mt-3 min-w-0 text-center">
-                    <div class="truncate text-sm font-black text-[#2d2140] sm:text-base">{{ getPlayerName() }}</div>
-                    <div class="text-xs font-bold uppercase tracking-[0.18em] text-[#7b6a98]">
-                      {{ getPlayerCaption() }}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="score-center flex flex-col items-center justify-center gap-2 px-1 sm:gap-3 sm:px-2">
-                  <div class="score-value">
-                    {{ getPlayerScore() }} <span class="score-divider">-</span> {{ getOpponentScore() }}
-                  </div>
-                </div>
-
-                <div class="player-column">
-                  <div class="avatar-shell" [ngClass]="isOpponentWinner() ? 'winner-ring' : ''">
-                    <div class="crown-badge" *ngIf="isOpponentWinner()">👑</div>
-                    <div class="avatar-face opponent-face">{{ getOpponentAvatar() }}</div>
-                  </div>
-                  <div class="mt-3 min-w-0 text-center">
-                    <div class="truncate text-sm font-black text-[#2d2140] sm:text-base">{{ getOpponentName() }}</div>
-                    <div class="text-xs font-bold uppercase tracking-[0.18em] text-[#7b6a98]">
-                      {{ getOpponentCaption() }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-4 grid grid-cols-2 gap-2 sm:mt-6 sm:gap-3">
-              <div class="action-button">
-                <chess-button
-                  label="Новая игра"
-                  variant="primary"
-                  (handleClick)="onNewGame()"
-                />
-              </div>
-              <div class="action-button">
-                <chess-button
-                  label="Реванш"
-                  variant="dark"
-                  (handleClick)="onRematch()"
-                />
-              </div>
-            </div>
-
-            <div class="mt-2.5 action-button sm:mt-3">
-              <chess-button
-                label="Посмотреть игру"
-                variant="dark"
-                (handleClick)="onClose()"
-              />
-            </div>
-          </main>
-
-          <footer class="rounded-t-[24px] border-t-2 border-white/70 bg-[#f8efcf] px-4 py-4 sm:rounded-t-[28px] sm:px-7 sm:py-5 flex justify-end items-center gap-4">
-            <div class="flex items-center gap-3">
-              <button type="button" class="share-link" (click)="shareResult('x')" aria-label="Поделиться в X">
-                <lucide-icon [img]="XIcon" size="20"></lucide-icon>
-              </button>
-              <button type="button" class="share-link" (click)="shareResult('telegram')" aria-label="Поделиться в Telegram">
-                <lucide-icon [img]="TelegramIcon" size="20"></lucide-icon>
-              </button>
-              <button type="button" class="share-link" (click)="shareResult('instagram')" aria-label="Поделиться в Instagram">
-                <lucide-icon [img]="InstagramIcon" size="20"></lucide-icon>
-              </button>
-            </div>
-            <div role="button" class="flex items-center gap-2 text-xs font-black uppercase tracking-[0.24em] text-[#7b6a98]">
-              <lucide-icon [img]="ShareIcon" size="20"></lucide-icon>
-            </div>
-          </footer>
-        </div>
+            <button type="button" class="share-link" (click)="shareResult('telegram')" aria-label="Telegram">
+              <lucide-icon [img]="TelegramIcon" size="16"></lucide-icon>
+            </button>
+            <button type="button" class="share-link" (click)="shareResult('instagram')" aria-label="Instagram">
+              <lucide-icon [img]="InstagramIcon" size="16"></lucide-icon>
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
   `,
@@ -156,21 +143,6 @@ export interface GameEndData {
         .action-button {
           width: 100%;
           min-width: 0;
-        }
-
-        .action-button button {
-          min-height: 56px;
-          width: 100%;
-          font-size: 1rem;
-          border-radius: 18px;
-        }
-
-        .close-button {
-          transition: background-color 160ms ease;
-        }
-
-        .close-button:hover {
-          background: rgba(255, 255, 255, 0.24);
         }
 
         .scoreboard-card {
@@ -199,123 +171,93 @@ export interface GameEndData {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 108px;
-          height: 108px;
+          width: 96px;
+          height: 96px;
           border-radius: 999px;
-          background: #f7f1df;
-          border: 3px solid #fff;
+          background: #fffefb;
+          border: 2px solid #c5c0b1;
         }
 
         .winner-ring {
-          border-color: #ffd65a;
+          border-color: #ff4f00;
         }
 
         .avatar-face {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 84px;
-          height: 84px;
+          width: 76px;
+          height: 76px;
           border-radius: 999px;
-          font-size: 2.4rem;
-          border: 3px solid rgba(255, 255, 255, 0.95);
+          font-size: 2.2rem;
+          border: 2px solid #f8f4f0;
         }
 
         .player-face {
-          background: linear-gradient(180deg, #d9f2ff, #9ed8ff);
+          background: #f8f4f0;
         }
 
         .opponent-face {
-          background: linear-gradient(180deg, #ffe1c2, #ffc58f);
+          background: #f8f4f0;
         }
 
         .crown-badge {
           position: absolute;
-          top: -26px;
+          top: -24px;
           left: 50%;
           transform: translateX(-50%);
-          font-size: 2rem;
+          font-size: 1.75rem;
         }
 
         .score-value {
-          font-size: 2.5rem;
+          font-size: 2.25rem;
           line-height: 1;
-          font-weight: 900;
-          color: #2d2140;
+          font-weight: 700;
+          color: #201515;
           text-align: center;
           white-space: nowrap;
         }
 
         .score-divider {
-          color: #a68f5d;
+          color: #939084;
         }
 
         .share-link {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 44px;
-          height: 44px;
+          width: 36px;
+          height: 36px;
           border-radius: 999px;
-          border: 2px solid #fff;
-          background: rgba(255, 255, 255, 0.72);
-          color: #4e3d69;
-          transition: background-color 160ms ease;
+          border: 1px solid #c5c0b1;
+          background: #fffefb;
+          color: #605d52;
+          transition: background-color 150ms ease;
         }
 
         .share-link:hover {
-          background: #fff;
+          background: #f8f4f0;
         }
 
-        @media (max-width: 640px) {
-          .scoreboard-layout {
-            gap: 0.75rem;
-          }
-
+        @media (max-width: 480px) {
           .avatar-shell {
-            width: 76px;
-            height: 76px;
+            width: 72px;
+            height: 72px;
           }
 
           .avatar-face {
-            width: 58px;
-            height: 58px;
-            font-size: 1.75rem;
+            width: 56px;
+            height: 56px;
+            font-size: 1.6rem;
           }
 
           .score-value {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
           }
 
           .crown-badge {
             top: -20px;
             font-size: 1.5rem;
-          }
-
-          .share-link {
-            width: 42px;
-            height: 42px;
-          }
-        }
-
-        @media (max-width: 420px) {
-          .scoreboard-layout {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: start;
-          }
-
-          .score-center {
-            padding-top: 0.4rem;
-          }
-
-          .score-value {
-            font-size: 1.3rem;
-          }
-
-          .action-button button {
-            min-height: 50px;
-            font-size: 0.92rem;
           }
         }
       }
@@ -376,13 +318,13 @@ export class GameEndModalComponent {
   getHeaderClasses(): string {
     switch (this.data.state) {
       case GameEndState.PlayerWon:
-        return 'bg-[#7ad6a6]';
+        return 'bg-[#ff4f00]';
       case GameEndState.OpponentWon:
-        return 'bg-[#ff9f8f]';
+        return 'bg-[#201515]';
       case GameEndState.Draw:
-        return 'bg-[#83cfff]';
+        return 'bg-[#36342e]';
       default:
-        return 'bg-[#b59dff]';
+        return 'bg-[#201515]';
     }
   }
 

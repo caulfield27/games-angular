@@ -1,23 +1,32 @@
 <div
-  class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
+  class="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
 >
   <div
-    class="bg-white border border-neutral-200/80 shadow-[0_24px_60px_-38px_rgba(15,23,42,0.38)] rounded-2xl p-10 text-center min-w-[400px] max-w-[400px] max-sm:min-w-full flex flex-col gap-4"
+    class="flex w-[400px] max-w-[calc(100vw-32px)] flex-col gap-5 rounded-xl border border-[#c5c0b1] bg-[#fffefb] p-6 text-center"
   >
-    <h2 class="text-[18px]">
-      С вами сыграет первый, кто перейдет по этой ссылке
-    </h2>
-    <div
-      class="w-full py-2 px-3 rounded-md bg-neutral-200 flex justify-center items-center"
-    >
-      <span>{{ link }}</span>
+    <div>
+      <h2 class="text-[20px] font-semibold leading-[25px] text-[#201515]">
+        Поделитесь ссылкой
+      </h2>
+      <p class="mt-1 text-[14px] text-[#605d52]">
+        С вами сыграет первый, кто перейдет по этой ссылке
+      </p>
     </div>
-    <chess-button
-      label="Скопировать"
-      [icon]="CopyIcon"
-      variant="dark"
-      (handleClick)="onCopy()"
-    />
-    <chess-button label="Отмена" (handleClick)="onCancel()" />
+
+    <div
+      class="flex w-full items-center justify-center rounded-md border border-[#c5c0b1] bg-[#f8f4f0] px-4 py-3"
+    >
+      <span class="break-all text-[13px] text-[#605d52]">{{ link }}</span>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <chess-button
+        label="Скопировать"
+        [icon]="CopyIcon"
+        variant="secondary"
+        (handleClick)="onCopy()"
+      />
+      <chess-button label="Отмена" variant="primary" (handleClick)="onCancel()" />
+    </div>
   </div>
 </div>

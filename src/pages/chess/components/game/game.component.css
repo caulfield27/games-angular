@@ -6,7 +6,7 @@
   width: calc(var(--chess-cell) / 2.5);
   height: calc(var(--chess-cell) / 2.5);
   border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(32, 21, 21, 0.25);
   pointer-events: none;
   z-index: 1;
 }
@@ -19,29 +19,30 @@
   width: var(--chess-cell);
   height: var(--chess-cell);
   border-radius: 50%;
-  border: 6px solid rgba(0, 0, 0, 0.4);
+  border: 5px solid rgba(32, 21, 21, 0.35);
   pointer-events: none;
   z-index: 1;
 }
 
 @keyframes dangerPulse {
   0% {
-    filter: drop-shadow(0 0 6px rgba(255, 0, 0, 0.6));
+    filter: drop-shadow(0 0 6px rgba(255, 79, 0, 0.6));
   }
   50% {
-    filter: drop-shadow(0 0 16px rgba(255, 0, 0, 1))
-      drop-shadow(0 0 32px rgba(255, 0, 0, 0.6));
+    filter: drop-shadow(0 0 16px rgba(255, 79, 0, 1))
+      drop-shadow(0 0 32px rgba(255, 79, 0, 0.6));
   }
   100% {
-    filter: drop-shadow(0 0 6px rgba(255, 0, 0, 0.6));
+    filter: drop-shadow(0 0 6px rgba(255, 79, 0, 0.6));
   }
 }
 
 .check {
   animation: dangerPulse 1s infinite ease-in-out;
 }
+
 .mate {
-  background-color: #ef4444;
+  background-color: #ff4f00;
 }
 
 .history {
@@ -51,7 +52,7 @@
   width: var(--chess-cell);
   height: var(--chess-cell);
   background: var(--board-history);
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
 .cdk-drag-preview {
@@ -67,56 +68,20 @@
   overflow: hidden;
 }
 
-.match-sidebar::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  pointer-events: none;
-}
-
 .moves-scroll {
   scrollbar-width: thin;
-  scrollbar-color: rgba(163, 163, 163, 0.45) transparent;
+  scrollbar-color: rgba(197, 192, 177, 0.6) transparent;
 }
 
 .moves-scroll::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .moves-scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
-  background: rgba(163, 163, 163, 0.45);
+  background: rgba(197, 192, 177, 0.6);
 }
 
 .moves-scroll::-webkit-scrollbar-track {
   background: transparent;
-}
-
-@media (max-width: 1279px) {
-  .match-sidebar {
-    max-width: 44rem;
-    margin: 0 auto;
-  }
-}
-
-
-main::-webkit-scrollbar {
-  width: 6px;
-}
-
-main::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-main::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-  transition: background 0.2s ease;
-}
-
-main::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
 }

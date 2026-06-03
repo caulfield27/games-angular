@@ -1,14 +1,16 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { getFields, getLevels } from '../utils/utils';
-import Swal from 'sweetalert2';
 import { launchConfetti } from '../../../shared/utils/utils';
 import { dropdownOptions } from '../constants';
 import { ILevelOption } from '../../../shared/types/types';
+import { AppModalService } from '../../../shared/services/modal.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BoardService {
+  private readonly modalService = inject(AppModalService);
+
   level = signal<ILevelOption>(dropdownOptions[2]);
   levels = getLevels(window.innerWidth);
   isGameStart = signal<boolean>(false);
@@ -196,17 +198,16 @@ export class BoardService {
   }
 
   gameOver(faildIdx: number, isMine: boolean) {
-    Swal.fire({
+    this.modalService.open({
       icon: 'error',
       title: 'Вы проиграли',
-      text: isMine
+      body: isMine
         ? 'К сожалению, вы наступили на мину :('
-        : 'К сожалению вы не успели найти все мину во время :(',
-      showCancelButton: true,
-      confirmButtonText: 'Попробовать ещё раз',
-      cancelButtonText: 'Посмотреть результат',
-    }).then((res) => {
-      if (res?.isConfirmed) {
+        : 'К сожалению вы не успели найти все мины во время :(',
+      confirmText: 'Попробовать ещё раз',
+      cancelText: 'Посмотреть результат',
+    }).then(({ isConfirmed }) => {
+      if (isConfirmed) {
         this.restart();
       } else {
         this.fields.update((prev) =>
@@ -231,13 +232,13 @@ export class BoardService {
     launchConfetti(2 * 1000);
 
     setTimeout(() => {
-      Swal.fire({
+      this.modalService.open({
         icon: 'success',
         title: 'Поздравляю, вы выиграли!',
-        text: `Вы нашли все мины за ${this.seconds() ?? ''} секунд.`,
-        confirmButtonText: 'Сыграть ещё',
-      }).then((res) => {
-        if (res?.isConfirmed) {
+        body: `Вы нашли все мины за ${this.seconds() ?? ''} секунд.`,
+        confirmText: 'Сыграть ещё',
+      }).then(({ isConfirmed }) => {
+        if (isConfirmed) {
           this.restart();
         }
       });
