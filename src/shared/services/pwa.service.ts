@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { isDevMode } from '@angular/core';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -12,7 +13,7 @@ export class PwaService {
   private initialized = false;
 
   init() {
-    if (this.initialized || typeof window === 'undefined') {
+    if (this.initialized || typeof window === 'undefined' || isDevMode()) {
       return;
     }
 
@@ -41,7 +42,7 @@ export class PwaService {
   }
 
   async install() {
-    if (!this.deferredPrompt) {
+    if (!this.deferredPrompt || isDevMode()) {
       return;
     }
 
