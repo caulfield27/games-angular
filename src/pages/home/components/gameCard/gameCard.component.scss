@@ -95,7 +95,9 @@
 }
 
 .game-tile__body {
+  height: 150px;
   padding: 18px;
+  overflow-y: auto;
 }
 
 .game-tile__meta {
