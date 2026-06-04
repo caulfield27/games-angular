@@ -1,124 +1,214 @@
-.battle_field {
-  background-color: white;
+@use 'design' as *;
+
+// ─── OCEAN GRID ────────────────────────────────────────────────────────────
+$cell: 30px;
+
+.battle-field {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(10, 30px);
-  grid-template-rows: repeat(10, 30px);
-
-  border-right: 1px solid gainsboro;
-  border-bottom: 1px solid gainsboro;
-
-  background-image: linear-gradient(to right, gainsboro 1px, transparent 1px),
-    linear-gradient(to bottom, gainsboro 1px, transparent 1px);
-  background-size: 30px 30px;
+  grid-template-columns: repeat(10, $cell);
+  grid-template-rows:    repeat(10, $cell);
+  background-color: #daeef7;   // Ocean surface
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.12) 1px, transparent 1px);
+  background-size: $cell $cell;
+  border: 1px solid $frame-ink;
 }
 
-.letters_grid {
-  display: grid;
-  grid-template-columns: repeat(10, 30px);
+// ─── COORDINATE LABELS ─────────────────────────────────────────────────────
+.coord-labels {
   position: absolute;
-  top: -25px;
+  pointer-events: none;
+
+  span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @include t-label;
+    color: $ink;
+    font-size: 10px;
+  }
+
+  &--letters {
+    top: -22px;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(10, $cell);
+  }
+
+  &--numbers {
+    top: 0;
+    left: -22px;
+    display: grid;
+    grid-template-rows: repeat(10, $cell);
+  }
+}
+
+// ─── PLAYER INFO ───────────────────────────────────────────────────────────
+.board-info {
+  position: absolute;
+  bottom: -46px;
   left: 0;
-}
-
-.letters_grid span {
-  justify-self: center;
-  align-self: center;
-}
-
-.numbers_grid span {
-  align-self: center;
-  justify-self: center;
-}
-
-.numbers_grid {
-  display: grid;
-  grid-template-rows: repeat(10, 30px);
-  position: absolute;
-  top: 0;
-  left: -25px;
-}
-
-.info-section {
-  display: flex;
   width: 100%;
-  justify-content: space-between;
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
-  position: absolute;
-  left: 0;
-  bottom: -45px;
 }
+
+.ready-area {
+  display: flex;
+  align-items: center;
+}
+
+.ready-badge {
+  @include t-btn;
+  text-transform: uppercase;
+  background: $tint-lime;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: $s-xxs $s-sm;
+}
+
+.ready-btn {
+  @include btn-primary;
+  padding: $s-xs $s-lg;
+}
+
+// ─── SHIPS (top-down naval silhouette) ──────────────────────────────────────
+// Hull: tint-sky base with steel deck stripe and hard bevel
+// The deck stripe runs along the ship's main axis via ::before
+// A superstructure dot sits on the stern via ::after
 
 .ship {
-  border: 2px solid blue;
+  background: $tint-sky;
+  border: 1px solid $frame-ink;
   position: relative;
   touch-action: none;
+  z-index: 2;
+  // Hard bevel: DESIGN.MD elevation level 3
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.25);
+
+  // Deck stripe (horizontal ship — runs L→R)
+  &--h::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    bottom: 7px;
+    left: 6px;
+    right: 6px;
+    background: $tint-steel;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  // Deck stripe (vertical ship — runs T→B)
+  &--v::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 7px;
+    right: 7px;
+    background: $tint-steel;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  // Gun turret (horizontal — at right end)
+  &--h::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: $frame-ink;
+    top: 50%;
+    right: 9px;
+    transform: translateY(-50%);
+  }
+
+  // Gun turret (vertical — at bottom end)
+  &--v::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: $frame-ink;
+    bottom: 9px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  // Single-cell ship: just a bold marker square
+  &--single::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    background: $frame-ink;
+    border: 0;
+  }
+  &--single::after { display: none; }
 }
 
-.place_to_arrange{
-  border: 2px solid lightgreen;
+// ─── DRAG PREVIEW ──────────────────────────────────────────────────────────
+.place-preview {
+  background: $tint-lime;
+  border: 1px solid $frame-ink;
+  opacity: 0.75;
+  z-index: 3;
 }
 
-.miss_field {
+// ─── HIT / MISS MARKERS (own board) ────────────────────────────────────────
+
+@keyframes hit-burst {
+  0%   { transform: scale(0.6); opacity: 0; }
+  40%  { transform: scale(1.15); opacity: 1; }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1.0); opacity: 1; }
+}
+
+@keyframes fire-flicker {
+  0%, 100% { opacity: 0.85; transform: scale(1.0); }
+  50%       { opacity: 1.0;  transform: scale(1.05); }
+}
+
+.field-marker {
   position: relative;
   width: 100%;
   height: 100%;
-  opacity: 0.7;
   pointer-events: none;
-  cursor: default;
-}
+  z-index: 4; // above ships (z-index: 2) and drag-preview (z-index: 3)
+  animation: hit-burst 0.35s ease forwards;
 
-.miss_field::after {
-  content: "";
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-image: url(/dot-fill.svg);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
+  &--miss {
+    background: rgba(180, 200, 210, 0.45);
 
-.hitted_field {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  cursor: default;
-  border: 2px solid #dd1919;
-}
+    &::after {
+      content: '•';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: $tint-sky;
+      line-height: 1;
+    }
+  }
 
-.hitted_field::after {
-  content: "";
-  width: 30px;
-  height: 30px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-image: url(/x.png);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
+  &--hit {
+    background: rgba(233, 29, 42, 0.18);
+    border: 2px solid $primary;
 
-.ready_btn {
-  border: none;
-  outline: none;
-  background: #7965c1;
-  border-radius: 8px;
-  padding: 10px 20px;
-  width: fit-content;
-  font-size: 14px;
-  color: #ffffff;
-  transition: 0.3s ease-in-out;
-  cursor: pointer;
-  letter-spacing: 1px;
-}
-
-.ready_btn:hover {
-  background: #362b7d;
+    &::after {
+      content: '🔥';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      animation: fire-flicker 0.7s ease infinite;
+    }
+  }
 }

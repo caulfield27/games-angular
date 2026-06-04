@@ -68,6 +68,7 @@
   &--error    { background: $primary;      color: $canvas; border: 1px solid $frame-ink; }
   &--info     { background: $tint-sky;     color: $ink; border: 1px solid $frame-ink; }
   &--settings { background: $tint-steel;   color: $ink; border: 1px solid $frame-ink; }
+  &--warning  { background: $yellow-sticker; color: $ink; border: 1px solid $frame-ink; }
 }
 
 .modal-close {
@@ -97,12 +98,33 @@
   &--error    { background: $tint-salmon; }
   &--info     { background: $tint-sky; }
   &--settings { background: $tint-steel; }
+  &--warning  { background: $yellow-sticker; }
 }
 
 .modal-text {
   @include t-body;
   color: $ink;
   margin: 0;
+}
+
+// ─── TEXT INPUT ────────────────────────────────────────────────────────────
+.modal-input-wrap {
+  margin-top: $s-sm;
+}
+
+.modal-input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid $frame-ink;
+  background: $canvas;
+  padding: 0 $s-sm;
+  @include t-body;
+  color: $ink;
+  outline: none;
+  appearance: none;
+  box-sizing: border-box;
+
+  &:focus { border-color: $primary; }
 }
 
 // ─── SETTINGS FORM ─────────────────────────────────────────────────────────

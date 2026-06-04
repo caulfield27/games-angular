@@ -1,17 +1,19 @@
-import { effect, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Figures, FiguresMap } from '../types';
 import {
   BOARD_MATRIX,
   COLORS,
   FIGURES_INITIAL_COORDINATES,
 } from '../constants';
-import Swal from 'sweetalert2';
 import { launchConfetti } from '@/shared/utils/utils';
+import { AppModalService } from '@/shared/services/modal.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TetrisService {
+  private readonly modalService = inject(AppModalService);
+
   readonly isMobile = window.innerWidth <= 710;
   public bestScore = signal<number>(
     Number(localStorage.getItem('testris_best_score')) || 0
@@ -35,6 +37,8 @@ export class TetrisService {
   readonly NEXT_CELL_SIZE = this.isMobile ? 12 : 24;
   private canvas: HTMLCanvasElement | null = null;
   private infoCanvas: HTMLCanvasElement | null = null;
+  // Overlay canvas for line-clear flash animation (separate from game canvas)
+  private flashCanvas: HTMLCanvasElement | null = null;
   private coordinates: number[][] | null = null;
   private prevCoordinates: number[][] | null = null;
   private x: number = 4;
@@ -70,18 +74,23 @@ export class TetrisService {
     this.infoCanvas.height = this.NEXT_CELL_SIZE * 4;
   }
 
+  /** Register the flash-overlay canvas (same pixel size as game canvas). */
+  public initFlashCanvas(canvas: HTMLCanvasElement) {
+    this.flashCanvas = canvas;
+    canvas.width  = this.CELL_SIZE * this.GRID_ROWS;
+    canvas.height = this.CELL_SIZE * this.GRID_COLS;
+  }
+
   public reset() {
     const ctx1 = this.canvas?.getContext('2d');
     const ctx2 = this.infoCanvas?.getContext('2d');
+    const ctx3 = this.flashCanvas?.getContext('2d');
     if (ctx1)
       ctx1.clearRect(0, 0, this.canvas?.width ?? 0, this.canvas?.height ?? 0);
     if (ctx2)
-      ctx2.clearRect(
-        0,
-        0,
-        this.infoCanvas?.width ?? 0,
-        this.infoCanvas?.height ?? 0
-      );
+      ctx2.clearRect(0, 0, this.infoCanvas?.width ?? 0, this.infoCanvas?.height ?? 0);
+    if (ctx3)
+      ctx3.clearRect(0, 0, this.flashCanvas?.width ?? 0, this.flashCanvas?.height ?? 0);
     this.x = 4;
     this.y = -1;
     this.lastY = this.y;
@@ -192,18 +201,21 @@ export class TetrisService {
         const isRecoredBreaked = this.score() > this.bestScore();
         if (isRecoredBreaked) {
           launchConfetti(1000);
-          Swal.fire({
+          this.modalService.open({
             icon: 'success',
-            title: 'Вы побили свой рекорд',
-            text: `Ваш новый рекорд: ${this.score()}`,
+            title: 'Новый рекорд!',
+            body: `Ваш новый рекорд: ${this.score()}`,
+            confirmText: 'Играть снова',
           }).then(() => {
             localStorage.setItem('testris_best_score', String(this.score()));
             this.reset();
           });
         } else {
-          Swal.fire({
+          this.modalService.open({
+            icon: 'error',
             title: 'Игра окончена!',
-            text: `Ваш счёт: ${this.score()}, текущий рекорд: ${this.bestScore()}`,
+            body: `Ваш счёт: ${this.score()} · рекорд: ${this.bestScore()}`,
+            confirmText: 'Играть снова',
           }).then(() => {
             this.reset();
           });
@@ -417,7 +429,15 @@ export class TetrisService {
     }
   }
 
+  /**
+   * Clears a completed row and drops all blocks above it.
+   * Also triggers a golden flash animation on the flashCanvas overlay
+   * (the overlay persists for ~250 ms while the game canvas is already cleared,
+   * giving visible line-clear feedback without pausing game logic).
+   */
   private breakLine(index: number) {
+    this.flashRow(index);
+
     for (let x = 0; x < this.matrix[index].length; x++) {
       this.matrix[index][x] = false;
       this.clearBlock(x, index);
@@ -432,6 +452,34 @@ export class TetrisService {
         start--;
       }
     }
+  }
+
+  /** Draws a golden flash on the overlay canvas and fades it out over ~250 ms. */
+  private flashRow(index: number) {
+    const ctx = this.flashCanvas?.getContext('2d');
+    if (!ctx) return;
+
+    const x = 0;
+    const y = index * this.CELL_SIZE;
+    const w = this.GRID_ROWS * this.CELL_SIZE;
+    const h = this.CELL_SIZE;
+
+    // White burst first frame (synchronous — shows in the current paint)
+    ctx.fillStyle = 'rgba(255, 253, 80, 1.0)';
+    ctx.fillRect(x, y, w, h);
+
+    // Fade-out over the following frames
+    let opacity = 0.85;
+    const fade = () => {
+      ctx.clearRect(x, y, w, h);
+      if (opacity > 0) {
+        ctx.fillStyle = `rgba(255, 253, 80, ${opacity})`;
+        ctx.fillRect(x, y, w, h);
+        opacity -= 0.13;
+        requestAnimationFrame(fade);
+      }
+    };
+    requestAnimationFrame(fade);
   }
 
   private dropBlock(x: number, y: number) {

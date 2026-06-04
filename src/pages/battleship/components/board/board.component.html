@@ -1,56 +1,64 @@
-<div class="battle_field" id="battlefield" #container>
-  <div class="letters_grid">
+<div class="battle-field" id="battlefield" #container>
+
+  <!-- Grid coordinate labels -->
+  <div class="coord-labels coord-labels--letters">
     <span>А</span><span>Б</span><span>В</span><span>Г</span><span>Д</span
     ><span>Е</span><span>Ж</span><span>З</span><span>И</span><span>К</span>
   </div>
-  <div class="numbers_grid">
+  <div class="coord-labels coord-labels--numbers">
     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span
     ><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
   </div>
-  @if (battleshipService.gameStatus() === 'start' ||
-  battleshipService.gameStatus() === 'found') {
-  <div class="info-section">
-    <span>{{ battleshipService.gameMetadata().myName }}</span>
-    @if(battleshipService.gameStatus() !== 'start'){
-    <div>
-      @if (battleshipService.isReady()) {
-      <span>Готов</span>
-      }@else{
-      <button (click)="onReady()" class="ready_btn">Готов</button>
+
+  <!-- Player info / ready button -->
+  @if (battleshipService.gameStatus() === 'start' || battleshipService.gameStatus() === 'found') {
+    <div class="board-info">
+      @if (battleshipService.gameStatus() === 'found') {
+        <div class="ready-area">
+          @if (battleshipService.isReady()) {
+            <span class="ready-badge">ГОТОВ ✓</span>
+          } @else {
+            <button (click)="onReady()" class="ready-btn">ГОТОВ</button>
+          }
+        </div>
       }
     </div>
-    }
-  </div>
-  } @for(ship of battleshipService.ships(); track $index) {
-  <div
-    cdkDrag
-    [cdkDragDisabled]="battleshipService.gameStatus() === 'start'"
-    [cdkDragBoundary]="'#battlefield'"
-    [cdkDragData]="ship"
-    (cdkDragMoved)="onDragMove($event)"
-    (cdkDragEnded)="onDragEnd($event)"
-    class="ship"
-    [ngStyle]="battleshipService.getGridArea(ship.coordinates, ship.direction)"
-    [style]="
-      battleshipService.gameStatus() === 'start'
-        ? 'cursor: default'
-        : 'cursor:grab'
-    "
-  ></div>
-  } @if (boardService.placeToArrange()) {
-  <div
-    class="place_to_arrange"
-    [ngStyle]="
-      battleshipService.getGridArea(
-        boardService.placeToArrange()!.coordinates,
-        boardService.placeToArrange()!.direction
-      )
-    "
-  ></div>
-  } @for (field of battleshipService.hittedFields(); track $index) {
-  <div
-    [ngClass]="field.type === 'hit' ? 'hitted_field' : 'miss_field'"
-    [ngStyle]="battleshipService.getGridArea({ x: field.x, y: field.y }, null)"
-  ></div>
   }
+
+  <!-- Ships -->
+  @for (ship of battleshipService.ships(); track $index) {
+    <div
+      cdkDrag
+      [cdkDragDisabled]="battleshipService.gameStatus() === 'start'"
+      [cdkDragBoundary]="'#battlefield'"
+      [cdkDragData]="ship"
+      (cdkDragMoved)="onDragMove($event)"
+      (cdkDragEnded)="onDragEnd($event)"
+      [ngClass]="[
+        'ship',
+        ship.direction === 'horizontal' ? 'ship--h' : '',
+        ship.direction === 'vertical'   ? 'ship--v' : '',
+        ship.size === 1                 ? 'ship--single' : '',
+      ]"
+      [ngStyle]="battleshipService.getGridArea(ship.coordinates, ship.direction)"
+      [style.cursor]="battleshipService.gameStatus() === 'start' ? 'default' : 'grab'"
+    ></div>
+  }
+
+  <!-- Drag-preview ghost -->
+  @if (boardService.placeToArrange()) {
+    <div
+      class="place-preview"
+      [ngStyle]="battleshipService.getGridArea(boardService.placeToArrange()!.coordinates, boardService.placeToArrange()!.direction)"
+    ></div>
+  }
+
+  <!-- Hit/miss markers on own board -->
+  @for (field of battleshipService.hittedFields(); track $index) {
+    <div
+      [ngClass]="['field-marker', field.type === 'hit' ? 'field-marker--hit' : 'field-marker--miss']"
+      [ngStyle]="battleshipService.getGridArea({ x: field.x, y: field.y }, null)"
+    ></div>
+  }
+
 </div>

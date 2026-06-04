@@ -1,119 +1,102 @@
-.actions_wrapper {
+@use 'design' as *;
+
+.options-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: $s-lg;
 }
 
-.switcher {
-  position: relative;
-  display: inline-flex;
-  background: #7965c1;
-  border-radius: 8px;
-  padding: 4px;
-  width: fit-content;
+// ─── TAB BAR ───────────────────────────────────────────────────────────────
+.tab-bar {
+  display: flex;
+  border: 1px solid $frame-ink;
 }
 
-.switcher button {
-  position: relative;
+.tab-btn {
   flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  padding: 8px 16px;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 1;
+  background: $canvas;
+  color: $ink;
+  border: 0;
+  border-right: 1px solid $frame-ink;
+  padding: $s-sm $s-md;
+  @include t-btn;
+  text-transform: uppercase;
   cursor: pointer;
+  letter-spacing: 0.3px;
+
+  &:last-child { border-right: none; }
+
+  &--active {
+    background: $frame-ink;
+    color: $canvas;
+  }
+
+  &:active:not(.tab-btn--active) { filter: brightness(0.9); }
 }
 
-.switch-control {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  background: #362b7d;
-  border-radius: 8px;
-  transition: transform 0.3s ease;
-  z-index: 0;
+// ─── RIBBON CARDS ──────────────────────────────────────────────────────────
+.ribbon-card { border: 1px solid $frame-ink; }
+
+.ribbon-title {
+  @include ribbon-title;
 }
 
-.switcher.right .switch-control {
-  transform: translateX(100%);
+.ribbon-body {
+  @include ribbon-body-base;
+
+  &--sky   { background: $tint-sky; }
+  &--peach { background: $tint-peach; }
 }
 
-.invite_friend_wrapper {
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  padding: 10px 10px 34px 10px;
-  background: transparent;
-  border-radius: 8px;
-  font-size: 12px;
-  border: 1px solid gainsboro;
+// ─── CONTENT ───────────────────────────────────────────────────────────────
+.option-hint {
+  @include t-body;
+  color: $ink;
+  margin: 0 0 $s-md 0;
 }
 
-.invite_friend_wrapper div {
+.find-btn {
+  @include btn-primary;
   width: 100%;
-  border-radius: 4px;
-  background: #7965c1;
+
+  &--loading {
+    opacity: 0.55;
+    cursor: wait;
+    pointer-events: none;
+  }
+}
+
+// ─── INVITE LINK ───────────────────────────────────────────────────────────
+.link-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-items: stretch;
-  color: #ffffff;
+  border: 1px solid $frame-ink;
+  background: $canvas;
 }
 
-.link {
-  margin: 8px;
+.link-text {
+  @include t-body-sm;
+  flex: 1;
+  padding: $s-xs $s-sm;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: $link;
+
+  &::-webkit-scrollbar { display: none; }
 }
 
-.battleship_btn {
-  border: none;
-  outline: none;
-  background: #7965c1;
-  border-radius: 8px;
-  padding: 10px 20px;
-  width: fit-content;
-  font-size: 14px;
-  color: #ffffff;
-  transition: 0.3s ease-in-out;
-  cursor: pointer;
-  letter-spacing: 1px;
-}
-
-.battleship_btn:hover {
-  background: #362b7d;
-}
-
-.play_btn_loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.link {
-  overflow-x: scroll;
-}
-
-.link::-webkit-scrollbar {
-  display: none;
-}
-
-.invite_friend_wrapper div button {
-  width: 40px;
-  height: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-  border-left: 1px solid #ae9fe6;
-  outline: none;
+.copy-btn {
+  flex-shrink: 0;
+  width: 36px;
+  border: 0;
+  border-left: 1px solid $frame-ink;
+  background: $canvas;
   cursor: copy;
-  background: transparent;
-}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $s-xs;
 
-.invite_friend_wrapper img {
-  width: 30px;
+  img { width: 18px; height: 18px; display: block; }
+
+  &:active { background: $tint-sage; }
 }

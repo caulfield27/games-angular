@@ -1,44 +1,44 @@
 @if (battleshipService.isChatOpen()) {
-<div class="chat_container">
-  <div class="chat_wrapper">
-    <header>
-      <span>{{battleshipService.gameMetadata().opName}}</span>
-      <button (click)="onCLose()">&times;</button>
-    </header>
-    <div class="messages_container">
-      <div class="messages_wrapper">
+
+  <!-- Expanded chat panel -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <span class="chat-header__name">{{ battleshipService.gameMetadata().opName }}</span>
+      <button class="chat-close" (click)="onCLose()" type="button" aria-label="Закрыть чат">✕</button>
+    </div>
+
+    <div class="chat-messages">
+      <div class="messages-inner">
         @for (message of chatService.messages(); track $index) {
-        <div
-          [ngClass]="{
-            msg: true,
-            op_msg: message.type === 'opponent',
-            my_msg: message.type === 'user'
-          }"
-        >
-          {{ message.content }}
-        </div>
+          <div [ngClass]="['msg', message.type === 'opponent' ? 'msg--op' : 'msg--me']">
+            {{ message.content }}
+          </div>
         }
       </div>
     </div>
-    <footer>
+
+    <div class="chat-footer">
       <input
+        #msgInput
         (keydown)="onKeyDown($event)"
         type="text"
         placeholder="написать..."
-        #msgInput
+        class="chat-input"
       />
-      <button class="send_btn" (click)="handleSend()">
-        <img src="/send.svg" alt="send" />
+      <button class="chat-send" (click)="handleSend()" type="button" aria-label="Отправить">
+        <img src="/send.svg" alt="отправить" />
       </button>
-    </footer>
+    </div>
   </div>
-</div>
-}@else{
-<div class="chat" (click)="onOpen()" role="button" id="chat">
-  <img class="chat_icon" src="/chat.png" alt="chat" />
-  @if (battleshipService.notifications() > 0) {
-  <span class="not">{{ battleshipService.notifications() }}</span>
-  }
-</div>
+
+} @else {
+
+  <!-- Collapsed chat bubble -->
+  <button class="chat-bubble" (click)="onOpen()" type="button" aria-label="Открыть чат">
+    <img class="chat-bubble__icon" src="/chat.png" alt="chat" />
+    @if (battleshipService.notifications() > 0) {
+      <span class="chat-badge">{{ battleshipService.notifications() }}</span>
+    }
+  </button>
 
 }

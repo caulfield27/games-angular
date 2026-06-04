@@ -1,23 +1,25 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Type } from './findGameOptions.types';
-import { NgClass } from '@angular/common';
 import { copy } from '@/shared/utils/utils';
 import { v4 as uuidv4 } from 'uuid';
 import { BattleshipService, WebSocketService } from '../../services';
 import { sendMessageType } from '../../types/types';
-import Swal from 'sweetalert2';
+import { AppModalService } from '@/shared/services/modal.service';
 
 @Component({
   selector: 'find-game-options',
   templateUrl: './findGameOptions.component.html',
   styleUrl: './findGameOptions.component.scss',
-  imports: [NgClass],
+  imports: [],
 })
 export class FindGameOptions {
+  private readonly modalService = inject(AppModalService);
+
   constructor(
     private ws: WebSocketService,
     public battleshipService: BattleshipService
   ) {}
+
   public type: Type = 'random';
   public switcherClasses: Record<string, boolean> = {
     switcher: true,
@@ -39,37 +41,30 @@ export class FindGameOptions {
         this.inviteLink = `${window.location.href}?room=${id}`;
         this.ws.sendMessage({
           type: sendMessageType.INVITE,
-          data: {
-            key: id,
-          },
+          data: { key: id },
         });
       }
     }
   }
 
   handleFindOpponent() {
-    Swal.fire({
+    this.modalService.open({
+      icon: 'info',
       title: 'Введите ваш никнейм',
-      input: 'text',
       inputPlaceholder: 'никнейм',
-      confirmButtonText: 'Продолжить',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const name = result?.value;
+      confirmText: 'Продолжить',
+      cancelText: 'Отмена',
+    }).then(({ isConfirmed, inputValue }) => {
+      if (isConfirmed) {
+        const name = inputValue ?? '';
         this.battleshipService.gameMetadata.update((prev) => ({
           ...prev,
-          myName: !name
-            ? 'you'
-            : name.length > 15
-            ? name.slice(0, 15) + '...'
-            : name,
+          myName: !name ? 'you' : name.length > 15 ? name.slice(0, 15) + '...' : name,
         }));
         this.battleshipService.selectionLoading.set(true);
         this.ws.sendMessage({
           type: sendMessageType.SELECTION,
-          data: {
-            name,
-          },
+          data: { name },
         });
       }
     });

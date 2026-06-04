@@ -1,197 +1,492 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@use 'design' as *;
 
-.tetris_wrapper {
-  font-family: "Press Start 2P", system-ui;
-  width: 100%;
-  height: 100svh;
+// ─── PAGE FRAME ────────────────────────────────────────────────────────────
+.page-frame { @include page-frame; }
+
+// ─── TOP BANNER ────────────────────────────────────────────────────────────
+.top-banner { @include top-banner; }
+
+.banner-left {
+  display: flex;
+  align-items: baseline;
+  gap: $s-lg;
+  flex-wrap: wrap;
+}
+
+.banner-title {
+  @include t-display;
+  color: $canvas;
+  text-transform: uppercase;
+
+  @media (max-width: 480px) { font-size: 22px; }
+}
+
+.banner-tagline {
+  @include t-h2;
+  color: $canvas;
+  @media (max-width: 600px) { display: none; }
+}
+
+.banner-right { flex-shrink: 0; }
+
+.record-badge {
+  display: inline-block;
+  background: $yellow-sticker;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: $s-xxs $s-sm;
+  @include t-btn;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+// ─── PAGE CANVAS ───────────────────────────────────────────────────────────
+.page-canvas {
+  background: $canvas;
+  flex: 1;
+  padding: $s-lg;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 24px;
-  background-color: #171717;
 
-
-  @media screen and (max-width: 905px) {
-    padding: 80px 16px 16px 16px;
-  }
+  @media (max-width: 710px) { padding: $s-sm; }
 }
 
-.tetris_main_wrapper{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.tetris_container {
+// ─── GAME LAYOUT ───────────────────────────────────────────────────────────
+.game-layout {
   display: flex;
   flex-direction: row;
-}
+  gap: $s-sect;
+  align-items: flex-start;
 
-.tetris_cavnvas_container {
-  position: relative;
-}
-
-.tetris_canvas {
-  image-rendering: pixelated;
-  background: #262626;
-  backdrop-filter: blur(4px);
-  border-radius: 10px;
-
-  @media screen and (max-width: 710px) {
-    border-radius: 0;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+  @media (max-width: 710px) {
+    flex-direction: column;
+    gap: $s-md;
+    align-items: center;
+    width: 100%;
   }
 }
 
-.tetris_play_btn {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tetris_pause_btn {
-  position: absolute;
-  left: -100px;
-  top: 0;
-
-  @media screen and (max-width: 710px) {
-    left: -50px;
-  }
-}
-
-.tetris_info_section {
-  color: white;
-  font-size: 14px;
-  height: calc(20 * 25px);
-  background: #262626;
-  margin-left: 16px;
-  backdrop-filter: blur(4px);
-  border-radius: 10px;
+// ─── CANVAS SECTION ────────────────────────────────────────────────────────
+.canvas-section {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  @media screen and (max-width: 710px) {
-    display: none;
-  }
+  gap: 0;
+  flex-shrink: 0;
 }
 
-.tetris_info_section_mobile {
+// ─── MOBILE STAT BAR (hidden on desktop) ───────────────────────────────────
+.mobile-bar {
   display: none;
 
-  @media screen and (max-width: 710px) {
-    color: white;
-    font-size: 10px;
-    width: calc(10 * 20px);
-    height: calc(4 * 20px);
-    background: #262626;
-    backdrop-filter: blur(4px);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+  @media (max-width: 710px) {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 8px;
-    border-bottom: 1px solid #404040;
+    align-items: center;
+    background: #1a1a1a;
+    border: 1px solid $frame-ink;
+    border-bottom: none;
+    padding: $s-sm;
+    gap: $s-sm;
   }
 }
 
-.tetris_info_wrapper {
+.mobile-stat {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
 
-  @media screen and (max-width: 710px) {
-    &:last-child {
-      gap: 0;
-    }
+  &__label {
+    @include t-label;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    font-size: 9px;
+  }
+
+  &__value {
+    font-family: 'Arial Black', Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: 900;
+    color: $canvas;
+    line-height: 1;
   }
 }
 
-.control_wrapper {
+// ─── CANVAS WRAPPER ────────────────────────────────────────────────────────
+.canvas-wrapper {
+  position: relative;
+  display: inline-block; // Sizes to canvas content
+  line-height: 0;        // No gap between inline-block canvas and sibling
+  border: 2px solid $frame-ink;
+  box-shadow: 3px 3px 0 $frame-ink;
+  overflow: hidden;      // Clip the pre-game screen to canvas bounds
+}
+
+// ─── GAME CANVAS ───────────────────────────────────────────────────────────
+// The JS buffer stays at full resolution (300 × 600 px desktop / 200 × 400 px
+// mobile). CSS constrains only the *display* size so the canvas always fits
+// within the visible viewport height without scrolling.
+//
+// Desktop overhead (page-frame + banner + padding + footer) ≈ 180 px.
+// Mobile overhead adds the mobile-bar (~48 px) and D-pad (~130 px) ≈ 320 px.
+.tetris-canvas {
+  image-rendering: pixelated;
+  background: #1a1a1a;
+  display: block;
+
+  // Never taller than viewport minus surrounding chrome
+  height: min(600px, calc(100svh - 180px));
+  aspect-ratio: 1 / 2; // 10 cols : 20 rows — width auto-follows
+  width: auto;
+
+  @media (max-width: 710px) {
+    height: min(400px, calc(100svh - 320px));
+  }
+}
+
+// ─── FLASH OVERLAY CANVAS ──────────────────────────────────────────────────
+// Fills the canvas-wrapper which is already sized to the tetris-canvas CSS
+// dimensions. JS drawing uses the full-res buffer coordinates; the browser
+// scales the result proportionally to match the display size.
+.flash-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+// ─── PRE-GAME / PAUSED SCREEN ──────────────────────────────────────────────
+.pre-game {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+  overflow: hidden;
+
+  // Paused: semi-transparent so the game board shows through
+  &--paused {
+    background: rgba(0, 0, 0, 0.78);
+  }
+}
+
+// ─── BLOCK RAIN ────────────────────────────────────────────────────────────
+.block-rain {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@keyframes block-fall {
+  0%   { transform: translateY(-30px); opacity: 0; }
+  8%   { opacity: 0.85; }
+  88%  { opacity: 0.55; }
+  100% { transform: translateY(110%);  opacity: 0; }
+}
+
+// Shared block base — each .br overrides via CSS custom props
+.br {
+  position: absolute;
+  top: 0;
+  left:       var(--l);
+  width:      var(--w);
+  height:     var(--h);
+  background: var(--c);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.28);
+  animation: block-fall var(--d) linear infinite var(--del);
+}
+
+// 14 blocks — tetris piece colours, varied size / speed / offset
+.br--1  { --c: #3ef2ff; --w: 14px; --h: 14px; --l: 4%;  --d: 3.7s; --del: 0s;    }
+.br--2  { --c: #ffe65c; --w: 22px; --h: 10px; --l: 12%; --d: 5.2s; --del: -1.8s; }
+.br--3  { --c: #d057ff; --w: 10px; --h: 22px; --l: 22%; --d: 4.1s; --del: -0.7s; }
+.br--4  { --c: #5aff8b; --w: 18px; --h: 18px; --l: 32%; --d: 3.5s; --del: -3.0s; }
+.br--5  { --c: #ff4b6b; --w: 12px; --h: 24px; --l: 42%; --d: 4.9s; --del: -2.4s; }
+.br--6  { --c: #4c6bff; --w: 20px; --h: 20px; --l: 53%; --d: 3.3s; --del: -1.2s; }
+.br--7  { --c: #ff9651; --w: 16px; --h: 16px; --l: 63%; --d: 5.6s; --del: -4.1s; }
+.br--8  { --c: #3ef2ff; --w: 10px; --h: 20px; --l: 73%; --d: 4.3s; --del: -2.7s; }
+.br--9  { --c: #ffe65c; --w: 24px; --h: 12px; --l: 82%; --d: 3.8s; --del: -0.5s; }
+.br--10 { --c: #d057ff; --w: 14px; --h: 14px; --l: 90%; --d: 4.7s; --del: -1.5s; }
+.br--11 { --c: #5aff8b; --w: 12px; --h: 12px; --l: 28%; --d: 6.1s; --del: -3.7s; }
+.br--12 { --c: #ff4b6b; --w: 18px; --h:  8px; --l: 68%; --d: 3.2s; --del: -2.1s; }
+.br--13 { --c: #4c6bff; --w:  8px; --h: 16px; --l: 48%; --d: 5.8s; --del: -0.9s; }
+.br--14 { --c: #ff9651; --w: 20px; --h: 14px; --l: 8%;  --d: 4.4s; --del: -4.8s; }
+
+// ─── PRE-GAME CENTRE CARD ──────────────────────────────────────────────────
+.pre-game__card {
+  position: relative;
+  z-index: 2;
+  background: $canvas;
+  border: 2px solid $frame-ink;
+  box-shadow: 4px 4px 0 $frame-ink;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $s-lg;
+  padding: $s-xl $s-xxl;
+  min-width: 190px;
+  text-align: center;
+
+  @media (max-width: 710px) {
+    padding: $s-md $s-lg;
+    gap: $s-sm;
+    min-width: 150px;
+  }
+}
+
+// Large eyebrow title: "TETRIS" or "ПАУЗА"
+.pre-game__eyebrow {
+  @include t-display;
+  color: $ink;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 2px;
+
+  // Scale with the canvas on small viewports
+  @media (max-width: 710px)         { font-size: 26px; }
+  @media (max-height: 600px)        { font-size: 22px; }
+  @media (max-height: 500px)        { font-size: 18px; }
+}
+
+// Subtitle under TETRIS
+.pre-game__sub {
+  @include t-btn;
+  color: rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: -$s-sm;
+}
+
+// PLAY / CONTINUE button — pulsing yellow border draws the eye
+@keyframes btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%       { box-shadow: 0 0 0 3px $yellow-sticker; }
+}
+
+.pre-game__btn {
+  @include btn-primary;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $s-sm;
+  padding: $s-sm $s-xl;
+  font-size: 13px;
+  width: 100%;
+  animation: btn-pulse 1.6s ease infinite;
+
+  &:active { filter: brightness(1.3); animation: none; }
+}
+
+// Record chip below the button
+.pre-game__record {
+  @include t-body-sm;
+  color: $ink;
+  background: $tint-lime;
+  border: 1px solid $frame-ink;
+  padding: $s-xxs $s-sm;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// ─── PAUSE BUTTON (top-right corner, only while running) ───────────────────
+.pause-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: $s-xs;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+
+  &:active { background: rgba(0, 0, 0, 0.85); }
+}
+
+// ─── NEXT-PIECE MINI CANVAS ────────────────────────────────────────────────
+.next-canvas {
+  image-rendering: pixelated;
+  display: block;
+}
+
+// ─── D-PAD CONTROLS ────────────────────────────────────────────────────────
+// Shared grid layout used both in info-panel and mobile-bar
+.dpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 4px;
+  grid-template-rows:    repeat(3, 1fr);
+  gap: $s-xs;
 
-  & button {
+  &--mobile {
+    display: none;
+
+    @media (max-width: 710px) {
+      display: grid;
+      margin-top: $s-sm;
+    }
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $frame-ink;
+    color: $canvas;
+    border: 1px solid $frame-ink;
+    padding: $s-xs;
     cursor: pointer;
-    padding: 4px;
-    background-color: #171717;
-    border-radius: 10px;
     touch-action: none;
+    min-width: 40px;
+    min-height: 40px;
 
-    &:active {
-      scale: 0.9;
-    }
+    &:active { filter: brightness(1.35); }
 
-    &:nth-child(1) {
-      grid-area: 1/2;
-    }
-    &:nth-child(2) {
-      grid-area: 2/3;
-    }
-    &:nth-child(3) {
-      grid-area: 3/2;
-    }
-    &:nth-child(4) {
-      grid-area: 2/1;
-    }
+    // D-pad grid positions
+    &:nth-child(1) { grid-area: 1/2; } // Up    → top centre
+    &:nth-child(2) { grid-area: 2/3; } // Right → middle right
+    &:nth-child(3) { grid-area: 3/2; } // Down  → bottom centre
+    &:nth-child(4) { grid-area: 2/1; } // Left  → middle left
   }
 }
 
-.control_wrapper_mobile {
-  display: none;
+// ─── INFO PANEL (desktop only) ─────────────────────────────────────────────
+// ─── INFO PANEL ────────────────────────────────────────────────────────────
+// Same height formula as .tetris-canvas so it aligns flush.
+// Critical: min-height: 0 on every flex item — without it, items refuse to
+// shrink below their content size and the last card overflows the panel.
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  height: min(600px, calc(100svh - 180px));
+  overflow: hidden; // hard-stop — nothing escapes the panel boundary
 
-  @media screen and (max-width: 710px) {
-    margin-top: 10px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  @media (max-width: 710px) { display: none; }
+
+  > .ribbon-card {
+    flex: 1 1 0;    // flex-basis: 0 so all cards start equal before growing
+    min-height: 0;  // allow shrinking below content minimum — the key fix
+    display: flex;
+    flex-direction: column;
+    border-bottom: none;
+
+    &:last-child { border-bottom: 1px solid $frame-ink; }
+
+    > .ribbon-body {
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+      padding: $s-sm $s-md; // tighter than global default to save vertical space
+    }
+  }
+
+  // Next-piece canvas: cap so it never forces the body to overflow
+  .next-canvas {
+    display: block;
+    image-rendering: pixelated;
+    max-width:  80px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  // D-pad: expand to fill its card body; rows share height via 1fr.
+  // Buttons restored to normal sizing — no cramped overrides.
+  .dpad {
+    width: 100%;
+    height: 100%;
     grid-template-rows: repeat(3, 1fr);
-    gap: 4px;
 
-    & button {
-      touch-action: none;
-      color: white;
-      cursor: pointer;
-      background-color: #171717;
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      &:active {
-        scale: 0.95;
-      }
-
-      &:nth-child(1) {
-        grid-area: 1/2;
-      }
-      &:nth-child(2) {
-        grid-area: 2/3;
-      }
-      &:nth-child(3) {
-        grid-area: 3/2;
-      }
-      &:nth-child(4) {
-        grid-area: 2/1;
-      }
+    &__btn {
+      min-height: 0;
+      min-width: 0;
     }
   }
-}
 
-.record_span {
-  color: white;
-  font-weight: 500;
-  font-size: 16px;
-
-  @media screen and (max-width: 710px) {
-    font-size: 12px;
+  // Stat number scales with available space
+  .stat-value {
+    font-size: clamp(16px, 3.5vh, 28px);
   }
 }
+
+// ─── COMBINED STAT ROW (score + level side by side) ────────────────────────
+.ribbon-body--stats {
+  @include ribbon-body-base;
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  overflow: hidden;
+}
+
+.stat-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $s-xxs;
+  padding: $s-sm $s-xs;
+
+  &--periwinkle { background: $tint-periwinkle; }
+  &--sage       { background: $tint-sage; }
+
+  &__label {
+    @include t-label;
+    text-transform: uppercase;
+    color: $ink;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+}
+
+.stat-divider {
+  width: 1px;
+  background: $frame-ink;
+  flex-shrink: 0;
+}
+
+// ─── RIBBON CARDS ──────────────────────────────────────────────────────────
+.ribbon-card { border: 1px solid $frame-ink; }
+
+.ribbon-title { @include ribbon-title; }
+
+.ribbon-body {
+  @include ribbon-body-base;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &--periwinkle { background: $tint-periwinkle; }
+  &--sage       { background: $tint-sage; }
+  &--steel      { background: $tint-steel; }
+
+  // Dark background for next-piece canvas
+  &--dark {
+    background: #1a1a1a;
+    padding: $s-lg;
+  }
+}
+
+// Stat values (score, level)
+.stat-value {
+  font-family: 'Arial Black', Helvetica, sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: $ink;
+  line-height: 1;
+}
+
+// ─── FOOTER BAND ───────────────────────────────────────────────────────────
+.footer-band { @include footer-band; }

@@ -1,57 +1,91 @@
-@if (battleshipService.gameStatus() === 'found' ||
-battleshipService.gameStatus() === 'start') {
-<battleship-chat />
+@if (battleshipService.gameStatus() === 'found' || battleshipService.gameStatus() === 'start') {
+  <battleship-chat />
 }
-<div class="pages_container">
-  <div class="battleship_container">
-    <header class="battleship_header">
-      <h1>Морской бой</h1>
-      <div>
-        <span>
-          @if(ws.state() === 'connecting'){ Идет соеденение... } 
-          @else if(ws.state() === 'open'){ Игроков онлайн: }
-        </span>
-        @if(ws.state() === 'open'){<span>{{
-          battleshipService.activeUsers()
-        }}</span
-        >}
-      </div>
-    </header>
-    <div class="instructions_wrapper">
-      <div class="instructions_container">
-        <span>
-          @if(battleshipService.gameStatus() === 'idle' ||
-          battleshipService.gameStatus() === 'found'){ Расположите корабли
-          }@else if(battleshipService.turn() === 1){ Ваш ход }@else{ Ход
-          противника }
-        </span>
-        @if (battleshipService.gameStatus() !== 'start') {
-        <button class="shuffle_btn" (click)="handleShuffle()">
-          <img src="/shuffle.svg" alt="shuffle icon" />
-        </button>
-        }
-      </div>
-      @if (battleshipService.gameStatus() === 'start') {
-      <button (click)="handleQuit()" class="battleship_btn">
-        Выйти из игры
-      </button>
+
+<div class="page-frame">
+
+  <!-- Top Banner -->
+  <div class="top-banner">
+    <div class="banner-left">
+      <span class="banner-title">BATTLESHIP</span>
+      <span class="banner-tagline">ONLINE MULTIPLAYER. NOW.</span>
+    </div>
+    <div class="banner-right">
+      @if (ws.state() === 'connecting') {
+        <span class="banner-meta">CONNECTING...</span>
+      }
+      @if (ws.state() === 'open') {
+        <span class="online-badge">{{ battleshipService.activeUsers() }} ONLINE</span>
       }
     </div>
-    <main
-      class="battleship_main"
-      [ngStyle]="
-        battleshipService.gameStatus() === 'found' ||
-        battleshipService.gameStatus() === 'start'
-          ? { justifyContent: 'space-between', gap: '0' }
-          : {}
-      "
-    >
-      <battleship-board />
-      @if (battleshipService.gameStatus() === 'idle') {
-      <find-game-options />
-      }@else{
-      <opponent-board />
-      }
-    </main>
   </div>
+
+  <!-- White page canvas -->
+  <div class="page-canvas">
+
+    <!-- Control bar: turn indicator + shuffle/quit -->
+    <div class="control-bar">
+      <div class="turn-label" [class.turn-label--yours]="battleshipService.gameStatus() === 'start' && battleshipService.turn() === 1"
+                              [class.turn-label--wait]="battleshipService.gameStatus() === 'start' && battleshipService.turn() !== 1">
+        @if (battleshipService.gameStatus() === 'idle' || battleshipService.gameStatus() === 'found') {
+          РАСПОЛОЖИТЕ КОРАБЛИ
+        } @else if (battleshipService.turn() === 1) {
+          ВАШ ХОД
+        } @else {
+          ХОД ПРОТИВНИКА
+        }
+      </div>
+      <div class="control-actions">
+        @if (battleshipService.gameStatus() !== 'start') {
+          <button class="ctrl-icon-btn" (click)="handleShuffle()" title="Перемешать">
+            <img src="/shuffle.svg" alt="shuffle" />
+          </button>
+        }
+        @if (battleshipService.gameStatus() === 'start') {
+          <button class="ctrl-quit-btn" (click)="handleQuit()">ВЫЙТИ</button>
+        }
+      </div>
+    </div>
+
+    <!-- Game boards -->
+    <div class="boards-area" [ngStyle]="battleshipService.gameStatus() === 'found' || battleshipService.gameStatus() === 'start'
+      ? { justifyContent: 'space-between' } : {}">
+
+      <!-- Player fleet column -->
+      <div class="board-col">
+        <div class="board-col__header">
+          <span class="board-col__title">ВАШИ КОРАБЛИ</span>
+          @if (battleshipService.gameStatus() === 'found' || battleshipService.gameStatus() === 'start') {
+            <span class="board-col__name">{{ battleshipService.gameMetadata().myName }}</span>
+          }
+        </div>
+        <div class="board-col__inner">
+          <battleship-board />
+        </div>
+      </div>
+
+      <!-- Right column: find opponent or enemy board -->
+      <div class="board-col">
+        @if (battleshipService.gameStatus() === 'idle') {
+          <div class="board-col__header">
+            <span class="board-col__title">НАЙТИ СОПЕРНИКА</span>
+          </div>
+          <div class="board-col__inner board-col__inner--find">
+            <find-game-options />
+          </div>
+        } @else {
+          <div class="board-col__header">
+            <span class="board-col__title">ВОДЫ ПРОТИВНИКА</span>
+            <span class="board-col__name">{{ battleshipService.gameMetadata().opName }}</span>
+          </div>
+          <div class="board-col__inner">
+            <opponent-board />
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-band">BATTLESHIP © ONLINE EDITION &nbsp;&middot;&nbsp; МОРСКОЙ БОЙ</div>
 </div>

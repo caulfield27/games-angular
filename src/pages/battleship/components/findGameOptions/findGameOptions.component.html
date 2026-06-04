@@ -1,36 +1,61 @@
-<div class="actions_wrapper">
-  <div [ngClass]="switcherClasses">
-    <div class="switch-control"></div>
-    <button (click)="onChange($event)" name="random">
-      Cлучайный противник
-    </button>
-    <button (click)="onChange($event)" name="friend">Играть с другом</button>
+<div class="options-wrapper">
+
+  <!-- Mode tab switcher -->
+  <div class="tab-bar">
+    <button
+      class="tab-btn"
+      [class.tab-btn--active]="type === 'random'"
+      (click)="onChange($event)"
+      name="random"
+      type="button"
+    >СЛУЧАЙНЫЙ</button>
+    <button
+      class="tab-btn"
+      [class.tab-btn--active]="type === 'friend'"
+      (click)="onChange($event)"
+      name="friend"
+      type="button"
+    >С ДРУГОМ</button>
   </div>
-  @if(type === 'random'){
-  <button
-    (click)="handleFindOpponent()"
-    class="battleship_btn"
-    [ngClass]="{
-      play_btn_loading: battleshipService.selectionLoading()
-    }"
-  >
-    @if(battleshipService.selectionLoading()){ Подбор противника... }@else{
-    Найти противника }
-  </button>
-  }@else{
-  <div class="invite_friend_wrapper">
-    <span>Чтобы пригласить друга, отправьте ему эту ссылку</span>
-    <div>
-      <span class="link">
-        @if(inviteLink){
-        {{ inviteLink }}
-        }
-      </span>
-      <button (click)="handleCopy()">
-        <img src="/copy.svg" alt="copy icon" />
-      </button>
+
+  <!-- Random opponent -->
+  @if (type === 'random') {
+    <div class="ribbon-card">
+      <div class="ribbon-title">ПОИСК ПРОТИВНИКА</div>
+      <div class="ribbon-body ribbon-body--sky">
+        <p class="option-hint">Система подберёт случайного соперника.</p>
+        <button
+          (click)="handleFindOpponent()"
+          class="find-btn"
+          [class.find-btn--loading]="battleshipService.selectionLoading()"
+          type="button"
+        >
+          @if (battleshipService.selectionLoading()) {
+            ПОДБОР...
+          } @else {
+            НАЙТИ ПРОТИВНИКА
+          }
+        </button>
+      </div>
     </div>
-    <span>С вами сыграет первый, кто перейдёт по этой ссылке.</span>
-  </div>
   }
+
+  <!-- Invite friend -->
+  @if (type === 'friend') {
+    <div class="ribbon-card">
+      <div class="ribbon-title">ПРИГЛАСИТЬ ДРУГА</div>
+      <div class="ribbon-body ribbon-body--peach">
+        <p class="option-hint">Отправьте другу эту ссылку — с вами сыграет первый, кто перейдёт по ней.</p>
+        @if (inviteLink) {
+          <div class="link-row">
+            <span class="link-text">{{ inviteLink }}</span>
+            <button (click)="handleCopy()" class="copy-btn" type="button" title="Скопировать">
+              <img src="/copy.svg" alt="copy" />
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
 </div>

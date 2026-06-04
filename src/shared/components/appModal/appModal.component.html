@@ -1,8 +1,5 @@
 @if (modal.modal(); as cfg) {
-  <!-- Backdrop -->
   <div class="backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true" [attr.aria-label]="cfg.title">
-
-    <!-- Modal card -->
     <div class="modal-card">
 
       <!-- Header: ribbon title bar -->
@@ -12,6 +9,7 @@
             @switch (cfg.icon) {
               @case ('success') { ✓ }
               @case ('error')   { ✗ }
+              @case ('warning') { ! }
               @case ('settings'){ ⚙ }
               @default          { ℹ }
             }
@@ -28,7 +26,21 @@
           <p class="modal-text">{{ cfg.body }}</p>
         }
 
-        <!-- Settings form (difficulty selector) -->
+        <!-- Text input (e.g. nickname entry) -->
+        @if (cfg.inputPlaceholder !== undefined) {
+          <div class="modal-input-wrap">
+            <input
+              #textInput
+              type="text"
+              class="modal-input"
+              [placeholder]="cfg.inputPlaceholder"
+              (keydown.enter)="onConfirm()"
+              autofocus
+            />
+          </div>
+        }
+
+        <!-- Settings difficulty select -->
         @if (cfg.settingsLevel !== undefined) {
           <div class="settings-form">
             <label class="settings-label" for="modal-level">Сложность</label>
@@ -43,17 +55,21 @@
 
       </div>
 
-      <!-- Footer: action buttons -->
-      <div class="modal-footer">
-        @if (cfg.cancelText) {
-          <button class="modal-btn modal-btn--secondary" (click)="onDismiss()">
-            {{ cfg.cancelText }}
-          </button>
-        }
-        <button class="modal-btn modal-btn--primary" (click)="onConfirm()">
-          {{ cfg.confirmText ?? 'OK' }}
-        </button>
-      </div>
+      <!-- Footer -->
+      @if (cfg.confirmText || cfg.cancelText) {
+        <div class="modal-footer">
+          @if (cfg.cancelText) {
+            <button class="modal-btn modal-btn--secondary" (click)="onDismiss()">
+              {{ cfg.cancelText }}
+            </button>
+          }
+          @if (cfg.confirmText) {
+            <button class="modal-btn modal-btn--primary" (click)="onConfirm()">
+              {{ cfg.confirmText }}
+            </button>
+          }
+        </div>
+      }
 
     </div>
   </div>

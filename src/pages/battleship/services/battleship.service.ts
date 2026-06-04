@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   CheckMessageData,
@@ -18,15 +18,16 @@ import {
   sendMessageType,
   StatusData,
 } from '../types/types';
-import Swal from 'sweetalert2';
 import { launchConfetti } from '@/shared/utils/utils';
 import { AudioService } from '@/shared/services/audio.service';
+import { AppModalService } from '@/shared/services/modal.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BattleshipService {
-  // contructor
+  private readonly modalService = inject(AppModalService);
+
   constructor(private route: ActivatedRoute, private router: Router, private audio: AudioService) {
     audio.connect('message', '/audio/battleship/message.wav');
   }
@@ -594,11 +595,11 @@ export class BattleshipService {
         this.gameSessionData.sessionId = sessionId;
         this.gameStatus.set('found');
         this.selectionLoading.set(false);
-        Swal.fire({
+        this.modalService.open({
           icon: 'success',
-          text: 'Игра началась.',
-          showConfirmButton: false,
-          timer: 1300,
+          title: 'Игра началась!',
+          body: 'Противник найден. Расположите корабли и нажмите Готов.',
+          autoClose: 1800,
         });
         break;
       case incomneMessageType.GAME_START:
@@ -608,10 +609,11 @@ export class BattleshipService {
         ]);
         break;
       case incomneMessageType.LOSE:
-        Swal.fire({
+        this.modalService.open({
           icon: 'error',
-          title: 'К сожалению, вы проиграли битву.',
-          text: 'Но не проиграли войну!',
+          title: 'К сожалению, вы проиграли.',
+          body: 'Но не проиграли войну! Попробуйте снова.',
+          confirmText: 'OK',
         }).then(() => this.reset(false));
         break;
       case incomneMessageType.MESSAGE:
@@ -627,10 +629,11 @@ export class BattleshipService {
         this.isOpponentReady.set(true);
         break;
       case incomneMessageType.ROOM_CLOSED:
-        Swal.fire({
+        this.modalService.open({
           icon: 'info',
           title: 'Игра закончена',
-          text: `Противник ${this.gameMetadata().opName ?? ''} покинул игру`,
+          body: `Противник ${this.gameMetadata().opName ?? ''} покинул игру.`,
+          confirmText: 'OK',
         }).then(() => this.reset(false));
         break;
       case incomneMessageType.STATUS:
@@ -649,10 +652,11 @@ export class BattleshipService {
         if (status === 'lose') {
           launchConfetti(2000);
           setTimeout(() => {
-            Swal.fire({
+            this.modalService.open({
               icon: 'success',
-              title: 'Поздравляем, вы выиграли битву!',
-              text: 'Вы смогли уничтожить весь флот противника',
+              title: 'Поздравляем, победа!',
+              body: 'Вы уничтожили весь флот противника.',
+              confirmText: 'Играть снова',
             }).then(() => this.reset(false));
           }, 2000);
         } else if (status === 'destroy') {

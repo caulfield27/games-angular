@@ -1,34 +1,46 @@
-<div class="battle_field" #container>
-  <div class="letters_grid">
+<div class="battle-field" #container>
+
+  <!-- Coordinate labels -->
+  <div class="coord-labels coord-labels--letters">
     <span>А</span><span>Б</span><span>В</span><span>Г</span><span>Д</span
     ><span>Е</span><span>Ж</span><span>З</span><span>И</span><span>К</span>
   </div>
-  <div class="numbers_grid">
+  <div class="coord-labels coord-labels--numbers">
     <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span
     ><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
   </div>
-  <div class="info-section">
-    <span>{{ battleshipService.gameMetadata().opName }}</span>
-    @if (battleshipService.gameStatus() !== 'start') {
-    <div>
-      @if (battleshipService.isOpponentReady()) {
-      <span>готов</span>
-      }@else{
-      <span>готовится...</span>
-      }
+
+  <!-- Opponent ready indicator -->
+  @if (battleshipService.gameStatus() !== 'start') {
+    <div class="board-info">
+      <span class="ready-badge" [class.ready-badge--yes]="battleshipService.isOpponentReady()">
+        {{ battleshipService.isOpponentReady() ? 'ГОТОВ ✓' : 'ГОТОВИТСЯ...' }}
+      </span>
     </div>
-    }
-  </div>
-  @for (button of battleshipService.buttons(); track $index) {
-  <button
-    (click)="onClick($event)"
-    [ngStyle]="{ gridColumn: button.gridColumn, gridRow: button.gridRow }"
-    [ngClass]="{
-      miss_field: button.missed,
-      hitted_field: button.hitted,
-      disabled_btn: button.disabled,
-      cell_btn: !button.missed && !button.hitted && !button.disabled
-    }"
-  ></button>
   }
+
+  <!-- Shot cells -->
+  @for (button of battleshipService.buttons(); track $index) {
+    <button
+      (click)="onClick($event)"
+      [ngStyle]="{ gridColumn: button.gridColumn, gridRow: button.gridRow }"
+      [ngClass]="{
+        'field-miss':     button.missed,
+        'field-hit':      button.hitted,
+        'field-disabled': button.disabled && !button.missed && !button.hitted,
+        'field-cell':     !button.missed && !button.hitted && !button.disabled
+      }"
+    ></button>
+  }
+
+  <!-- Projectile: flies from board bottom to click target -->
+  @if (projectileVisible) {
+    <div
+      class="projectile"
+      [class.projectile--fly]="projectileFly"
+      [style.--tx]="projectileTargetX + 'px'"
+      [style.--ty]="projectileTargetY + 'px'"
+    ></div>
+  }
+
 </div>

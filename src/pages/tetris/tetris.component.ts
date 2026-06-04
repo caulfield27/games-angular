@@ -25,10 +25,10 @@ import { Move } from './types';
 })
 export class Tetris implements AfterViewInit, OnDestroy {
   readonly ArrowRight = ArrowBigRight;
-  readonly ArrowLeft = ArrowBigLeft;
-  readonly ArrowDown = ArrowBigDown;
-  readonly ArrowUp = ArrowBigUp;
-  readonly Play = Play;
+  readonly ArrowLeft  = ArrowBigLeft;
+  readonly ArrowDown  = ArrowBigDown;
+  readonly ArrowUp    = ArrowBigUp;
+  readonly Play  = Play;
   readonly Pause = Pause;
 
   private currentAnimationFrameId: number | null = null;
@@ -36,13 +36,17 @@ export class Tetris implements AfterViewInit, OnDestroy {
 
   constructor(public tetrisService: TetrisService) {}
 
-  @ViewChild('canvas') canvas!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('infoCanvas') infoCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('canvas')      canvas!:      ElementRef<HTMLCanvasElement>;
+  @ViewChild('infoCanvas')  infoCanvas!:  ElementRef<HTMLCanvasElement>;
+  @ViewChild('flashCanvas') flashCanvas!: ElementRef<HTMLCanvasElement>;
 
   ngAfterViewInit(): void {
+    const tetris = this.tetrisService;
     if (this.canvas.nativeElement && this.infoCanvas.nativeElement) {
-      const tetris = this.tetrisService;
       tetris.init(this.canvas.nativeElement, this.infoCanvas.nativeElement);
+    }
+    if (this.flashCanvas?.nativeElement) {
+      tetris.initFlashCanvas(this.flashCanvas.nativeElement);
     }
   }
 

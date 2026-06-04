@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type ModalIcon = 'success' | 'error' | 'info' | 'settings';
+export type ModalIcon = 'success' | 'error' | 'info' | 'settings' | 'warning';
 
 export interface AppModalConfig {
   title: string;
@@ -8,14 +8,18 @@ export interface AppModalConfig {
   icon?: ModalIcon;
   confirmText?: string;
   cancelText?: string;
-  // Settings modal: pass current level so the select is pre-selected
+  /** Render a <select> pre-selected to this level value (memory settings) */
   settingsLevel?: string;
+  /** Render a <input type="text"> with this placeholder (e.g. nickname entry) */
+  inputPlaceholder?: string;
+  /** Auto-dismiss after N ms without user action (e.g. game-found toast) */
+  autoClose?: number;
 }
 
 export interface AppModalResult {
   isConfirmed: boolean;
-  // Filled when settings modal is confirmed
   selectedLevel?: string;
+  inputValue?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -28,11 +32,15 @@ export class AppModalService {
     return new Promise((resolve) => {
       this.resolveRef = resolve;
       this.modal.set(config);
+
+      if (config.autoClose) {
+        setTimeout(() => this.dismiss(), config.autoClose);
+      }
     });
   }
 
-  confirm(selectedLevel?: string): void {
-    this.resolveRef?.({ isConfirmed: true, selectedLevel });
+  confirm(selectedLevel?: string, inputValue?: string): void {
+    this.resolveRef?.({ isConfirmed: true, selectedLevel, inputValue });
     this.modal.set(null);
     this.resolveRef = undefined;
   }

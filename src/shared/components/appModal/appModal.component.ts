@@ -8,12 +8,14 @@ import { AppModalService } from '../../services/modal.service';
 })
 export class AppModal {
   @ViewChild('levelSelect') levelSelect?: ElementRef<HTMLSelectElement>;
+  @ViewChild('textInput')   textInput?:  ElementRef<HTMLInputElement>;
 
   constructor(public modal: AppModalService) {}
 
   onConfirm(): void {
     const selectedLevel = this.levelSelect?.nativeElement.value;
-    this.modal.confirm(selectedLevel);
+    const inputValue    = this.textInput?.nativeElement.value;
+    this.modal.confirm(selectedLevel, inputValue);
   }
 
   onDismiss(): void {
@@ -21,8 +23,6 @@ export class AppModal {
   }
 
   onBackdropClick(e: MouseEvent): void {
-    if (e.target === e.currentTarget) {
-      this.modal.dismiss();
-    }
+    if (e.target === e.currentTarget) this.modal.dismiss();
   }
 }

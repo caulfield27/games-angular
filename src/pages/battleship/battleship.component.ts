@@ -1,9 +1,9 @@
-import { Component, effect, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit } from '@angular/core';
 import { Board, Chat, FindGameOptions, OpponentBoard } from './components';
 import { BattleshipService, ChatService, WebSocketService } from './services';
 import { NgStyle } from '@angular/common';
-import Swal from 'sweetalert2';
 import { sendMessageType } from './types/types';
+import { AppModalService } from '@/shared/services/modal.service';
 
 @Component({
   selector: 'battleship',
@@ -12,6 +12,8 @@ import { sendMessageType } from './types/types';
   imports: [Chat, Board, FindGameOptions, NgStyle, OpponentBoard],
 })
 export class Battleship implements OnInit, OnDestroy {
+  private readonly modalService = inject(AppModalService);
+
   constructor(
     public battleshipService: BattleshipService,
     public ws: WebSocketService,
@@ -24,9 +26,7 @@ export class Battleship implements OnInit, OnDestroy {
         if (this.ws.state() === 'open') {
           this.ws.sendMessage({
             type: sendMessageType.INVITE,
-            data: {
-              key: room,
-            },
+            data: { key: room },
           });
         }
       }
@@ -51,19 +51,17 @@ export class Battleship implements OnInit, OnDestroy {
   }
 
   handleQuit() {
-    Swal.fire({
+    this.modalService.open({
       icon: 'warning',
-      title: 'Вы действительно хотите покинуть игру?',
-      showCancelButton: true,
-      cancelButtonText: 'Отмена',
-      confirmButtonText: 'Покинуть',
-    }).then((res) => {
-      if (res?.isConfirmed) {
+      title: 'Покинуть игру?',
+      body: 'Вы действительно хотите покинуть текущую партию?',
+      confirmText: 'Покинуть',
+      cancelText: 'Отмена',
+    }).then(({ isConfirmed }) => {
+      if (isConfirmed) {
         this.ws.sendMessage({
           type: sendMessageType.CLOSE_ROOM,
-          data: {
-            roomId: this.battleshipService.gameSessionData.sessionId,
-          },
+          data: { roomId: this.battleshipService.gameSessionData.sessionId },
         });
         this.battleshipService.reset(false);
       }
