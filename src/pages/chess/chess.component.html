@@ -1,145 +1,79 @@
-<div class="relative min-h-[100dvh] w-full bg-[#fffefb]">
+<div class="chess-frame">
+
+  <!-- ── Top Banner ──────────────────────────────────────────────────────── -->
+  <header class="chess-banner">
+    @if (chessService.gameType() !== null) {
+      <button class="chess-banner__back" (click)="onGoback()" aria-label="Назад">
+        <lucide-icon [img]="ArrowIcon" size="14" color="#000000" />
+      </button>
+    }
+    <span class="chess-banner__brand">ШАХМАТЫ</span>
+    @if (chessService.gameType() === null) {
+      <button class="chess-banner__theme" (click)="openThemeSettings()">
+        <lucide-icon [img]="PaintBrushIcon" size="13" color="#ffffff" />
+        <span>ТЕМЫ</span>
+      </button>
+    }
+  </header>
+
+  <!-- ── Menu (no active game) ───────────────────────────────────────────── -->
   @if (chessService.gameType() === null) {
-    <div
-      class="mx-auto flex min-h-[100dvh] w-full max-w-6xl flex-col px-6 py-10 max-lg:px-4 max-sm:px-4"
-    >
-      <div class="mb-8">
-        <p
-          class="mb-2 text-[14px] font-medium uppercase tracking-[1px] text-[#939084]"
-        >
-          Шахматы
-        </p>
-        <h1
-          class="text-[32px] font-medium leading-[36px] tracking-[1px] text-[#201515]"
-        >
-          Выберите режим игры
-        </h1>
-      </div>
 
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div class="chess-canvas">
+
+      <!-- Section eyebrow -->
+      <div class="chess-eyebrow">ВЫБЕРИТЕ РЕЖИМ ИГРЫ</div>
+
+      <!-- Mode cards 2×2 grid -->
+      <div class="mode-grid">
         @for (item of menuOptions; track item.type) {
-          @let selectedMode = getSelectedMode(item.type);
-          <div
-            class="flex h-full flex-col rounded-xl border border-[#c5c0b1] bg-[#f8f4f0] p-6 max-sm:p-4"
-          >
-            <div class="mb-5 flex items-center justify-between">
-              <div
-                class="flex h-12 w-12 items-center justify-center rounded-xl"
-                [style.background]="item.iconBg"
-              >
-                <lucide-icon size="22" [img]="item.icon" [color]="item.iconColor" />
+          <div class="mode-card mode-card--{{ item.type }}">
+
+            <!-- Ribbon title bar -->
+            <div class="mode-card__header">
+              <div class="mode-card__header-left">
+                <lucide-icon size="15" [img]="item.icon" color="#000000" />
+                <span>{{ item.title }}</span>
               </div>
-              <span
-                class="rounded-full border border-[#c5c0b1] bg-[#fffefb] px-3 py-1 text-[13px] text-[#605d52]"
-              >
-                {{ item.badge }}
-              </span>
+              <span class="mode-card__badge">{{ item.badge }}</span>
             </div>
 
-            <h3
-              class="mb-2 text-[20px] font-bold leading-[25px] tracking-[-0.5px] text-[#201515]"
-            >
-              {{ item.title }}
-            </h3>
-            <p class="mb-5 text-[16px] leading-[24px] text-[#605d52]">
-              {{ item.description }}
-            </p>
-
-            <div class="mb-4">
-              <p
-                class="mb-2 text-[13px] font-medium uppercase tracking-[1px] text-[#939084]"
-              >
-                Тип игры
-              </p>
-              <div
-                class="-mx-1 overflow-x-auto px-1 pb-2 [scrollbar-width:none]"
-              >
-                <div class="flex min-w-max gap-2">
-                  @for (mode of speedOptions; track mode.type) {
-                    <chess-chip
-                      [label]="mode.title"
-                      [active]="selectedModes[item.type] === mode.type"
-                      (handleClick)="onModeChoose(item.type, mode.type)"
-                    />
-                  }
-                </div>
-              </div>
+            <!-- Tinted ribbon body -->
+            <div class="mode-card__body">
+              <span class="mode-card__deco" aria-hidden="true">{{ item.piece }}</span>
+              <p class="mode-card__desc">{{ item.description }}</p>
             </div>
 
-            <div
-              class="mb-5 rounded-xl border border-[#c5c0b1] bg-[#fffefb] p-4"
-            >
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-[13px] text-[#939084]">Выбранный формат</p>
-                  <p class="mt-1 text-[16px] font-semibold text-[#201515]">
-                    {{ selectedMode.title }}
-                  </p>
-                </div>
-                <span
-                  class="shrink-0 rounded-full border border-[#c5c0b1] bg-[#f8f4f0] px-3 py-1 text-[13px] text-[#605d52]"
-                >
-                  {{ selectedMode.time }}
-                </span>
-              </div>
-              <p class="mt-2 text-[14px] leading-[21px] text-[#605d52]">
-                {{ selectedMode.subtitle }}
-              </p>
+            <!-- Card footer -->
+            <div class="mode-card__footer">
+              <button
+                type="button"
+                class="mode-card__play-btn"
+                (click)="onGameTypeChoose(item.type)"
+              >
+                НАЧАТЬ &nbsp;›
+              </button>
             </div>
 
-            <chess-button
-              class="mt-auto"
-              label="Начать"
-              variant="primary"
-              (handleClick)="onGameTypeChoose(item.type)"
-            />
           </div>
         }
       </div>
 
-      <div
-        class="mt-4 flex items-center justify-between gap-4 rounded-xl border border-[#c5c0b1] bg-[#fffefb] p-6 max-sm:p-4"
-      >
-        <div class="flex items-center gap-4">
-          <div
-            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f8f4f0]"
-          >
-            <lucide-icon size="20" [img]="PaintBrushIcon" color="#201515" />
-          </div>
-          <div>
-            <h2 class="text-[16px] font-semibold text-[#201515]">
-              Темы и внешний вид
-            </h2>
-            <p class="mt-1 text-[14px] leading-[21px] text-[#605d52]">
-              Переключайте оформление доски под свой стиль.
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          (click)="openThemeSettings()"
-          class="shrink-0 rounded-xl border border-[#201515] bg-[#fffefb] px-5 py-2.5 text-[14px] font-semibold text-[#201515] transition hover:bg-[#f8f4f0] max-sm:hidden"
-        >
-          Настройки
-        </button>
-        <button
-          type="button"
-          (click)="openThemeSettings()"
-          class="shrink-0 rounded-xl border border-[#c5c0b1] bg-[#f8f4f0] p-2.5 text-[#201515] transition hover:bg-[#fffefb] sm:hidden"
-        >
-          <lucide-icon size="18" [img]="PaintBrushIcon" color="#201515" />
-        </button>
-      </div>
     </div>
+
+    <footer class="chess-footer">
+      &copy; Аркадные игры &nbsp;·&nbsp; Шахматы
+    </footer>
+
   } @else {
-    <button
-      (click)="onGoback()"
-      class="absolute left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-[#c5c0b1] bg-[#fffefb] outline-none transition hover:bg-[#f8f4f0]"
-    >
-      <lucide-icon [img]="ArrowIcon" color="#201515" size="18"></lucide-icon>
-    </button>
-    <game></game>
+
+    <!-- ── Active Game ────────────────────────────────────────────────────── -->
+    <div class="chess-game-view">
+      <game></game>
+    </div>
+
   }
+
 </div>
 
 @if (isThemeModalOpen) {

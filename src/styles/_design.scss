@@ -106,7 +106,7 @@ $s-sect-l: 48px;
 
 // page-frame: 8 px literal black border around the entire viewport
 @mixin page-frame {
-  min-height: 100%;
+  min-height: 100svh;
   background: $frame-ink;
   padding: 8px;
   display: flex;

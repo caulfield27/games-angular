@@ -3,11 +3,11 @@
   <!-- Top Banner -->
   <div class="top-banner">
     <div class="banner-left">
-      <span class="banner-title">MEMORY GAME</span>
-      <span class="banner-tagline">FIND ALL MATCHING PAIRS. ONLINE.</span>
+      <span class="banner-title">НАЙДИ ПАРУ</span>
+      <span class="banner-tagline">ОТКРОЙ ВСЕ ПАРЫ. ОНЛАЙН.</span>
     </div>
     <div class="banner-right">
-      <span class="new-burst">NEW!</span>
+      <span class="new-burst">НОВИНКА!</span>
     </div>
   </div>
 
@@ -20,23 +20,23 @@
 
         <!-- Stats ribbon card -->
         <div class="ribbon-card">
-          <div class="ribbon-title">GAME STATS</div>
+          <div class="ribbon-title">СТАТИСТИКА</div>
           <div class="ribbon-body ribbon-body--sage">
             <dl class="stats-list">
               <div class="stat-row">
-                <dt class="stat-label">TIME LEFT</dt>
+                <dt class="stat-label">ОСТАЛОСЬ</dt>
                 <dd class="stat-value" aria-live="polite">{{ minutes }}:{{ seconds }}</dd>
               </div>
               <div class="stat-row">
-                <dt class="stat-label">PROGRESS</dt>
+                <dt class="stat-label">ПРОГРЕСС</dt>
                 <dd class="stat-value">{{ progressText }}</dd>
               </div>
               <div class="stat-row">
-                <dt class="stat-label">LEVEL</dt>
+                <dt class="stat-label">УРОВЕНЬ</dt>
                 <dd class="stat-value">{{ currentLevelLabel }}</dd>
               </div>
               <div class="stat-row">
-                <dt class="stat-label">CARDS</dt>
+                <dt class="stat-label">КАРТОЧКИ</dt>
                 <dd class="stat-value">{{ quantity }}</dd>
               </div>
             </dl>
@@ -45,7 +45,7 @@
 
         <!-- Controls ribbon card -->
         <div class="ribbon-card">
-          <div class="ribbon-title">CONTROLS</div>
+          <div class="ribbon-title">УПРАВЛЕНИЕ</div>
           <div class="ribbon-body ribbon-body--sky">
             <div class="controls">
               <button
@@ -55,7 +55,7 @@
                 aria-label="Открыть настройки игры"
               >
                 <lucide-icon [img]="SettingsIcon" color="currentColor" size="13"></lucide-icon>
-                <span>SETTINGS</span>
+                <span>НАСТРОЙКИ</span>
               </button>
               <button
                 type="button"
@@ -64,7 +64,7 @@
                 aria-label="Перезапустить игру"
               >
                 <lucide-icon [img]="RotateIcon" color="currentColor" size="13"></lucide-icon>
-                <span>RESTART</span>
+                <span>РЕСТАРТ</span>
               </button>
             </div>
           </div>
@@ -75,7 +75,7 @@
       <!-- Board area -->
       <main class="board-area">
         <div class="board-title-bar">
-          SUPERHERO PAIRS &mdash; {{ currentLevelLabel }}
+          СУПЕРГЕРОИ — {{ currentLevelLabel }}
         </div>
         <div
           class="cards-grid"
@@ -110,7 +110,7 @@
 
   <!-- Footer band -->
   <div class="footer-band">
-    <span>MEMORY GAME &copy; CLASSIC EDITION &nbsp;&middot;&nbsp; FLIP CARDS TO FIND MATCHING PAIRS</span>
+    <span>НАЙДИ ПАРУ &copy; КЛАССИЧЕСКОЕ ИЗДАНИЕ &nbsp;&middot;&nbsp; ОТКРЫВАЙ КАРТОЧКИ — ИЩИ СОВПАДЕНИЯ</span>
   </div>
 
 </div>

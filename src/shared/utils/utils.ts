@@ -49,21 +49,3 @@ export function copy(data: string) {
       })
     );
 }
-
-export function handleAppBackground(
-  pathname: string,
-  updateIsHome: (isHome: boolean) => boolean
-) {
-  const curPageBackground = PAGES_METADATA[pathname]?.background_url_path;
-  document.body.style.backgroundImage = curPageBackground
-    ? `url(${curPageBackground})`
-    : '';
-
-  if (pathname === '/') {
-    updateIsHome(true);
-    document.body.style.backgroundColor = '#EEF4F7';
-  } else {
-    updateIsHome(false);
-    document.body.style.backgroundColor = '';
-  }
-}

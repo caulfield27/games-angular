@@ -90,7 +90,7 @@ export class BoardService {
       for (let i = 0; i < dynamicSize; i++) {
         if (dir === 'horizontal') {
           if (
-            matrix[y][dynamicStart] !== false ||
+            (matrix[y][dynamicStart] !== false && !(staticPrevDir === y && prevPositionSet.has(dynamicStart))) ||
             (matrix[y - 1] !== undefined &&
               matrix[y - 1][dynamicStart] &&
               !(
@@ -104,7 +104,7 @@ export class BoardService {
           }
         } else {
           if (
-            matrix[dynamicStart]?.[x] !== false ||
+            (matrix[dynamicStart]?.[x] !== false && !(staticPrevDir === x && prevPositionSet.has(dynamicStart))) ||
             (matrix[dynamicStart]?.[x - 1] &&
               !(
                 x - 1 === staticPrevDir && prevPositionSet.has(dynamicStart)

@@ -1,0 +1,44 @@
+@use 'design' as *;
+
+.chess-btn {
+  @include t-btn;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $s-sm;
+  padding: $s-sm $s-lg;
+  border: 1px solid $frame-ink;
+  cursor: pointer;
+
+  &:active { filter: brightness(0.88); }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  &.chess-btn--primary {
+    background: $frame-ink;
+    color: $canvas;
+
+    &:active { filter: brightness(1.3); }
+  }
+
+  &.chess-btn--secondary {
+    background: $canvas;
+    color: $ink;
+  }
+
+  &.chess-btn--danger {
+    background: $primary;
+    color: $canvas;
+    border-color: $primary;
+
+    &:active { filter: brightness(0.9); }
+  }
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}

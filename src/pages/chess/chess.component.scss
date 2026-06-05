@@ -1,0 +1,306 @@
+@use 'design' as *;
+
+// ─── Page Frame ──────────────────────────────────────────────────────────────
+.chess-frame {
+  @include page-frame;
+}
+
+// ─── Top Banner ──────────────────────────────────────────────────────────────
+.chess-banner {
+  @include top-banner;
+  flex-shrink: 0;
+}
+
+.chess-banner__back {
+  @include btn-secondary;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.chess-banner__brand {
+  @include t-h2;
+  text-transform: uppercase;
+  color: $canvas;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.chess-banner__theme {
+  @include t-btn;
+  text-transform: uppercase;
+  background: transparent;
+  color: $canvas;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: $s-xs $s-sm;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: $s-xs;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+
+  &:active { opacity: 0.75; }
+}
+
+// ─── Menu View ───────────────────────────────────────────────────────────────
+.chess-canvas {
+  background: $canvas;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.chess-eyebrow {
+  @include t-display;
+  text-transform: uppercase;
+  background: $tint-olive;
+  color: $ink;
+  padding: $s-xl $s-lg;
+  border-bottom: 1px solid $frame-ink;
+  flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    font-size: 22px;
+    padding: $s-md $s-md;
+  }
+}
+
+// ─── Mode Cards Grid ─────────────────────────────────────────────────────────
+.mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  flex: 1;
+  min-height: 0;
+
+  @media (max-width: 620px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, 1fr);
+  }
+}
+
+.mode-card {
+  border-right: 1px solid $frame-ink;
+  border-bottom: 1px solid $frame-ink;
+  display: flex;
+  flex-direction: column;
+
+  &:nth-child(even) {
+    border-right: none;
+  }
+
+  @media (max-width: 620px) {
+    border-right: none;
+  }
+}
+
+.mode-card--online    { --mode-tint: #{$tint-sky}; }
+.mode-card--bot       { --mode-tint: #{$tint-periwinkle}; }
+.mode-card--friend    { --mode-tint: #{$tint-lime}; }
+.mode-card--irl       { --mode-tint: #{$tint-peach}; }
+
+// Ribbon-card title bar
+.mode-card__header {
+  @include ribbon-title;
+  display: flex;
+  align-items: center;
+  gap: $s-sm;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.mode-card__header-left {
+  display: flex;
+  align-items: center;
+  gap: $s-sm;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mode-card__badge {
+  @include t-btn;
+  font-size: 10px;
+  text-transform: uppercase;
+  background: $frame-ink;
+  color: $canvas;
+  padding: 2px $s-sm;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+// Ribbon-card body (tinted)
+.mode-card__body {
+  @include ribbon-body-base;
+  background: var(--mode-tint);
+  border-top: 1px solid $frame-ink;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $s-md;
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-card__desc {
+  @include t-body;
+  color: $ink;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+// Decorative chess piece — "product photo notch" (Dell 1996)
+@keyframes piece-float {
+  0%, 100% { transform: rotate(-12deg) translateY(0);   }
+  50%       { transform: rotate(-12deg) translateY(-8px); }
+}
+
+.mode-card__deco {
+  position: absolute;
+  right: -4px;
+  bottom: -12px;
+  font-size: 108px;
+  line-height: 1;
+  color: $frame-ink;
+  opacity: 0.13;
+  pointer-events: none;
+  user-select: none;
+  animation: piece-float 5s ease-in-out infinite;
+}
+
+// Speed selection
+.speed-section-label {
+  @include t-label;
+  text-transform: uppercase;
+  color: $ink;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: $s-xs;
+}
+
+.speed-chips-row {
+  display: flex;
+  gap: $s-xs;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.speed-info-box {
+  background: $canvas;
+  border: 1px solid $frame-ink;
+  padding: $s-sm $s-md;
+}
+
+.speed-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-sm;
+  margin-bottom: $s-xxs;
+}
+
+.speed-info-name {
+  @include t-h3;
+  color: $ink;
+}
+
+.speed-info-time {
+  @include t-btn;
+  font-size: 10px;
+  text-transform: uppercase;
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: 2px $s-sm;
+  letter-spacing: 0.3px;
+}
+
+.speed-info-subtitle {
+  @include t-body-sm;
+  color: $ink;
+  margin: 0;
+}
+
+// Card footer with play button
+.mode-card__footer {
+  flex-shrink: 0;
+  border-top: 1px solid $frame-ink;
+  background: $canvas;
+  padding: $s-md $s-md;
+}
+
+.mode-card__play-btn {
+  @include btn-primary;
+  width: 100%;
+  justify-content: center;
+  padding: $s-m $s-lg;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  box-shadow: 3px 3px 0 $frame-ink;
+
+  &:active {
+    box-shadow: none;
+    transform: translate(3px, 3px);
+  }
+}
+
+// ─── Theme Settings Row ───────────────────────────────────────────────────────
+.theme-row {
+  border-bottom: 1px solid $frame-ink;
+  display: flex;
+  align-items: center;
+  gap: $s-lg;
+  justify-content: space-between;
+  background: $tint-steel;
+  padding: $s-md $s-lg;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.theme-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: $s-xxs;
+  flex: 1;
+  min-width: 0;
+}
+
+.theme-row__title {
+  @include t-h3;
+  text-transform: uppercase;
+  color: $ink;
+}
+
+.theme-row__desc {
+  @include t-body;
+  color: $ink;
+  margin: 0;
+}
+
+.theme-row__btn {
+  @include btn-secondary;
+  flex-shrink: 0;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+.chess-footer {
+  @include footer-band;
+  flex-shrink: 0;
+}
+
+// ─── Game View ───────────────────────────────────────────────────────────────
+.chess-game-view {
+  flex: 1;
+  background: $canvas;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}

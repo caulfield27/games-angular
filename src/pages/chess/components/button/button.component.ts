@@ -1,23 +1,21 @@
-import { NgClass } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { LucideAngularModule, LucideIconData } from 'lucide-angular';
 
 @Component({
   selector: 'chess-button',
   standalone: true,
-  imports: [LucideAngularModule, NgClass],
+  imports: [LucideAngularModule],
+  styleUrl: './button.component.scss',
   template: `
     <button
       (click)="onClick()"
-      [ngClass]="buttonClasses"
-      class="w-full flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-[18px] font-semibold leading-[27px] transition-opacity"
+      class="chess-btn"
+      [class.chess-btn--primary]="variant === 'primary'"
+      [class.chess-btn--secondary]="variant === 'secondary'"
+      [class.chess-btn--danger]="variant === 'dark'"
     >
       @if (icon) {
-        <lucide-angular
-          [img]="icon"
-          [style.color]="iconColor"
-          class="w-5 h-5"
-        />
+        <lucide-angular [img]="icon" [style.color]="iconColor" class="btn-icon" />
       }
       {{ label }}
     </button>

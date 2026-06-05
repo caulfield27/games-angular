@@ -2,7 +2,6 @@ import { IPagesMetadata } from '../types/types';
 
 export const PAGES_METADATA: Record<string, IPagesMetadata> = {
   '/': {
-    background_url_path: null,
     title: 'Онлайн игры — Список лучших бесплатных браузерных игр',
     description:
       'Лучшие онлайн игры на любой вкус — морской бой, сапёр, найди пару и другие. Бесплатно и без регистрации. Играйте прямо в браузере!',
@@ -11,7 +10,6 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/logo.ico',
   },
   '/minesweeper': {
-    background_url_path: null,
     title: 'Сапёр — Классическая логическая онлайн игра',
     description:
       'Классическая игра сапёр онлайн — раскрывайте клетки, избегайте мин, улучшайте навыки логики и реакции. Играйте бесплатно в браузере.',
@@ -20,7 +18,6 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/minesweeper.ico',
   },
   '/memory-game': {
-    background_url_path: '/pagesBackground/heroes_bg.webp',
     title: 'Найди пару — Онлайн игра для тренировки памяти',
     description:
       'Игра "Найди пару" — тренируйте память и внимание, открывая пары карт. Бесплатная онлайн игра с настройками и таймером.',
@@ -29,7 +26,6 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/logo.ico',
   },
   '/battleship': {
-    background_url_path: '/pagesBackground/battleship_bg.png',
     title: 'Морской бой — Онлайн игра с реальными игроками',
     description:
       'Играйте в морской бой онлайн с реальными игроками. Захватывающие сражения, поиск противника, мультиплеер и удобный интерфейс.',
@@ -38,7 +34,6 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/battleship.ico',
   },
   '/tetris': {
-    background_url_path: null,
     title: 'Тетрис — Классическая онлайн игра бесплатно',
     description:
       'Играйте в Тетрис онлайн бесплатно! Собирайте линии, зарабатывайте очки и ставьте рекорды в легендарной игре прямо в браузере.',
@@ -47,16 +42,14 @@ export const PAGES_METADATA: Record<string, IPagesMetadata> = {
     icoPath: 'ico/Tetris.ico',
   },
   '/flappy-bird': {
-    background_url_path: null ,
-    title: 'Flappy Bird — Классическая аркадная онлайн игра',
+    title: 'Флаппи Бёрд — Классическая аркадная онлайн игра',
     description:
-      'Flappy Bird — популярная аркадная игра онлайн. Управляйте птицей, пролетайте между трубами, набирайте очки и ставьте новые рекорды. Играйте бесплатно прямо в браузере.',
+      'Флаппи Бёрд — популярная аркадная игра онлайн. Управляйте птицей, пролетайте между трубами, набирайте очки и ставьте новые рекорды. Играйте бесплатно прямо в браузере.',
     keywords:
       'flappy bird, флаппи берд, аркадные игры, онлайн игры, бесплатные игры, браузерные игры, классические игры',
     icoPath: 'ico/flappy_bird_icon.ico',
   },
   '/chess': {
-    background_url_path: null,
     title: 'Шахматы онлайн — Играйте с другом, онлайн или против компьютера',
     description:
       'Играйте в шахматы онлайн бесплатно: быстрые партии с реальными соперниками, игра с другом по ссылке, локальный режим и партия против компьютера прямо в браузере.',

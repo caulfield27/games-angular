@@ -1,0 +1,77 @@
+@use 'design' as *;
+
+// ─── Backdrop ────────────────────────────────────────────────────────────────
+.invite-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $s-lg;
+  background: rgba(0, 0, 0, 0.72);
+}
+
+// ─── Modal Card ──────────────────────────────────────────────────────────────
+.invite-card {
+  background: $canvas;
+  border: 2px solid $frame-ink;
+  box-shadow: 4px 4px 0 $frame-ink;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: card-in 0.15s ease;
+}
+
+@keyframes card-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+// ─── Header (ribbon title) ───────────────────────────────────────────────────
+.invite-header {
+  @include ribbon-title;
+  text-align: center;
+  padding: $s-s $s-md;
+}
+
+// ─── Body ────────────────────────────────────────────────────────────────────
+.invite-body {
+  @include ribbon-body-base;
+  background: $tint-lime;
+  display: flex;
+  flex-direction: column;
+  gap: $s-md;
+}
+
+.invite-desc {
+  @include t-body;
+  color: $ink;
+  margin: 0;
+}
+
+// Link display box
+.invite-link-box {
+  background: $canvas;
+  border: 1px solid $frame-ink;
+  padding: $s-sm $s-md;
+}
+
+.invite-link-text {
+  @include t-body-sm;
+  color: $ink;
+  word-break: break-all;
+  display: block;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+.invite-footer {
+  border-top: 1px solid $frame-ink;
+  background: $canvas;
+  padding: $s-sm $s-md;
+  display: flex;
+  flex-direction: column;
+  gap: $s-xs;
+}

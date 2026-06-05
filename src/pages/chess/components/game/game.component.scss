@@ -1,0 +1,477 @@
+@use 'design' as *;
+
+// ─── Host ────────────────────────────────────────────────────────────────────
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ─── Game Outer Layout ───────────────────────────────────────────────────────
+.game-outer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.game-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: $s-sm;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+// ─── Game Section (card wrapper) ─────────────────────────────────────────────
+.game-section {
+  border: 2px solid $frame-ink;
+  box-shadow: 3px 3px 0 $frame-ink;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  overflow: hidden;
+  background: $canvas;
+
+  @media (max-width: 480px) {
+    border: none;
+    box-shadow: none;
+    width: 100%;
+  }
+}
+
+// ─── Player Bars ─────────────────────────────────────────────────────────────
+.player-bar {
+  @include ribbon-title;
+  display: flex;
+  align-items: center;
+  gap: $s-sm;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: $s-sm $s-md;
+
+  @media (max-width: 480px) {
+    padding: $s-xs $s-sm;
+    border-left: none;
+    border-right: none;
+  }
+}
+
+.player-bar--opponent {
+  border-bottom: 1px solid $frame-ink;
+  border-top: none;
+}
+
+.player-bar--self {
+  border-top: 1px solid $frame-ink;
+  border-bottom: none;
+}
+
+.player-bar__avatar {
+  width: 32px;
+  height: 32px;
+  background: $frame-ink;
+  color: $canvas;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid $frame-ink;
+}
+
+.player-bar__avatar--opponent {
+  background: $tint-steel;
+  color: $ink;
+}
+
+.player-bar__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.player-bar__name {
+  @include t-h3;
+  color: $ink;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-bar__pieces {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.player-bar__advantage {
+  @include t-caption;
+  color: $ink;
+}
+
+// ─── Board + Sidebar Row ──────────────────────────────────────────────────────
+.board-row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+
+// ─── Board Column ─────────────────────────────────────────────────────────────
+.board-col {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+}
+
+#board {
+  // Size the board to fit the viewport without overflow.
+  // Height-driven on desktop: board height = min(available-vh, available-vw).
+  aspect-ratio: 1;
+  height: min(
+    calc(100svh - 180px),       // vertical: viewport minus banner + bars + padding
+    calc(100vw - 300px)         // horizontal: viewport minus sidebar + frame
+  );
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  overflow: hidden;
+
+  @media (max-width: 600px) {
+    height: auto;
+    width: 100vw;
+    max-width: 100vw;
+  }
+}
+
+// ─── Board cells ─────────────────────────────────────────────────────────────
+.board-cell {
+  position: relative;
+}
+
+.piece-drag {
+  position: relative;
+  z-index: 2;
+  cursor: grab;
+  touch-action: none;
+}
+
+// ─── Board interaction overlays ───────────────────────────────────────────────
+.available_square {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--chess-cell) / 2.5);
+  height: calc(var(--chess-cell) / 2.5);
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.take_square {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--chess-cell);
+  height: var(--chess-cell);
+  border-radius: 50%;
+  border: 5px solid rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes dangerPulse {
+  0%   { filter: drop-shadow(0 0 6px rgba(233, 29, 42, 0.7)); }
+  50%  { filter: drop-shadow(0 0 18px rgba(233, 29, 42, 1)) drop-shadow(0 0 32px rgba(233, 29, 42, 0.5)); }
+  100% { filter: drop-shadow(0 0 6px rgba(233, 29, 42, 0.7)); }
+}
+
+.check {
+  animation: dangerPulse 1s infinite ease-in-out;
+}
+
+.mate {
+  background-color: $primary;
+}
+
+.history {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: var(--chess-cell);
+  height: var(--chess-cell);
+  background: var(--board-history);
+  opacity: 0.75;
+}
+
+.cdk-drag-preview {
+  z-index: 1000 !important;
+}
+
+.cdk-drag-dragging {
+  z-index: 1000 !important;
+}
+
+// ─── Sidebar (desktop) ───────────────────────────────────────────────────────
+.match-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: $tint-steel;
+  border-left: 1px solid $frame-ink;
+  display: flex;
+  flex-direction: column;
+  padding: $s-md;
+  overflow: hidden;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-sm;
+  margin-bottom: $s-sm;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  @include t-h3;
+  text-transform: uppercase;
+  color: $ink;
+}
+
+.sidebar-count {
+  @include t-btn;
+  font-size: 10px;
+  text-transform: uppercase;
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  padding: 2px $s-sm;
+  flex-shrink: 0;
+}
+
+// Move list
+.moves-scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+.move-row {
+  display: grid;
+  grid-template-columns: 2rem 1fr 1fr;
+  align-items: center;
+  gap: $s-xs;
+  padding: 2px $s-xs;
+  @include t-body-sm;
+  color: $ink;
+}
+
+.move-num {
+  @include t-caption;
+  color: $ink;
+  opacity: 0.6;
+}
+
+.move-cell {
+  padding: 2px $s-xs;
+  text-align: center;
+  cursor: default;
+
+  &--active {
+    background: $frame-ink;
+    color: $canvas;
+  }
+}
+
+// Sidebar footer controls
+.sidebar-footer {
+  margin-top: $s-sm;
+  border-top: 1px solid $frame-ink;
+  padding-top: $s-sm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.sidebar-controls-left {
+  display: flex;
+  gap: $s-xs;
+}
+
+.sidebar-controls-right {
+  display: flex;
+  gap: $s-xs;
+}
+
+.ctrl-btn {
+  @include btn-secondary;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Mobile Controls ─────────────────────────────────────────────────────────
+.mobile-controls {
+  flex-shrink: 0;
+  border-top: 1px solid $frame-ink;
+  background: $canvas;
+  display: none;
+
+  @media (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// Mobile move history strip
+.mobile-strip {
+  display: flex;
+  height: 40px;
+  align-items: stretch;
+  border-bottom: 1px solid $frame-ink;
+}
+
+.mobile-strip__arrow {
+  width: 40px;
+  flex-shrink: 0;
+  border: none;
+  background: $canvas;
+  color: $ink;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid $frame-ink;
+
+  &:last-child {
+    border-right: none;
+    border-left: 1px solid $frame-ink;
+  }
+
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+  &:active { background: $tint-sage; }
+}
+
+.mobile-strip__moves {
+  flex: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.mobile-strip__inner {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 2px;
+  padding: 0 $s-xs;
+}
+
+.mobile-move-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mobile-move-num {
+  @include t-caption;
+  color: $ink;
+  opacity: 0.6;
+  width: 1.8rem;
+  text-align: center;
+}
+
+.mobile-move-cell {
+  @include t-body-sm;
+  padding: 2px $s-xs;
+  color: $ink;
+
+  &--active {
+    background: $frame-ink;
+    color: $canvas;
+  }
+}
+
+// Mobile action buttons row
+.mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: $s-xs;
+  padding: $s-xs $s-md;
+}
+
+.mobile-action-btn {
+  @include btn-secondary;
+  display: flex;
+  align-items: center;
+  gap: $s-xs;
+  padding: $s-xs $s-sm;
+  font-size: 11px;
+
+  &--right {
+    margin-left: auto;
+  }
+}
+
+// ─── Coord labels on board ────────────────────────────────────────────────────
+.coord-label {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: difference;
+}
+
+.coord-label--col {
+  left: 2px;
+  top: 1px;
+}
+
+.coord-label--row {
+  bottom: 1px;
+  right: 2px;
+}

@@ -6,7 +6,7 @@
       <div class="brand-icon">
         <lucide-icon [img]="GamepadIcon" [strokeWidth]="2.5" />
       </div>
-      <span class="brand-name">ARCADE GAMES</span>
+      <span class="brand-name">АРКАДНЫЕ ИГРЫ</span>
     </div>
 
     <div class="banner-search banner-search--desktop">
@@ -33,7 +33,7 @@
       @if (auth.isAuthed()) {
         <button class="btn-secondary">
           <lucide-icon [img]="UserIcon" [strokeWidth]="2.5" />
-          <span>{{ auth.user()?.username ?? "player" }}</span>
+          <span>{{ auth.user()?.username ?? "игрок" }}</span>
         </button>
       } @else {
         <button (click)="onModalOpen()" class="btn-primary">
@@ -70,7 +70,7 @@
       @if (auth.isAuthed()) {
         <button class="btn-secondary btn--full">
           <lucide-icon [img]="UserIcon" />
-          <span>{{ auth.user()?.username ?? "player" }}</span>
+          <span>{{ auth.user()?.username ?? "игрок" }}</span>
         </button>
       } @else {
         <button (click)="onModalOpen()" class="btn-primary btn--full">
@@ -91,14 +91,11 @@
   <!-- ── White page canvas ───────────────────────────────────────────────── -->
   <div class="page-canvas">
 
-    <!-- Section eyebrow -->
-    <div class="section-eyebrow">GAMES CATALOG</div>
-
     <!-- Active-tag filter bar -->
     @if (filters.activeTags().length) {
       <div class="filter-bar">
         <div class="ribbon-card filter-bar__card">
-          <div class="ribbon-title filter-bar__title">ACTIVE FILTERS</div>
+          <div class="ribbon-title filter-bar__title">АКТИВНЫЕ ФИЛЬТРЫ</div>
           <div class="ribbon-body ribbon-body--lime">
             <div class="filter-chips">
               @for (tag of filters.activeTags(); track tag) {
@@ -141,8 +138,8 @@
 
   <!-- ── Footer band ─────────────────────────────────────────────────────── -->
   <div class="footer-band">
-    <span>ARCADE GAMES &copy; CLASSIC EDITION</span>
-    <span class="footer-legal">&nbsp;&middot;&nbsp; All games are browser-based &middot; No download required</span>
+    <span>АРКАДНЫЕ ИГРЫ &copy; КЛАССИЧЕСКОЕ ИЗДАНИЕ</span>
+    <span class="footer-legal">&nbsp;&middot;&nbsp; Все игры в браузере &middot; Без скачивания</span>
   </div>
 
 </div>

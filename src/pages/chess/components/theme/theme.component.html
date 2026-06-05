@@ -1,58 +1,43 @@
-<div
-  class="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 backdrop-blur-sm"
->
-  <div
-    class="flex max-h-[100svh] w-[480px] max-w-[calc(100vw-32px)] flex-col gap-5 overflow-y-auto rounded-xl border border-[#c5c0b1] bg-[#fffefb] px-6 py-5 max-sm:rounded-none max-sm:max-w-full max-sm:h-[100svh]"
-  >
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-[13px] font-medium uppercase tracking-[1px] text-[#939084]">
-          Настройки
-        </p>
-        <h2 class="mt-0.5 text-[20px] font-semibold text-[#201515]">
-          Выберите тему
-        </h2>
-      </div>
-      <button
-        (click)="close()"
-        class="flex h-9 w-9 items-center justify-center rounded-xl border border-[#c5c0b1] text-[18px] text-[#605d52] transition hover:bg-[#f8f4f0]"
-      >
-        ✕
-      </button>
+<div class="theme-backdrop" (click)="close()">
+  <div class="theme-card" (click)="$event.stopPropagation()">
+
+    <!-- Header: ribbon title bar -->
+    <div class="theme-header">
+      <span class="theme-header__title">ВЫБЕРИТЕ ТЕМУ</span>
+      <button class="theme-close" (click)="close()" aria-label="Закрыть">✕</button>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      @for (theme of themes; track theme.name) {
-        <div
-          (click)="selectTheme(theme)"
-          class="cursor-pointer rounded-xl border-2 p-3 transition hover:bg-[#f8f4f0]"
-          [class.border-[#ff4f00]]="theme === selectedTheme"
-          [class.border-transparent]="theme !== selectedTheme"
-        >
+    <!-- Body: steel-tinted ribbon body -->
+    <div class="theme-body">
+      <div class="theme-grid">
+        @for (theme of themes; track theme.name) {
           <div
-            class="mx-auto grid w-[108px] grid-cols-8 overflow-hidden rounded-md"
+            class="theme-option"
+            [class.theme-option--active]="theme === selectedTheme"
+            (click)="selectTheme(theme)"
           >
-            @for (sq of preview; track $index) {
-              <div
-                class="aspect-square"
-                [style.background]="getColor($index, theme)"
-              ></div>
-            }
+            <div class="theme-board-preview">
+              @for (sq of preview; track $index) {
+                <div
+                  class="theme-board-sq"
+                  [style.background]="getColor($index, theme)"
+                ></div>
+              }
+            </div>
+            <span class="theme-option__label">{{ theme.name }}</span>
           </div>
-          <p class="mt-2.5 text-center text-[14px] text-[#201515]">
-            {{ theme.name }}
-          </p>
-        </div>
-      }
+        }
+      </div>
     </div>
 
-    <div class="mt-auto pt-2">
+    <!-- Footer: save button -->
+    <div class="theme-footer">
       <chess-button
-        class="w-full"
         variant="primary"
-        label="Сохранить"
+        label="СОХРАНИТЬ"
         (handleClick)="handleSave()"
       />
     </div>
+
   </div>
 </div>

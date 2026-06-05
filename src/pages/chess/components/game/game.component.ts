@@ -48,7 +48,7 @@ import { StockfishService } from '../../service/stockfish.service';
 @Component({
   selector: 'game',
   templateUrl: './game.component.html',
-  styleUrl: './game.component.css',
+  styleUrl: './game.component.scss',
   imports: [
     LucideAngularModule,
     CdkDrag,

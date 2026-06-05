@@ -4,7 +4,8 @@ import { ChessButton } from '../../../button/button.component';
 @Component({
   selector: 'waiting-opponent',
   templateUrl: './waiting.component.html',
-  imports: [ChessButton]
+  styleUrl: './waiting.component.scss',
+  imports: [ChessButton],
 })
 export class WaitingOpponent implements OnInit, OnDestroy {
 

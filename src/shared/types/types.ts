@@ -26,7 +26,6 @@ interface IDropdownOption{
 }
 
 interface IPagesMetadata{
-  background_url_path: string | null;
   title: string;
   description: string;
   keywords: string;

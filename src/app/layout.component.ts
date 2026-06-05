@@ -1,9 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
+import { Component } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { LucideAngularModule, House } from 'lucide-angular';
-import { handleAppBackground } from '@/shared/utils/utils';
-import { SeoService } from '../shared/services/seo.service';
 import { AuthModal } from '@/shared/components/authModal/authModal.component';
 import { AppModal } from '@/shared/components/appModal/appModal.component';
 import { AuthService } from '@/shared/services/auth.service';
@@ -26,41 +23,29 @@ import { AxiosError } from 'axios';
 export class Layout {
   constructor(
     private router: Router,
-    private seoService: SeoService,
     public authService: AuthService,
     private pwaService: PwaService,
-  ) {
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        const pathname = this.router.url;
-        seoService.updateMetadata(pathname);
-        handleAppBackground(
-          this.router.url,
-          (isHome) => (this.isHome = isHome),
-        );
-      });
-  }
+  ) {}
   isHome: boolean = true;
   readonly house = House;
 
   ngOnInit(): void {
     this.pwaService.init();
 
-    // this.authService
-    //   .getMe()
-    //   .then((res) => {
-    //     const user = res.data?.data as User | undefined;
-    //     if (user) {
-    //       this.authService.user.set(user);
-    //     }
-    //   })
-    //   .catch((err: AxiosError<any>) => {
-    //     if (err.response?.status === 401) {
-    //       localStorage.removeItem('token');
-    //       this.authService.user.set(null);
-    //     }
-    //   });
+    this.authService
+      .getMe()
+      .then((res) => {
+        const user = res.data?.data as User | undefined;
+        if (user) {
+          this.authService.user.set(user);
+        }
+      })
+      .catch((err: AxiosError<any>) => {
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token');
+          this.authService.user.set(null);
+        }
+      });
   }
 
   goHome() {

@@ -7,15 +7,15 @@
   <!-- Top Banner -->
   <div class="top-banner">
     <div class="banner-left">
-      <span class="banner-title">BATTLESHIP</span>
-      <span class="banner-tagline">ONLINE MULTIPLAYER. NOW.</span>
+      <span class="banner-title">МОРСКОЙ БОЙ</span>
+      <span class="banner-tagline">ОНЛАЙН МУЛЬТИПЛЕЕР. ПРЯМО СЕЙЧАС.</span>
     </div>
     <div class="banner-right">
       @if (ws.state() === 'connecting') {
-        <span class="banner-meta">CONNECTING...</span>
+        <span class="banner-meta">ПОДКЛЮЧЕНИЕ...</span>
       }
       @if (ws.state() === 'open') {
-        <span class="online-badge">{{ battleshipService.activeUsers() }} ONLINE</span>
+        <span class="online-badge">{{ battleshipService.activeUsers() }} В СЕТИ</span>
       }
     </div>
   </div>
@@ -38,7 +38,7 @@
       <div class="control-actions">
         @if (battleshipService.gameStatus() !== 'start') {
           <button class="ctrl-icon-btn" (click)="handleShuffle()" title="Перемешать">
-            <img src="/shuffle.svg" alt="shuffle" />
+            <img src="/shuffle.svg" alt="перемешать" />
           </button>
         }
         @if (battleshipService.gameStatus() === 'start') {
@@ -87,5 +87,5 @@
     </div>
   </div>
 
-  <div class="footer-band">BATTLESHIP © ONLINE EDITION &nbsp;&middot;&nbsp; МОРСКОЙ БОЙ</div>
+  <div class="footer-band">МОРСКОЙ БОЙ © ОНЛАЙН ВЕРСИЯ</div>
 </div>

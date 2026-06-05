@@ -7,19 +7,20 @@ import {
 } from '@angular/core';
 import { Bird, BirdType, Pipe } from './types';
 import { defaultPipe } from './constants';
-import { NgClass, NgStyle } from '@angular/common';
-import { LucideAngularModule, Play, Sun, Moon, View } from 'lucide-angular';
-import Swal from 'sweetalert2';
+import { NgStyle } from '@angular/common';
+import { LucideAngularModule, Play, Sun, Moon } from 'lucide-angular';
 import { launchConfetti } from '@/shared/utils/utils';
+import { AppModalService } from '@/shared/services/modal.service';
 import { AudioService } from '@/shared/services/audio.service';
 
 @Component({
   selector: 'flappy-bird',
   templateUrl: './flappyBird.component.html',
-  imports: [NgStyle, NgClass, LucideAngularModule],
+  styleUrl: './flappyBird.component.scss',
+  imports: [NgStyle, LucideAngularModule],
 })
 export class FlappyBird implements AfterViewInit, OnDestroy {
-  constructor(private audio: AudioService) {}
+  constructor(private audio: AudioService, private modalService: AppModalService) {}
 
   // dom
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -45,17 +46,17 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   readonly gravity: number = 1200;
   readonly birds: Bird[] = [
     {
-      name: 'Sunny',
+      name: 'Солнечный',
       src: '/flappyBird/yellowbird.png',
       type: 'yellow',
     },
     {
-      name: 'Sky',
+      name: 'Небесный',
       src: '/flappyBird/bluebird.png',
       type: 'blue',
     },
     {
-      name: 'Ruby',
+      name: 'Рубиновый',
       src: '/flappyBird/redbird.png',
       type: 'red',
     },
@@ -85,7 +86,7 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    Swal.close();
+    this.modalService.dismiss();
     this.reset();
   }
 
@@ -184,9 +185,10 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
     if (!this.pipeGap || !this.pipeWidth) return defaultPipe;
 
     height = height - this.landHeight;
+    const gapHeight = Math.max(100, Math.round(height * 0.25));
     const randomTopPos = (Math.round(Math.random() * 6) || 1) * 10;
-    const topHeight = (randomTopPos / 100) * height;
-    const bottomHeight = height - (topHeight + 0.18 * height);
+    const topHeight = Math.min((randomTopPos / 100) * height, height - gapHeight - 30);
+    const bottomHeight = height - topHeight - gapHeight;
     let xDir;
     if (!isFirstGenerate) {
       const before = this.pipes[0];
@@ -406,15 +408,18 @@ export class FlappyBird implements AfterViewInit, OnDestroy {
           this.currentBestScore = this.score;
           localStorage.setItem('fb-best-score', String(this.currentBestScore));
           launchConfetti(1000);
-          Swal.fire({
+          this.modalService.open({
             icon: 'success',
-            title: 'Вы побили свой рекорд',
-            text: `Ваш новый рекорд: ${this.currentBestScore}`,
+            title: 'Новый рекорд!',
+            body: `Ваш новый рекорд: ${this.currentBestScore}`,
+            confirmText: 'Играть снова',
           }).then(() => this.reset());
         } else {
-          Swal.fire({
+          this.modalService.open({
+            icon: 'error',
             title: 'Игра окончена!',
-            text: `Ваш счёт: ${this.score}, текущий рекорд: ${this.currentBestScore}`,
+            body: `Ваш счёт: ${this.score} · рекорд: ${this.currentBestScore}`,
+            confirmText: 'Играть снова',
           }).then(() => this.reset());
         }
       }, 500);

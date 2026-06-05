@@ -3,11 +3,11 @@
   <!-- Top Banner -->
   <div class="top-banner">
     <div class="banner-left">
-      <span class="banner-title">TETRIS</span>
-      <span class="banner-tagline">STACK THE BLOCKS. CLEAR THE LINES.</span>
+      <span class="banner-title">ТЕТРИС</span>
+      <span class="banner-tagline">СКЛАДЫВАЙ БЛОКИ. УБИРАЙ ЛИНИИ.</span>
     </div>
     <div class="banner-right">
-      <span class="record-badge">REC:&nbsp;{{ tetrisService.bestScore() }}</span>
+      <span class="record-badge">РЕК:&nbsp;{{ tetrisService.bestScore() }}</span>
     </div>
   </div>
 
@@ -66,10 +66,10 @@
               <!-- Centre card -->
               <div class="pre-game__card" (click)="$event.stopPropagation()">
                 <div class="pre-game__eyebrow">
-                  {{ tetrisService.gameStopped() ? 'ПАУЗА' : 'TETRIS' }}
+                  {{ tetrisService.gameStopped() ? 'ПАУЗА' : 'ТЕТРИС' }}
                 </div>
                 @if (!tetrisService.gameStopped()) {
-                  <div class="pre-game__sub">CLASSIC EDITION · 1996</div>
+                  <div class="pre-game__sub">КЛАССИЧЕСКОЕ ИЗДАНИЕ · 1996</div>
                 }
                 <button class="pre-game__btn" (click)="tetrisService.play()">
                   <lucide-icon
@@ -90,7 +90,7 @@
 
           <!-- Pause button (top-right corner, only while running) -->
           @if (tetrisService.gameStarted() && !tetrisService.gameStopped()) {
-            <button class="pause-btn" (click)="onPause()" aria-label="Pause">
+            <button class="pause-btn" (click)="onPause()" aria-label="Пауза">
               <lucide-icon
                 [size]="tetrisService.isMobile ? 18 : 22"
                 [img]="Pause"
@@ -102,7 +102,7 @@
 
         <!-- Mobile D-pad controls (visible only on mobile) -->
         <div class="dpad dpad--mobile">
-          <button (click)="moveUp()" class="dpad__btn" aria-label="Rotate">
+          <button (click)="moveUp()" class="dpad__btn" aria-label="Повернуть">
             <lucide-icon size="28" [img]="ArrowUp" />
           </button>
           <button
@@ -110,7 +110,7 @@
             (pointercancel)="onMouseUp()"
             (pointerup)="onMouseUp()"
             class="dpad__btn"
-            aria-label="Right"
+            aria-label="Вправо"
           >
             <lucide-icon size="28" [img]="ArrowRight" />
           </button>
@@ -119,7 +119,7 @@
             (pointercancel)="onMouseUp()"
             (pointerup)="onMouseUp()"
             class="dpad__btn"
-            aria-label="Down"
+            aria-label="Вниз"
           >
             <lucide-icon size="28" [img]="ArrowDown" />
           </button>
@@ -128,7 +128,7 @@
             (pointercancel)="onMouseUp()"
             (pointerup)="onMouseUp()"
             class="dpad__btn"
-            aria-label="Left"
+            aria-label="Влево"
           >
             <lucide-icon size="28" [img]="ArrowLeft" />
           </button>
@@ -170,7 +170,7 @@
           <div class="ribbon-title">УПРАВЛЕНИЕ</div>
           <div class="ribbon-body ribbon-body--steel">
             <div class="dpad">
-              <button (click)="moveUp()" class="dpad__btn" aria-label="Rotate">
+              <button (click)="moveUp()" class="dpad__btn" aria-label="Повернуть">
                 <lucide-icon size="22" [img]="ArrowUp" />
               </button>
               <button
@@ -178,7 +178,7 @@
                 (pointercancel)="onMouseUp()"
                 (pointerup)="onMouseUp()"
                 class="dpad__btn"
-                aria-label="Right"
+                aria-label="Вправо"
               >
                 <lucide-icon size="22" [img]="ArrowRight" />
               </button>
@@ -187,7 +187,7 @@
                 (pointercancel)="onMouseUp()"
                 (pointerup)="onMouseUp()"
                 class="dpad__btn"
-                aria-label="Down"
+                aria-label="Вниз"
               >
                 <lucide-icon size="22" [img]="ArrowDown" />
               </button>
@@ -196,7 +196,7 @@
                 (pointercancel)="onMouseUp()"
                 (pointerup)="onMouseUp()"
                 class="dpad__btn"
-                aria-label="Left"
+                aria-label="Влево"
               >
                 <lucide-icon size="22" [img]="ArrowLeft" />
               </button>
@@ -210,6 +210,6 @@
   </div>
 
   <!-- Footer -->
-  <div class="footer-band">TETRIS © CLASSIC EDITION &nbsp;&middot;&nbsp; ↑ ROTATE &nbsp;·&nbsp; ↔ MOVE &nbsp;·&nbsp; ↓ DROP</div>
+  <div class="footer-band">ТЕТРИС © КЛАССИЧЕСКОЕ ИЗДАНИЕ &nbsp;&middot;&nbsp; ↑ ПОВОРОТ &nbsp;·&nbsp; ↔ ДВИЖЕНИЕ &nbsp;·&nbsp; ↓ СБРОС</div>
 
 </div>

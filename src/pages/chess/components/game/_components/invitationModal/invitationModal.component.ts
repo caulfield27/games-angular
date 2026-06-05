@@ -6,6 +6,7 @@ import { ChessButton } from '../../../button/button.component';
 @Component({
   selector: 'invitation-modal',
   templateUrl: './invitationModal.component.html',
+  styleUrl: './invitationModal.component.scss',
   imports: [LucideAngularModule, ChessButton],
 })
 export class InvitationModal implements OnInit, OnDestroy {

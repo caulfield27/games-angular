@@ -1,0 +1,248 @@
+@use 'design' as *;
+
+// ─── Backdrop ────────────────────────────────────────────────────────────────
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $s-lg;
+  background: rgba(0, 0, 0, 0.72);
+  animation: modal-in 0.15s ease;
+
+  @media (max-width: 480px) {
+    padding: $s-sm;
+  }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ─── Modal Card ──────────────────────────────────────────────────────────────
+.modal-card {
+  background: $canvas;
+  border: 2px solid $frame-ink;
+  box-shadow: 4px 4px 0 $frame-ink;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: card-in 0.15s ease;
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+  }
+}
+
+@keyframes card-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+// ─── Header (state-coloured ribbon) ──────────────────────────────────────────
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $s-md;
+  padding: $s-md $s-lg;
+  border-bottom: 1px solid $frame-ink;
+
+  &--win  { background: $tint-lime; }
+  &--loss { background: $tint-salmon; }
+  &--draw { background: $tint-steel; }
+}
+
+.modal-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: $s-xxs;
+}
+
+.modal-header__badge {
+  @include t-label;
+  text-transform: uppercase;
+  color: $ink;
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+}
+
+.modal-header__title {
+  @include t-h1;
+  color: $ink;
+}
+
+.modal-close {
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  @include t-btn;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+
+  &:active { filter: brightness(0.85); }
+}
+
+// ─── Body ────────────────────────────────────────────────────────────────────
+.modal-body {
+  @include ribbon-body-base;
+  background: $canvas;
+  display: flex;
+  flex-direction: column;
+  gap: $s-md;
+}
+
+// ─── Scoreboard ──────────────────────────────────────────────────────────────
+.scoreboard {
+  border: 1px solid $frame-ink;
+  background: $tint-sage;
+  padding: $s-md $s-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-sm;
+}
+
+.player-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $s-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.player-avatar-wrap {
+  position: relative;
+}
+
+.player-avatar {
+  width: 64px;
+  height: 64px;
+  border: 2px solid $frame-ink;
+  background: $canvas;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+
+  &.player-avatar--winner {
+    background: $tint-lime;
+  }
+
+  @media (max-width: 400px) {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+  }
+}
+
+.crown-badge {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.player-name {
+  @include t-body-sm;
+  color: $ink;
+  text-align: center;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.player-caption {
+  @include t-caption;
+  color: $ink;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.score-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.score-value {
+  @include t-h1;
+  color: $ink;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.score-divider {
+  opacity: 0.5;
+}
+
+// ─── Action buttons ───────────────────────────────────────────────────────────
+.action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $s-sm;
+
+  @media (max-width: 400px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action-full {
+  // Full-width single button row
+}
+
+// ─── Footer (share) ──────────────────────────────────────────────────────────
+.modal-footer {
+  border-top: 1px solid $frame-ink;
+  background: $canvas;
+  padding: $s-sm $s-lg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-sm;
+}
+
+.share-label {
+  @include t-caption;
+  color: $ink;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.share-links {
+  display: flex;
+  gap: $s-xs;
+}
+
+.share-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid $frame-ink;
+  background: $canvas;
+  color: $ink;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:active { background: $tint-sage; }
+}

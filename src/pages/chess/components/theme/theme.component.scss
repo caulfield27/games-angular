@@ -1,0 +1,145 @@
+@use 'design' as *;
+
+// ─── Backdrop ────────────────────────────────────────────────────────────────
+.theme-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $s-lg;
+  background: rgba(0, 0, 0, 0.72);
+  animation: modal-in 0.15s ease;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ─── Modal Card ──────────────────────────────────────────────────────────────
+.theme-card {
+  background: $canvas;
+  border: 2px solid $frame-ink;
+  box-shadow: 4px 4px 0 $frame-ink;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100svh - 64px);
+  overflow: hidden;
+  animation: card-in 0.15s ease;
+
+  @media (max-width: 480px) {
+    max-width: 100%;
+    max-height: 100svh;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+@keyframes card-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+// ─── Header (ribbon title bar) ────────────────────────────────────────────────
+.theme-header {
+  @include ribbon-title;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $s-sm;
+  padding: $s-s $s-md;
+  flex-shrink: 0;
+}
+
+.theme-header__title {
+  @include t-h3;
+  text-transform: uppercase;
+  color: $ink;
+  flex: 1;
+  letter-spacing: 0.3px;
+}
+
+.theme-close {
+  background: $canvas;
+  color: $ink;
+  border: 1px solid $frame-ink;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  @include t-btn;
+  flex-shrink: 0;
+  padding: 0;
+  line-height: 1;
+
+  &:active { filter: brightness(0.85); }
+}
+
+// ─── Body ────────────────────────────────────────────────────────────────────
+.theme-body {
+  @include ribbon-body-base;
+  background: $tint-steel;
+  flex: 1;
+  overflow-y: auto;
+}
+
+// ─── Theme grid ──────────────────────────────────────────────────────────────
+.theme-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $s-md;
+}
+
+.theme-option {
+  border: 2px solid $frame-ink;
+  background: $canvas;
+  cursor: pointer;
+  padding: $s-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $s-sm;
+
+  &:active { filter: brightness(0.95); }
+
+  &.theme-option--active {
+    background: $frame-ink;
+
+    .theme-option__label {
+      color: $canvas;
+    }
+  }
+}
+
+.theme-board-preview {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  width: 96px;
+  overflow: hidden;
+  border: 1px solid $frame-ink;
+  flex-shrink: 0;
+}
+
+.theme-board-sq {
+  aspect-ratio: 1;
+}
+
+.theme-option__label {
+  @include t-body-sm;
+  color: $ink;
+  text-align: center;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+.theme-footer {
+  border-top: 1px solid $frame-ink;
+  padding: $s-sm $s-md;
+  background: $canvas;
+  flex-shrink: 0;
+}

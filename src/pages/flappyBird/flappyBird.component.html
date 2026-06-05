@@ -1,170 +1,122 @@
-<div class="w-full h-svh flex justify-center bg-black/80">
-  <div #container class="relative w-full max-w-[550px] h-full overflow-hidden">
-    <div
-      class="absolute inset-0 bg-cover bg-center"
-      [ngStyle]="{
-        'background-image':
-          'url(&quot;/flappyBird/background-' +
-          selectedBackground +
-          '.png&quot;)',
-      }"
-    ></div>
-    <div
-      class="absolute bottom-0 left-0 w-full h-[20svh] bg-repeat-x bg-bottom"
-      style="background-image: url(&quot;/flappyBird/base.png&quot;)"
-    ></div>
-    @if (isGameStart) {
-      <div class="absolute left-1/2 -translate-x-1/2 top-[10%] z-50 flex flex-row">
-        @for (score of scores; track $index) {
-          <img [src]="'/flappyBird/' + score + '.png'" [alt]="score" />
-        }
-      </div>
-    }
-    <canvas class="absolute inset-0" #canvas></canvas>
-  </div>
-</div>
+<div class="page-frame">
 
-@if (!isGameStart) {
-  <div
-    class="absolute inset-0 w-full flex justify-center items-center flex-col"
-  >
-    <div
-      class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-6 max-sm:p-4 max-w-md max-sm:max-w-sm max-[384px]:max-w-[320px] w-full space-y-8"
-    >
-      <div>
-        <h2
-          class="text-2xl max-sm:text-xl font-bold text-gray-800 mb-4 text-center"
-        >
-          Выбери свою птичку
-        </h2>
-
-        <div class="grid grid-cols-3 gap-4">
-          @for (bird of birds; track $index) {
-            <button
-              (click)="selectBird(bird.type)"
-              class="relative p-4 max-sm:p-2 rounded-2xl transition-all duration-300 transform"
-              [ngClass]="
-                selectedBird === bird.type
-                  ? 'bg-gradient-to-br from-yellow-300 to-orange-400 scale-110 shadow-xl ring-4 ring-yellow-500'
-                  : 'bg-gray-100 hover:bg-gray-200 hover:scale-105 shadow-md'
-              "
-            >
-              <div class="flex flex-col items-center">
-                <img class="animate-bounce" [src]="bird.src" alt="bird" />
-                <span class="text-xs font-semibold mt-2 text-gray-700">
-                  {{ bird.name }}
-                </span>
-              </div>
-
-              @if (selectedBird === bird.type) {
-                <div
-                  class="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg"
-                >
-                  <span class="text-white text-xs">✓</span>
-                </div>
-              }
-            </button>
-          }
-        </div>
-      </div>
-
-      <div>
-        <h2
-          class="text-2xl max-sm:text-xl font-bold text-gray-800 mb-4 text-center"
-        >
-          Выберите фон
-        </h2>
-
-        <div class="flex gap-4">
-          <button
-            (click)="changeBackground('day')"
-            class="flex-1 p-6 max-sm:p-2 rounded-2xl transition-all duration-300 transform"
-            [ngClass]="
-              selectedBackground === 'day'
-                ? 'bg-gradient-to-br from-sky-300 to-sky-500 scale-105 shadow-xl ring-4 ring-sky-500'
-                : 'bg-gray-100 hover:bg-gray-200 hover:scale-105 shadow-md'
-            "
-          >
-            <div class="flex flex-col items-center">
-              <lucide-icon
-                [img]="SunIcon"
-                class="w-12 h-12"
-                [ngClass]="
-                  selectedBackground === 'day'
-                    ? 'text-yellow-300'
-                    : 'text-gray-600'
-                "
-              ></lucide-icon>
-              <span
-                class="mt-2 font-semibold"
-                [ngClass]="
-                  selectedBackground === 'day' ? 'text-white' : 'text-gray-700'
-                "
-              >
-                День
-              </span>
-            </div>
-          </button>
-
-          <button
-            (click)="changeBackground('night')"
-            class="flex-1 p-6 rounded-2xl transition-all duration-300 transform"
-            [ngClass]="
-              selectedBackground === 'night'
-                ? 'bg-gradient-to-br from-slate-700 to-blue-900 scale-105 shadow-xl ring-4 ring-blue-500'
-                : 'bg-gray-100 hover:bg-gray-200 hover:scale-105 shadow-md'
-            "
-          >
-            <div class="flex flex-col items-center">
-              <lucide-icon
-                [img]="MoonIcon"
-                class="w-12 h-12"
-                [ngClass]="
-                  selectedBackground === 'night'
-                    ? 'text-yellow-200'
-                    : 'text-gray-600'
-                "
-              ></lucide-icon>
-              <span
-                class="mt-2 font-semibold"
-                [ngClass]="
-                  selectedBackground === 'night'
-                    ? 'text-white'
-                    : 'text-gray-700'
-                "
-              >
-                Ночь
-              </span>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <button
-        (click)="startGame()"
-        class="w-full bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white font-bold py-5 px-8 rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 text-2xl group"
-      >
-        <lucide-icon
-          [img]="PlayIcon"
-          class="w-8 h-8 group-hover:translate-x-1 transition-transform"
-        ></lucide-icon>
-        Начать игру
-      </button>
-
-      @if (!isMobile) {
-        <div
-          class="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-4 border-2 border-blue-200"
-        >
-          <p class="text-center text-gray-700 font-semibold">
-            💡 Нажмите на
-            <kbd
-              class="px-3 py-1 bg-white rounded-lg shadow-sm font-mono text-sm border border-gray-300"
-              >Пробел</kbd
-            >
-            чтобы летать!
-          </p>
-        </div>
-      }
+  <!-- Top Banner -->
+  <div class="top-banner">
+    <div class="banner-left">
+      <span class="banner-title">ФЛАППИ БЁРД</span>
+      <span class="banner-tagline">УКЛОНЯЙСЯ ОТ ТРУБ. БЕЙ РЕКОРД.</span>
+    </div>
+    <div class="banner-right">
+      <span class="record-badge">РЕК:&nbsp;{{ currentBestScore }}</span>
     </div>
   </div>
-}
+
+  <!-- Game area -->
+  <div class="page-canvas">
+    <div class="game-wrap">
+      <div #container class="canvas-container">
+
+        <!-- Scrolling game background -->
+        <div
+          class="game-bg"
+          [ngStyle]="{
+            'background-image':
+              'url(&quot;/flappyBird/background-' +
+              selectedBackground +
+              '.png&quot;)'
+          }"
+        ></div>
+
+        <!-- Ground strip (height matches landHeight constant in service) -->
+        <div class="game-base"></div>
+
+        <!-- Score digit images (shown only during active game) -->
+        @if (isGameStart) {
+          <div class="score-row">
+            @for (score of scores; track $index) {
+              <img [src]="'/flappyBird/' + score + '.png'" [alt]="score" />
+            }
+          </div>
+        }
+
+        <!-- Main game canvas -->
+        <canvas class="game-canvas" #canvas></canvas>
+
+        <!-- Pre-game overlay: shown until the player starts -->
+        @if (!isGameStart) {
+          <div class="pregame">
+            <div class="pregame__inner">
+
+              <!-- ── Bird selection ── -->
+              <div class="ribbon-card">
+                <div class="ribbon-title">ВЫБЕРИ ПТИЧКУ</div>
+                <div class="ribbon-body ribbon-body--periwinkle">
+                  <div class="bird-grid">
+                    @for (bird of birds; track $index) {
+                      <button
+                        (click)="selectBird(bird.type)"
+                        class="bird-btn"
+                        [class.bird-btn--active]="selectedBird === bird.type"
+                      >
+                        <img class="bird-img" [src]="bird.src" [alt]="bird.name" />
+                        <span class="bird-label">{{ bird.name }}</span>
+                        @if (selectedBird === bird.type) {
+                          <span class="bird-check">✓</span>
+                        }
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Background selection ── -->
+              <div class="ribbon-card">
+                <div class="ribbon-title">ВЫБЕРИ ФОН</div>
+                <div class="ribbon-body ribbon-body--sky">
+                  <div class="bg-grid">
+                    <button
+                      (click)="changeBackground('day')"
+                      class="bg-btn"
+                      [class.bg-btn--active]="selectedBackground === 'day'"
+                    >
+                      <lucide-icon [img]="SunIcon" [size]="22" color="currentColor" />
+                      <span>ДЕНЬ</span>
+                    </button>
+                    <button
+                      (click)="changeBackground('night')"
+                      class="bg-btn"
+                      [class.bg-btn--active]="selectedBackground === 'night'"
+                    >
+                      <lucide-icon [img]="MoonIcon" [size]="22" color="currentColor" />
+                      <span>НОЧЬ</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Start button ── -->
+              <button (click)="startGame()" class="start-btn">
+                <lucide-icon [img]="PlayIcon" [size]="16" color="currentColor" />
+                ИГРАТЬ
+              </button>
+
+              @if (!isMobile) {
+                <div class="hint-band">
+                  НАЖМИТЕ <kbd>ПРОБЕЛ</kbd> ЧТОБЫ ПРЫГНУТЬ
+                </div>
+              }
+
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-band">
+    ФЛАППИ БЁРД © КЛАССИЧЕСКОЕ ИЗДАНИЕ &nbsp;·&nbsp; {{ isMobile ? 'ТАП — ПРЫЖОК' : 'ПРОБЕЛ — ПРЫЖОК' }}
+  </div>
+
+</div>

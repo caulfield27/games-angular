@@ -1,0 +1,102 @@
+<div
+  *ngIf="isOpen"
+  class="backdrop"
+  (click)="onBackdropClick($event)"
+  role="dialog"
+  aria-modal="true"
+>
+  <div class="modal-card" (click)="$event.stopPropagation()">
+
+    <!-- Header: state-coloured ribbon -->
+    <div
+      class="modal-header"
+      [class.modal-header--win]="isPlayerWinner()"
+      [class.modal-header--loss]="isOpponentWinner()"
+      [class.modal-header--draw]="!isPlayerWinner() && !isOpponentWinner()"
+    >
+      <div class="modal-header__text">
+        <span class="modal-header__badge">{{ getBadgeText() }}</span>
+        <h2 class="modal-header__title">{{ getTitle() }}</h2>
+      </div>
+      <button
+        type="button"
+        class="modal-close"
+        (click)="onClose()"
+        aria-label="Закрыть"
+      >✕</button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <!-- Scoreboard ribbon -->
+      <div class="scoreboard">
+        <!-- Player -->
+        <div class="player-col">
+          <div class="player-avatar-wrap">
+            @if (isPlayerWinner()) {
+              <span class="crown-badge">♛</span>
+            }
+            <div class="player-avatar" [class.player-avatar--winner]="isPlayerWinner()">
+              {{ getPlayerAvatar() }}
+            </div>
+          </div>
+          <div>
+            <div class="player-name">{{ getPlayerName() }}</div>
+            <div class="player-caption">{{ getPlayerCaption() }}</div>
+          </div>
+        </div>
+
+        <!-- Score -->
+        <div class="score-center">
+          <div class="score-value">
+            {{ getPlayerScore() }}<span class="score-divider"> – </span>{{ getOpponentScore() }}
+          </div>
+        </div>
+
+        <!-- Opponent -->
+        <div class="player-col">
+          <div class="player-avatar-wrap">
+            @if (isOpponentWinner()) {
+              <span class="crown-badge">♛</span>
+            }
+            <div class="player-avatar" [class.player-avatar--winner]="isOpponentWinner()">
+              {{ getOpponentAvatar() }}
+            </div>
+          </div>
+          <div>
+            <div class="player-name">{{ getOpponentName() }}</div>
+            <div class="player-caption">{{ getOpponentCaption() }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-grid">
+        <chess-button label="НОВАЯ ИГРА" variant="primary" (handleClick)="onNewGame()" />
+        <chess-button label="РЕВАНШ" variant="secondary" (handleClick)="onRematch()" />
+      </div>
+      <div class="action-full">
+        <chess-button label="ПОСМОТРЕТЬ ИГРУ" variant="secondary" (handleClick)="onClose()" />
+      </div>
+
+    </div>
+
+    <!-- Footer: share -->
+    <footer class="modal-footer">
+      <span class="share-label">Поделиться</span>
+      <div class="share-links">
+        <button type="button" class="share-btn" (click)="shareResult('x')" aria-label="X / Twitter">
+          <lucide-icon [img]="XIcon" size="14"></lucide-icon>
+        </button>
+        <button type="button" class="share-btn" (click)="shareResult('telegram')" aria-label="Telegram">
+          <lucide-icon [img]="TelegramIcon" size="14"></lucide-icon>
+        </button>
+        <button type="button" class="share-btn" (click)="shareResult('instagram')" aria-label="Instagram">
+          <lucide-icon [img]="InstagramIcon" size="14"></lucide-icon>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+</div>

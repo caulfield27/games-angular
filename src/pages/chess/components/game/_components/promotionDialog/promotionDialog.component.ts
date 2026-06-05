@@ -5,6 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 @Component({
   selector: 'promotion-dialog',
   templateUrl: './promotionDialog.component.html',
+  styleUrl: './promotionDialog.component.scss',
   imports: [],
 })
 export class PromotionDialog {

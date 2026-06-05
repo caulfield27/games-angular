@@ -3,11 +3,11 @@
   <!-- Top Banner -->
   <div class="top-banner">
     <div class="banner-left">
-      <span class="banner-title">MINESWEEPER</span>
-      <span class="banner-tagline">CLEAR ALL MINES. ONLINE.</span>
+      <span class="banner-title">САПЁР</span>
+      <span class="banner-tagline">ОБЕЗВРЕЖЬ ВСЕ МИНЫ. ОНЛАЙН.</span>
     </div>
     <div class="banner-right">
-      <span class="new-burst">NEW!</span>
+      <span class="new-burst">НОВИНКА!</span>
     </div>
   </div>
 
@@ -20,7 +20,7 @@
 
         <!-- Difficulty ribbon card -->
         <div class="ribbon-card">
-          <div class="ribbon-title">DIFFICULTY</div>
+          <div class="ribbon-title">СЛОЖНОСТЬ</div>
           <div class="ribbon-body ribbon-body--sage">
             <dropdown
               [options]="options"
@@ -33,7 +33,7 @@
         <!-- Hint ribbon card -->
         @if (boardService.isGameStart()) {
           <div class="ribbon-card">
-            <div class="ribbon-title">HINT POWER-UP</div>
+            <div class="ribbon-title">ПОДСКАЗКА</div>
             <div class="ribbon-body ribbon-body--sky">
               <button
                 (click)="handleUseHint()"
@@ -65,14 +65,14 @@
           <!-- Tablo panel -->
           <div class="tablo-panel">
             <div class="tablo-segment">
-              <div class="tablo-label">MINES</div>
+              <div class="tablo-label">МИНЫ</div>
               <tablo [tabloNum]="boardService.flagCounter()" />
             </div>
             <div
               class="tablo-restart"
               (click)="boardService.restart()"
               role="button"
-              title="Restart game"
+              title="Перезапустить"
             >
               @if (boardService.isFailed()) {
                 <sad-smile />
@@ -81,7 +81,7 @@
               }
             </div>
             <div class="tablo-segment">
-              <div class="tablo-label">TIME</div>
+              <div class="tablo-label">ВРЕМЯ</div>
               <tablo [tabloNum]="boardService.seconds()" />
             </div>
           </div>
@@ -101,7 +101,7 @@
                   field?.failed ? 'cell--failed' : '',
                   $index === boardService.hintIdx() ? 'cell--hint' : '',
                   field?.minesAround
-                    ? 'cell--n' + ((field?.minesAround ?? 4) < 4 ? field.minesAround : 'high')
+                    ? 'cell--n' + ((field?.minesAround || 4) < 4 ? field.minesAround : 'high')
                     : '',
                 ]"
               >
@@ -123,7 +123,7 @@
 
   <!-- Footer band -->
   <div class="footer-band">
-    <span>MINESWEEPER &copy; CLASSIC EDITION &nbsp;&middot;&nbsp; RIGHT-CLICK TO FLAG MINES</span>
+    <span>САПЁР &copy; КЛАССИЧЕСКОЕ ИЗДАНИЕ &nbsp;&middot;&nbsp; ПКМ — УСТАНОВИТЬ ФЛАГ</span>
   </div>
 
 </div>

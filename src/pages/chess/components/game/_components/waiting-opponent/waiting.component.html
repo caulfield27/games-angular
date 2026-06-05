@@ -1,26 +1,25 @@
-<div
-  class="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
->
-  <div
-    class="flex w-[340px] max-w-[calc(100vw-32px)] flex-col items-center gap-5 rounded-xl border border-[#c5c0b1] bg-[#fffefb] p-8 text-center"
-  >
-    <div class="text-[40px] leading-none">♟</div>
+<div class="waiting-backdrop">
+  <div class="waiting-card">
 
-    <div>
-      <h2 class="text-[20px] font-semibold leading-[25px] text-[#201515]">
-        Подбор противника
-      </h2>
-      <p class="mt-1 text-[14px] text-[#939084]">
-        Время ожидания: {{ formattedTime }}
-      </p>
+    <!-- Header: ribbon title bar -->
+    <div class="waiting-header">ПОИСК СОПЕРНИКА</div>
+
+    <!-- Body: sky-tinted ribbon body -->
+    <div class="waiting-body">
+      <span class="waiting-chess-icon">♟</span>
+
+      <div class="waiting-text">
+        <span class="waiting-subtitle">Время ожидания</span>
+        <span class="waiting-timer">{{ formattedTime }}</span>
+      </div>
+
+      <div class="waiting-spinner"></div>
     </div>
 
-    <div class="flex justify-center">
-      <div
-        class="h-11 w-11 animate-spin rounded-full border-4 border-[#c5c0b1] border-t-[#ff4f00]"
-      ></div>
+    <!-- Footer: cancel button -->
+    <div class="waiting-footer">
+      <chess-button label="ОТМЕНА" variant="secondary" (handleClick)="cancelSearch()" />
     </div>
 
-    <chess-button label="Отмена" variant="secondary" (handleClick)="cancelSearch()" />
   </div>
 </div>

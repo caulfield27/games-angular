@@ -44,7 +44,7 @@ export const BOARD_THEMES: BoardTheme[] = [
 @Component({
   selector: 'theme-modal',
   templateUrl: './theme.component.html',
-  styleUrl: './theme.component.css',
+  styleUrl: './theme.component.scss',
   imports: [ChessButton],
 })
 export class ThemeSettingsComponent implements OnDestroy {

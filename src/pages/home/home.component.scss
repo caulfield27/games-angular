@@ -2,7 +2,7 @@
 
 // ─── PAGE FRAME ────────────────────────────────────────────────────────────
 .page-frame {
-  min-height: 100%;
+  min-height: 100svh;
   background: $frame-ink;
   padding: 8px;
   display: flex;
@@ -68,7 +68,7 @@
 .search-icon {
   position: absolute;
   left: $s-sm;
-  top: 50%;
+  top: 40%;
   transform: translateY(-50%);
   color: $ink;
   width: 16px;
@@ -82,7 +82,7 @@
   border: 1px solid $frame-ink;
   border-radius: 0;
   background: $canvas;
-  padding: 0 $s-sm 0 30px;
+  padding: 0 $s-sm 0 35px;
   @include t-body;
   color: $ink;
   outline: none;
@@ -158,19 +158,6 @@
   @media (max-width: 600px) { padding: $s-sm; }
 }
 
-// ─── SECTION EYEBROW ───────────────────────────────────────────────────────
-// Olive tint block — mirrors "DIMENSION DESKTOPS" eyebrow from DESIGN.MD
-.section-eyebrow {
-  background: $tint-olive;
-  color: $ink;
-  @include t-display;
-  text-transform: uppercase;
-  padding: $s-xl $s-lg;
-  border: 1px solid $frame-ink;
-  margin-bottom: $s-lg;
-
-  @media (max-width: 600px) { font-size: 24px; padding: $s-md; }
-}
 
 // ─── FILTER BAR ────────────────────────────────────────────────────────────
 .filter-bar {
