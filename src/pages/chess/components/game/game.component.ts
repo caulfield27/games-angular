@@ -87,6 +87,7 @@ export class Game implements OnDestroy, OnInit {
   boardH = signal<number>(175);
   currentFigure: Figure | null = null;
   beforeUnloadListener: (() => void) | null = null;
+  private resizeObserver: ResizeObserver | null = null;
 
   constructor(
     public chessService: ChessService,
@@ -121,9 +122,18 @@ export class Game implements OnDestroy, OnInit {
     if (width) {
       const root = document.documentElement;
       root.style.setProperty('--chess-cell', width + 'px');
-      this.boardH.update((prev) => boardHeight-prev);
+      this.boardH.update((prev) => boardHeight - prev);
       this.cellSize.set(width);
     }
+
+    this.resizeObserver = new ResizeObserver(() => {
+      const w = this.cell.nativeElement.clientWidth;
+      if (w) {
+        document.documentElement.style.setProperty('--chess-cell', w + 'px');
+        this.cellSize.set(w);
+      }
+    });
+    this.resizeObserver.observe(this.board.nativeElement);
   }
 
   ngOnInit(): void {
@@ -135,6 +145,7 @@ export class Game implements OnDestroy, OnInit {
 
   ngOnDestroy(): void {
     this.chessService.reset();
+    this.resizeObserver?.disconnect();
     window.removeEventListener('beforeunload', this.beforeUnloadListener!);
   }
 

@@ -301,8 +301,8 @@ export class ChessService {
   private isCastle(figure: Figure, index: number) {
     if (!(figure instanceof King)) return false;
     if (figure.isMoved || this.checkIndex() !== null) return false;
-    const x = figure.position()[1];
-    return Math.abs(x - index) > 1;
+    const kingIndex = get1Dposition(figure.position())!;
+    return Math.abs(kingIndex - index) === 2;
   }
 
   public moveFigure(

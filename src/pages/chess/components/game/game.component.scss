@@ -25,6 +25,10 @@
   padding: $s-sm;
   box-sizing: border-box;
   overflow: hidden;
+
+  @media (max-width: 600px) {
+    padding: $s-sm 0;
+  }
 }
 
 // ─── Game Section (card wrapper) ─────────────────────────────────────────────
@@ -130,6 +134,11 @@
   overflow: hidden;
   flex-shrink: 0;
   display: flex;
+
+  @media (max-width: 600px) {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 #board {
@@ -147,8 +156,8 @@
 
   @media (max-width: 600px) {
     height: auto;
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -158,10 +167,16 @@
 }
 
 .piece-drag {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 2;
   cursor: grab;
   touch-action: none;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 // ─── Board interaction overlays ───────────────────────────────────────────────
