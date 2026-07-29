@@ -122,15 +122,20 @@ export class Game implements OnDestroy, OnInit {
     if (width) {
       const root = document.documentElement;
       root.style.setProperty('--chess-cell', width + 'px');
-      this.boardH.update((prev) => boardHeight - prev);
+      this.boardH.set(boardHeight);
       this.cellSize.set(width);
     }
 
     this.resizeObserver = new ResizeObserver(() => {
       const w = this.cell.nativeElement.clientWidth;
+      const h = this.board.nativeElement.clientHeight;
       if (w) {
         document.documentElement.style.setProperty('--chess-cell', w + 'px');
         this.cellSize.set(w);
+      }
+
+      if (h) {
+        this.boardH.set(h);
       }
     });
     this.resizeObserver.observe(this.board.nativeElement);
@@ -204,10 +209,9 @@ export class Game implements OnDestroy, OnInit {
     if (!this.currentFigure) return;
     if (this.currentFigure instanceof Pawn)
       this.chessService.checkPawnPromotion(newIndex);
-    if (this.chessService.pawnPromotionIndex() !== null){
+    if (this.chessService.pawnPromotionIndex() !== null) {
       return;
-    } 
-      
+    }
 
     const prevIdx = get1Dposition(this.currentFigure.position());
     const moveType = this.chessService.moveFigure(

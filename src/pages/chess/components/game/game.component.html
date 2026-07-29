@@ -105,7 +105,7 @@
         </div>
 
         <!-- Desktop sidebar -->
-        <aside class="match-sidebar">
+        <aside class="match-sidebar" [style.height]="boardH()+'px'">
           <div class="sidebar-header">
             <span class="sidebar-title">Ходы</span>
             <span class="sidebar-count">{{ chessService.moves().length }}</span>
