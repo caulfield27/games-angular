@@ -102,10 +102,11 @@ export class ChessService {
         const data = parsedData.data as MoveData;
         const fromC = get2Dposition(data.from)!;
         const toC = get2Dposition(data.to)!;
-        const from = get1Dposition([7 - fromC[0], fromC[1]])!;
-        const to = get1Dposition([7 - toC[0], toC[1]])!;
+        const from = get1Dposition([7 - fromC[0], 7 - fromC[1]])!;
+        const to = get1Dposition([7 - toC[0], 7 - toC[1]])!;
         const figure = this.board()[from].figure;
-
+        
+        
         const sound = this.moveFigure(figure!, to, false);
         if (!sound) return;
         const isCheck = this.check();
